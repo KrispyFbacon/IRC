@@ -1,31 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   TestClient.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/23 15:37:03 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/10 17:59:16 by frbranda         ###   ########.fr       */
+/*   Created: 2026/02/10 16:52:07 by frbranda          #+#    #+#             */
+/*   Updated: 2026/02/10 16:52:30 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
-
 #include "Utils.hpp"
 
-class Server
-{
-	private:
-		int _fd;
-		int _port;
-		
-	public:
-		Server(int port);
-		~Server();
-
-		bool initServer();
-};
-
-#endif
+// int main (void)
+// {
+	
+// }

@@ -1,31 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/23 15:37:03 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/10 17:59:16 by frbranda         ###   ########.fr       */
+/*   Created: 2026/02/10 16:56:10 by frbranda          #+#    #+#             */
+/*   Updated: 2026/02/10 17:17:45 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
-
 #include "Utils.hpp"
+#include "Server.hpp"
 
-class Server
+int main(void)
 {
-	private:
-		int _fd;
-		int _port;
-		
-	public:
-		Server(int port);
-		~Server();
-
-		bool initServer();
-};
-
-#endif
+	Server server(PORT);
+	
+	if (!server.initServer())
+	{
+		return 1;
+	}
+}
