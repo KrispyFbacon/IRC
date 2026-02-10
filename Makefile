@@ -6,7 +6,7 @@
 #    By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/15 14:29:42 by frbranda          #+#    #+#              #
-#    Updated: 2026/01/23 17:25:27 by frbranda         ###   ########.fr        #
+#    Updated: 2026/02/10 16:18:40 by frbranda         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,11 +14,10 @@
 #                                   SETTINGS                                   #
 #==============================================================================#
 
-SERVER = server
-CLIENT = client
+NAME = ircserv
 
 CC = c++
-FLAGS = -Wall -Wextra -Werror -std=c++98 -Iincludes
+FLAGS = -Wall -Wextra -Werror -std=c++98 -Iinc
 
 RM = rm -rf
 
@@ -41,23 +40,18 @@ RESET = \033[0m
 #==============================================================================#
 
 VPATH = src
-VPATH += src/Server
-VPATH += src/Client
+VPATH += src/00_Server
 
-# Source Files
-SERVER_SRC = Server.cpp
-CLIENT_SRC = Client.cpp
+SRC = Server.cpp
 
-# Object Files
 OBJ_DIR = obj
-SERVER_OBJS = $(SERVER_SRC:%.cpp=$(OBJ_DIR)/%.o)
-CLIENT_OBJS = $(CLIENT_SRC:%.cpp=$(OBJ_DIR)/%.o)
+OBJS = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 
 #==============================================================================#
 #                                    RULES                                     #
 #==============================================================================#
 
-all: $(SERVER) $(CLIENT)
+all: $(NAME)
 
 $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)
@@ -66,40 +60,27 @@ $(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)
 	@$(CC) $(FLAGS) -c $< -o $@
 	@echo "$(YELLOW)[Compiled]$(RESET) $<"
 
-$(SERVER): $(SERVER_OBJS)
-	@$(CC) $(FLAGS) $(SERVER_OBJS) -o $(SERVER)
+$(NAME): $(OBJS)
+	@$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 	@echo "╔══════════════════════════╗"
-	@echo "║ ✅ Server Compiled!      ║"
+	@echo "║ ✅ Compiled Successfully!║"
 	@echo "╚══════════════════════════╝"
 
-$(CLIENT): $(CLIENT_OBJS)	
-	@$(CC) $(FLAGS) $(CLIENT_OBJS) -o $(CLIENT)
-	@echo "╔══════════════════════════╗"
-	@echo "║ ✅ Client Compiled!      ║"
-	@echo "╚══════════════════════════╝"
+r: all
+	@./$(NAME)
 
-
-rs: $(SERVER)
-	@./$(SERVER)
-
-rc: $(CLIENT)
-	@./$(CLIENT)
-
-rvs: $(SERVER)
-	@$(VAL) ./$(SERVER)
-
-rvc: $(CLIENT)
-	@$(VAL) ./$(CLIENT)
+rv: all
+	@$(VAL) ./$(NAME)
 
 clean:
-	@$(RM) $(SERVER_OBJS) $(CLIENT_OBJS)
+	@$(RM) $(OBJS)
 	@echo "$(RED)[CLEAN] Object files removed.$(RESET)"
 
 fclean: clean
-	@$(RM) $(SERVER) $(CLIENT) $(OBJ_DIR)
+	@$(RM) $(NAME) $(OBJ_DIR)
 	@echo "$(RED)[FCLEAN] Binary removed.$(RESET)"
 
 re: fclean all
 
 # Phony Targets
-.PHONY: all clean fclean re rs rc rvs rvc
+.PHONY: all clean fclean re r rv
