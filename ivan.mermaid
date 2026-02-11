@@ -1,0 +1,82 @@
+classDiagram
+    %% Core Server Components
+    class Server {
+        -Socket _serverSocket
+        -map~int, Socket*~ _clientSockets
+        -vector~pollfd~ _pollFds
+        -map~int, Client*~ _clients
+        -map~string, Channel*~ _channels
+        -string _password
+        +start(port, password) bool
+        +run() void
+        +stop() void
+        +createChannel(name, creator) Channel*
+        +getClientByNick(nickname) Client*
+    }
+
+    class Client {
+        -int _fd
+        -string _nickname
+        -string _username
+        -bool _authenticated
+        -bool _isBot
+        +sendMessage(message) bool
+    }
+
+    class Channel {
+        -string _name
+        -string _topic
+        -map~int, Client*~ _clients
+        -map~int, Client*~ _operators
+        -bool _inviteOnly
+        -string _key
+        +addClient(client) void
+        +broadcast(message, excludeFd) void
+    }
+
+    class Message {
+        -string _command
+        -vector~string~ _params
+        +getCommand() string
+        +parseParams(raw) vector~string~
+    }
+
+    %% Server Command Pattern
+    class CommandFactory {
+        <<Service>>
+        -static map~string, CommandCreator~ _commandCreators
+        +executeCommand(client, server, message) static void
+    }
+
+    class ACommand {
+        <<Abstract>>
+        #Server* _server
+        +execute(client, message)* void
+    }
+
+    %% Utility Classes
+    class Socket {
+        -int _fd
+        +create(domain, type, protocol) bool
+        +bind(port) bool
+        +listen(backlog) bool
+        +connect(host, port) bool
+    }
+
+    class HTTPClient {
+        -Socket _socket
+        +get(url) string
+        -parseUrl(url, host, port, path) bool
+    }
+
+    %% Relationships
+    Server "1" *-- "many" Client : manages
+    Server "1" *-- "many" Channel : manages
+    Server "1" *-- "1" Socket : listens on
+    Channel "many" o-- "many" Client : contains
+    
+    ACommand <|-- JoinCommand
+    ACommand <|-- PrivmsgCommand
+    ACommand <|-- ModeCommand
+    ACommand --> Server : uses
+    CommandFactory ..> ACommand : creates

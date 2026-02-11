@@ -1,0 +1,211 @@
+classDiagram
+    direction TB
+    
+    class Server {
+        📡 Network & Management
+        ---
+        -serverSocket: int
+        -port: int
+        -password: string
+        -pollfds: vector~pollfd~
+        -clients: map~int→Client*~
+        -channels: map~string→Channel*~
+        -running: bool
+        ---
+        ⚙️ Core Methods
+        ---
+        +init() void
+        +run() void
+        +shutdown() void
+        ---
+        🔌 Connection
+        ---
+        +acceptNewClient() void
+        +handleClientData(fd) void
+        +removeClient(fd) void
+        ---
+        📨 Communication
+        ---
+        +processCommand(client, cmd) void
+        +sendToClient(fd, msg) void
+        +broadcast(msg, exclude) void
+        ---
+        🔍 Lookup
+        ---
+        +findClientByNick(nick) Client*
+        +findClientByFd(fd) Client*
+        +findChannel(name) Channel*
+        +createChannel(name, creator) Channel*
+    }
+    
+    class Client {
+        👤 User Identity
+        ---
+        -fd: int
+        -nickname: string
+        -username: string
+        -realname: string
+        -hostname: string
+        ---
+        🔐 Authentication State
+        ---
+        -authenticated: bool
+        -registered: bool
+        -hasNick: bool
+        -hasUser: bool
+        ---
+        📥 Buffer & Channels
+        ---
+        -buffer: string
+        -channels: set~Channel*~
+        ---
+        ✅ State Checks
+        ---
+        +isAuthenticated() bool
+        +isRegistered() bool
+        +isInChannel(ch) bool
+        ---
+        📝 Getters/Setters
+        ---
+        +getNickname() string
+        +setNickname(nick) void
+        +getPrefix() string
+        ---
+        📨 Message Handling
+        ---
+        +appendToBuffer(data) void
+        +extractMessage() string
+        +hasCompleteMessage() bool
+        ---
+        🏠 Channel Management
+        ---
+        +addChannel(ch) void
+        +removeChannel(ch) void
+        +getChannels() set
+    }
+    
+    class Channel {
+        🏷️ Identity
+        ---
+        -name: string
+        -topic: string
+        -creationTime: time_t
+        ---
+        👥 Members
+        ---
+        -members: map~Client*→isOp~
+        -invitedUsers: set~Client*~
+        ---
+        🔒 Channel Modes
+        ---
+        -inviteOnly: bool (+i)
+        -topicRestricted: bool (+t)
+        -key: string (+k)
+        -userLimit: int (+l)
+        ---
+        👤 Member Management
+        ---
+        +addMember(client, isOp) void
+        +removeMember(client) void
+        +isMember(client) bool
+        +isOperator(client) bool
+        +setOperator(client, op) void
+        ---
+        🎫 Invite System
+        ---
+        +addInvite(client) void
+        +isInvited(client) bool
+        +removeInvite(client) void
+        ---
+        📢 Broadcasting
+        ---
+        +broadcast(msg, exclude) void
+        +getMembersList() string
+        ---
+        ⚙️ Settings
+        ---
+        +setTopic(topic, setter) void
+        +setKey(key) void
+        +setUserLimit(limit) void
+        +setInviteOnly(mode) void
+        +setTopicRestricted(mode) void
+        +getModesString() string
+    }
+    
+    class Command {
+        <<abstract>>
+        ---
+        #server: Server*
+        #client: Client*
+        #params: vector~string~
+        ---
+        +execute()* void
+        #sendReply(code, msg) void
+        #sendError(code, msg) void
+    }
+    
+    class MessageParser {
+        <<utility>>
+        ---
+        +parse(message) pair
+        +split(str, delim) vector
+        +trim(str) string
+        +extractCommand(msg) string
+        +extractParams(msg) vector
+    }
+    
+    class NumericReplies {
+        <<constants>>
+        ---
+        RPL_WELCOME = "001"
+        RPL_TOPIC = "332"
+        RPL_NAMREPLY = "353"
+        ERR_NOSUCHNICK = "401"
+        ERR_CHANOPRIVSNEEDED = "482"
+        etc...
+        ---
+        +format(code, client, msg) string
+    }
+    
+    class CommandFactory {
+        <<factory>>
+        ---
+        +createCommand(name, srv, cli, params) Command*
+    }
+    
+    %% Specific Commands (simplified)
+    class PassCommand
+    class NickCommand
+    class UserCommand
+    class JoinCommand
+    class PrivmsgCommand
+    class KickCommand
+    class ModeCommand
+    
+    %% Relationships with labels
+    Server "1" -- "0..*" Client : manages ▶
+    Server "1" -- "0..*" Channel : owns ▶
+    Client "0..*" -- "0..*" Channel : participates in ⬌
+    
+    Server ..> MessageParser : uses ▶
+    Server ..> CommandFactory : creates commands ▶
+    
+    Command <|.. PassCommand : implements
+    Command <|.. NickCommand : implements
+    Command <|.. UserCommand : implements
+    Command <|.. JoinCommand : implements
+    Command <|.. PrivmsgCommand : implements
+    Command <|.. KickCommand : implements
+    Command <|.. ModeCommand : implements
+    
+    Command --> Server : references
+    Command --> Client : references
+    Command ..> NumericReplies : uses
+    Command ..> Channel : modifies
+    
+    CommandFactory ..> Command : creates ▶
+    
+    note for Server "Single poll() event loop\nManages all connections\nNo forking"
+    note for Client "Can be in multiple\nchannels simultaneously"
+    note for Channel "Stores operators as\nmap value (bool)"
+    note for Command "Command Pattern:\nEach command is\nits own class"
