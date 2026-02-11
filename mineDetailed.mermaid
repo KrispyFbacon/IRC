@@ -1,0 +1,247 @@
+classDiagram
+    class Server {
+        -int _serverSocket
+        -int _port
+        -string _password
+        -vector~pollfd~ _pollfds
+        -map~int, Client*~ _clients
+        -map~string, Channel*~ _channels
+        -bool _running
+        
+        +Server(int port, string password)
+        +~Server()
+        +void init()
+        +void run()
+        +void shutdown()
+        -void setupSocket()
+        -void acceptNewClient()
+        -void handleClientData(int fd)
+        -void removeClient(int fd)
+        -void processCommand(Client* client, string cmd)
+        +Client* findClientByNick(string nickname)
+        +Client* findClientByFd(int fd)
+        +Channel* findChannel(string name)
+        +Channel* createChannel(string name, Client* creator)
+        +void removeChannel(string name)
+        +void broadcast(string message, Client* exclude)
+        +void sendToClient(int fd, string message)
+    }
+    
+    class Client {
+        -int _fd
+        -string _nickname
+        -string _username
+        -string _realname
+        -string _hostname
+        -string _buffer
+        -bool _authenticated
+        -bool _registered
+        -bool _hasNick
+        -bool _hasUser
+        -set~Channel*~ _channels
+        
+        +Client(int fd, string hostname)
+        +~Client()
+        +int getFd()
+        +string getNickname()
+        +string getUsername()
+        +string getRealname()
+        +string getHostname()
+        +string getPrefix()
+        +void setNickname(string nick)
+        +void setUsername(string user)
+        +void setRealname(string real)
+        +void setAuthenticated(bool auth)
+        +bool isAuthenticated()
+        +bool isRegistered()
+        +void appendToBuffer(string data)
+        +string extractMessage()
+        +bool hasCompleteMessage()
+        +void addChannel(Channel* channel)
+        +void removeChannel(Channel* channel)
+        +set~Channel*~ getChannels()
+        +bool isInChannel(Channel* channel)
+    }
+    
+    class Channel {
+        -string _name
+        -string _topic
+        -string _key
+        -int _userLimit
+        -bool _inviteOnly
+        -bool _topicRestricted
+        -map~Client*, bool~ _members
+        -set~Client*~ _invitedUsers
+        -time_t _creationTime
+        
+        +Channel(string name)
+        +~Channel()
+        +string getName()
+        +string getTopic()
+        +void setTopic(string topic, Client* setter)
+        +string getKey()
+        +void setKey(string key)
+        +int getUserLimit()
+        +void setUserLimit(int limit)
+        +bool isInviteOnly()
+        +void setInviteOnly(bool mode)
+        +bool isTopicRestricted()
+        +void setTopicRestricted(bool mode)
+        +void addMember(Client* client, bool isOperator)
+        +void removeMember(Client* client)
+        +bool isMember(Client* client)
+        +bool isOperator(Client* client)
+        +void setOperator(Client* client, bool op)
+        +void addInvite(Client* client)
+        +bool isInvited(Client* client)
+        +void removeInvite(Client* client)
+        +vector~Client*~ getMembers()
+        +vector~Client*~ getOperators()
+        +int getMemberCount()
+        +void broadcast(string message, Client* exclude)
+        +string getMembersList()
+        +string getModesString()
+    }
+    
+    class Command {
+        <<abstract>>
+        #Server* _server
+        #Client* _client
+        #vector~string~ _params
+        
+        +Command(Server* server, Client* client, vector params)
+        +virtual ~Command()
+        +virtual void execute() = 0
+        #void sendReply(string code, string message)
+        #void sendError(string code, string message)
+    }
+    
+    class PassCommand {
+        +PassCommand(Server* srv, Client* cli, vector params)
+        +void execute()
+    }
+    
+    class NickCommand {
+        +NickCommand(Server* srv, Client* cli, vector params)
+        +void execute()
+        -bool isValidNickname(string nick)
+    }
+    
+    class UserCommand {
+        +UserCommand(Server* srv, Client* cli, vector params)
+        +void execute()
+    }
+    
+    class JoinCommand {
+        +JoinCommand(Server* srv, Client* cli, vector params)
+        +void execute()
+        -void joinChannel(string channelName, string key)
+    }
+    
+    class PartCommand {
+        +PartCommand(Server* srv, Client* cli, vector params)
+        +void execute()
+    }
+    
+    class PrivmsgCommand {
+        +PrivmsgCommand(Server* srv, Client* cli, vector params)
+        +void execute()
+        -void sendToChannel(string target, string message)
+        -void sendToUser(string target, string message)
+    }
+    
+    class KickCommand {
+        +KickCommand(Server* srv, Client* cli, vector params)
+        +void execute()
+    }
+    
+    class InviteCommand {
+        +InviteCommand(Server* srv, Client* cli, vector params)
+        +void execute()
+    }
+    
+    class TopicCommand {
+        +TopicCommand(Server* srv, Client* cli, vector params)
+        +void execute()
+    }
+    
+    class ModeCommand {
+        +ModeCommand(Server* srv, Client* cli, vector params)
+        +void execute()
+        -void applyChannelMode(Channel* ch, char mode, bool add, string param)
+        -void parseModesString(string modes)
+    }
+    
+    class QuitCommand {
+        +QuitCommand(Server* srv, Client* cli, vector params)
+        +void execute()
+    }
+    
+    class MessageParser {
+        +static vector~string~ split(string str, char delimiter)
+        +static string trim(string str)
+        +static pair~string, vector~ parse(string message)
+        +static string extractCommand(string message)
+        +static vector~string~ extractParams(string message)
+    }
+    
+    class NumericReplies {
+        <<static>>
+        +static const string RPL_WELCOME
+        +static const string RPL_YOURHOST
+        +static const string RPL_CREATED
+        +static const string RPL_MYINFO
+        +static const string RPL_NOTOPIC
+        +static const string RPL_TOPIC
+        +static const string RPL_NAMREPLY
+        +static const string RPL_ENDOFNAMES
+        +static const string ERR_NOSUCHNICK
+        +static const string ERR_NOSUCHCHANNEL
+        +static const string ERR_CANNOTSENDTOCHAN
+        +static const string ERR_NOTONCHANNEL
+        +static const string ERR_USERONCHANNEL
+        +static const string ERR_NOTREGISTERED
+        +static const string ERR_NEEDMOREPARAMS
+        +static const string ERR_ALREADYREGISTERED
+        +static const string ERR_PASSWDMISMATCH
+        +static const string ERR_NICKNAMEINUSE
+        +static const string ERR_ERRONEUSNICKNAME
+        +static const string ERR_USERNOTINCHANNEL
+        +static const string ERR_CHANOPRIVSNEEDED
+        +static const string ERR_INVITEONLYCHAN
+        +static const string ERR_BADCHANNELKEY
+        +static const string ERR_CHANNELISFULL
+        +static string format(string code, Client* client, string msg)
+    }
+    
+    class CommandFactory {
+        +static Command* createCommand(string cmdName, Server* srv, Client* cli, vector params)
+    }
+    
+    %% Relationships
+    Server "1" --> "0..*" Client : manages
+    Server "1" --> "0..*" Channel : manages
+    Server --> MessageParser : uses
+    Server --> CommandFactory : uses
+    
+    Client "0..*" --> "0..*" Channel : joins
+    Channel "1" --> "0..*" Client : contains
+    
+    Command <|-- PassCommand
+    Command <|-- NickCommand
+    Command <|-- UserCommand
+    Command <|-- JoinCommand
+    Command <|-- PartCommand
+    Command <|-- PrivmsgCommand
+    Command <|-- KickCommand
+    Command <|-- InviteCommand
+    Command <|-- TopicCommand
+    Command <|-- ModeCommand
+    Command <|-- QuitCommand
+    
+    Command --> Server : references
+    Command --> Client : references
+    Command --> NumericReplies : uses
+    
+    CommandFactory ..> Command : creates
+    MessageParser ..> CommandFactory : parsed by

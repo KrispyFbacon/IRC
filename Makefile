@@ -6,7 +6,7 @@
 #    By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/15 14:29:42 by frbranda          #+#    #+#              #
-#    Updated: 2026/02/10 16:57:30 by frbranda         ###   ########.fr        #
+#    Updated: 2026/02/11 17:47:59 by frbranda         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,12 +39,22 @@ RESET = \033[0m
 #                                    PATHS                                     #
 #==============================================================================#
 
+# Source Directories
 VPATH = src
-VPATH += src/00_Server
+VPATH += src/Core
+VPATH += src/Utils
 
-SRC = main.cpp \
-		Server.cpp
-		TestClient.cpp
+
+# Source Files
+SRC = main.cpp 
+CORE = Server.cpp
+UTILS = Utils.cpp
+
+
+# Object Files
+SRC += $(CORE)
+SRC += $(UTILS)
+
 
 OBJ_DIR = obj
 OBJS = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
