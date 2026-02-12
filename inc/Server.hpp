@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:37:03 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/10 17:59:16 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/12 17:27:44 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ class Server
 		~Server();
 
 		bool initServer();
+		void run();
+		void cleanup();
 };
 
 #endif
