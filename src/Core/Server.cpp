@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/12 18:21:11 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/17 12:39:09 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,7 @@ bool Server::initServer()
 		return false;
 	}
 
-	// Set socket to non-blocking
-	// if (fcntl(_fd, F_SETFL, O_NONBLOCK) < 0)
-	// {
-	// 	Print::Error("fcntl() failed");
-	// 	return false;
-	// }
+	// TODO: Set socket to non-blocking
 
 	int opt = 1;
 	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) 
