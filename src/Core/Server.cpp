@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/17 12:39:09 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/17 18:06:14 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,10 @@ Server::~Server()
 	cleanup();
 }
 
+// initServer
 bool Server::initServer()
 {
-	// Step 1: Create socket
+	// Create socket
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_fd == -1)
 	{
@@ -29,16 +30,16 @@ bool Server::initServer()
 		return false;
 	}
 
-	// TODO: Set socket to non-blocking
-
 	int opt = 1;
-	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) 
-	{
-		Print::Error("setsockopt() failed");
+	if (!setOption(SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
 		return false;
-	}
 
-	// Step 2: Bind socket to address and port
+	// Set socket to non-blocking
+	if (!setNonBlocking())
+		return false;
+
+	// Bind socket to address and port 
+	// TODO maybe Adress:bind(port)
 	sockaddr_in address;
 	address.sin_family = AF_INET;
 	address.sin_port = htons(_port);
@@ -50,7 +51,8 @@ bool Server::initServer()
 		return false;
 	}
 
-	// Step 3: Start listening
+	// Start listening
+	// TODO maybe Adress:listen(backlog)
 	int backlog = 10;
 	if (listen(_fd, backlog) < 0)
 	{
@@ -58,35 +60,38 @@ bool Server::initServer()
 		return false;
 	}
 
-	std::cout << "Server Port: " << _port << std::endl;
+	// TODO Create the epoll instance
+	// TODO Register the listening socket with epoll
+
+	Print::Ok("Server listening on port: " + toString(_port));
 
 	return true;
 }
 
 
+// run
 void Server::run()
 {
 	Print::Debug("Server running. Press Ctrl+C to stop.");
 
 	while (g_running)
 	{
-		// Step 4: Accept incoming connection
+		// Accept incoming connection
 		struct sockaddr_in clientAdress;
 		socklen_t clientLen = sizeof(clientAdress);
 
-		std::cout << "G_Running = " << (g_running ? "true" : "false") << std::endl;
 		int clientFd = accept(_fd, (struct sockaddr*)&clientAdress, &clientLen);
-		std::cout << "G_Running = " << (g_running ? "true" : "false") << std::endl;
+		//std::cout << "G_Running = " << (g_running ? "true" : "false") << std::endl;
 		if (clientFd < 0)
 		{
-			Print::Fail("Couldn't accept connection");
+			//Print::Error("Couldn't accept connection");
 			continue ;
 		}
 
 		Print::Ok("New connection accepted. FD: " + toString(clientFd));
 
 		
-		// Step 5: Receive data from client
+		// Receive data from client
 		char buffer[BUFFER_SIZE] = {0};
 		ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 
@@ -106,12 +111,14 @@ void Server::run()
 		else
 			Print::Error("Failed receiving data");
 
-		// Step 6: Close client connection
+		// Close client connection
 		close(clientFd);
 		Print::Ok("Client connection closed Succefully");
 	}
 }
 
+
+// cleanup
 void Server::cleanup()
 {
 	if (_fd != -1)
@@ -120,4 +127,38 @@ void Server::cleanup()
 		_fd = -1;
 		Print::Ok("Server sockect closed Succefully");
 	}
+}
+
+
+// ── I/O helpers ─────────────────────────────────────────────────────────────
+
+// Makes a file descriptor non-blocking
+bool Server::setNonBlocking()
+{
+	int fdFlags = fcntl(_fd, F_GETFL, 0);
+	if (fdFlags == -1)
+	{
+		Print::Error("fcntl() F_GETFL failed");
+		return false;
+	}
+
+	if (fcntl(_fd, F_SETFL, fdFlags | O_NONBLOCK) == -1)
+	{
+		Print::Error("fcntl() F_SETFL failed");
+		return false;
+	}
+	
+	return true;
+}
+
+// Sets a socket options (e.g. SO_REUSEADDR)
+bool Server::setOption(int level, int optname, const void *optval, socklen_t optlen)
+{
+	if (setsockopt(_fd, level, optname, optval, optlen) < 0)
+	{
+		Print::Error("setsockopt() failed");
+		return false;
+	}
+
+	return true;
 }
