@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 17:27:40 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/17 15:34:06 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/18 11:29:45 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@
 #include <unistd.h> 	// close, lseek, (read, write - implied)
 #include <fcntl.h> 		// fcntl(), O_NONBLOCK (used for non-blocking I/O)
 #include <sys/stat.h> 	// fstat
-#include <poll.h> 		// poll
+#include <sys/epoll.h> 	// epoll
 
 // --- Signal Handling ---
 #include <signal.h>		// signal, sigaction, sigemptyset, sigfillset, sigaddset, sigdelset, sigismember
@@ -74,6 +74,7 @@
 extern bool g_running;
 
 
+// TODO exceptions
 // --- Utility Classes ---
 class Print
 {

@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:37:03 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/17 17:47:09 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/18 13:00:14 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,19 +46,20 @@ class Server
 
 		// TODO I/O helpers
 			bool setOption(int level, int optname, const void *optval, socklen_t optlen);
-			bool setNonBlocking();
-			// epollAdd (int fd, uint32_t events);
-			// epollMod (int fd, uint32_t events);
-			// voidDel (int fd);
+			bool setNonBlocking(int fd);
+			bool epollCreate (int flags);
+			bool epollAdd (int fd, uint32_t events);
+			bool epollMod (int fd, uint32_t events);
+			bool voidDel (int fd);
 
-		// TODO Event handlers — called from run()
-			// void handleNewConnection();
-			// void handleClientRead(int fd);
-			// void handleClientWrite(int fd);
-			// void disconnectClient(int fd);
+		// TODO Event handlers
+			void handleNewConnection();
+			void handleClientRead(int fd);
+			//void handleClientWrite(int fd);
+			void disconnectClient(int fd);
 
 		// TODO IRC logic (Parsing)
-			void processMessage(int fd, const std::string& msg);
+			// void processMessage(int fd, const std::string& msg);
 		
 	public:
 		Server(int port);

@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/17 18:06:14 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/18 13:01:54 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ bool Server::initServer()
 		return false;
 
 	// Bind socket to address and port 
-	// TODO maybe Adress:bind(port)
+	// TODO maybe Socket::bind(port)
 	sockaddr_in address;
 	address.sin_family = AF_INET;
 	address.sin_port = htons(_port);
@@ -52,7 +52,7 @@ bool Server::initServer()
 	}
 
 	// Start listening
-	// TODO maybe Adress:listen(backlog)
+	// TODO maybe Socket::listen(backlog)
 	int backlog = 10;
 	if (listen(_fd, backlog) < 0)
 	{
@@ -61,13 +61,17 @@ bool Server::initServer()
 	}
 
 	// TODO Create the epoll instance
+	if (!epollCreate(0))
+		return false;
+	
 	// TODO Register the listening socket with epoll
+	if (!epollAdd(_fd, EPOLLIN))
+		return false;
 
 	Print::Ok("Server listening on port: " + toString(_port));
 
 	return true;
 }
-
 
 // run
 void Server::run()
@@ -76,56 +80,46 @@ void Server::run()
 
 	while (g_running)
 	{
-		// Accept incoming connection
-		struct sockaddr_in clientAdress;
-		socklen_t clientLen = sizeof(clientAdress);
+		epoll_event events[MAX_EVENTS];
 
-		int clientFd = accept(_fd, (struct sockaddr*)&clientAdress, &clientLen);
-		//std::cout << "G_Running = " << (g_running ? "true" : "false") << std::endl;
-		if (clientFd < 0)
+		int nfds = epoll_wait(_epfd, events, MAX_EVENTS, -1);
+		if (nfds == -1)
 		{
-			//Print::Error("Couldn't accept connection");
-			continue ;
+			if (errno == EINTR) // signal interrupted wait
+				continue;
+			Print::Error("epoll_wait() failed");
+			break;
 		}
 
-		Print::Ok("New connection accepted. FD: " + toString(clientFd));
-
-		
-		// Receive data from client
-		char buffer[BUFFER_SIZE] = {0};
-		ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
-
-		if (bytesRead > 0)
+		for (int n = 0; n < nfds; ++n)
 		{
-			buffer[bytesRead] = '\0';
-			Print::Debug("Recieved " + toString(bytesRead)
-							+ " bytes from client FD: " + toString(clientFd)
-							+ " -> " + buffer);
+			int	currentFd = events[n].data.fd;
 			
-			// Echo back to client
-			const char* response = "Message received!\n";
-			send(clientFd, response, strlen(response), 0);
+			if (currentFd == _fd)
+				// TODO Accept incoming connection
+				handleNewConnection();
+			else
+				// TODO Receive data from client
+				handleClientRead(currentFd);
+			// TODO Disconnect Client // void disconnectClient(int fd);
 		}
-		else if (bytesRead == 0)
-			Print::StdOut("Client disconnected!");
-		else
-			Print::Error("Failed receiving data");
-
-		// Close client connection
-		close(clientFd);
-		Print::Ok("Client connection closed Succefully");
 	}
 }
-
 
 // cleanup
 void Server::cleanup()
 {
+	if (_epfd != -1)
+	{
+		close(_fd);
+		_fd = -1;
+		Print::Debug("Epoll socket closed Succefully");
+	}
 	if (_fd != -1)
 	{
 		close(_fd);
 		_fd = -1;
-		Print::Ok("Server sockect closed Succefully");
+		Print::Ok("Server socket closed Succefully");
 	}
 }
 
@@ -133,9 +127,9 @@ void Server::cleanup()
 // ── I/O helpers ─────────────────────────────────────────────────────────────
 
 // Makes a file descriptor non-blocking
-bool Server::setNonBlocking()
+bool Server::setNonBlocking(int fd)
 {
-	int fdFlags = fcntl(_fd, F_GETFL, 0);
+	int fdFlags = fcntl(fd, F_GETFL, 0);
 	if (fdFlags == -1)
 	{
 		Print::Error("fcntl() F_GETFL failed");
@@ -162,3 +156,143 @@ bool Server::setOption(int level, int optname, const void *optval, socklen_t opt
 
 	return true;
 }
+
+// Creates an epoll instance
+bool Server::epollCreate (int flags)
+{
+	_epfd = epoll_create1(flags);
+	
+	if (_epfd == -1)
+	{
+		Print::Error("epoll_create1() failed");
+		return false;
+	}
+
+	return true;
+}
+
+// Adds a fd to the epoll instance with specified events
+bool Server::epollAdd (int fd, uint32_t events)
+{
+	epoll_event ev;
+	ev.events = events; 
+	ev.data.fd = fd; // kernel hands this back to us when the event fires
+	
+	if (epoll_ctl(_epfd, EPOLL_CTL_ADD, fd, &ev) == -1)
+	{
+		Print::Error("epoll_ctl ADD FD: " + toString(fd));
+		return false;
+	}
+
+	return true;
+}
+
+// Modifies the events associated with a fd in the epoll instance
+bool Server::epollMod (int fd, uint32_t events)
+{
+	epoll_event ev;
+	ev.events = events;
+	ev.data.fd = fd;
+	
+	if (epoll_ctl(_epfd, EPOLL_CTL_MOD, fd, &ev) == -1)
+	{
+		Print::Error("epoll_ctl MOD FD: " + toString(fd));
+		return false;
+	}
+
+	return true;
+}
+
+// Removes a fd from the epoll instance
+bool Server::voidDel (int fd)
+{
+	if (epoll_ctl(_epfd, EPOLL_CTL_DEL, fd, NULL) == -1)
+	{
+		Print::Error("epoll_ctl DEL FD: " + toString(fd));
+		return false;
+	}
+
+	return true;
+}
+
+
+// ── Event handlers ──────────────────────────────────────────────────────────
+
+
+
+void Server::handleClientRead(int fd)
+{
+	while (true)
+	{
+		struct sockaddr_in clientAdress;
+		socklen_t clientLen = sizeof(clientAdress);
+	
+		int clientFd = accept(_fd, (struct sockaddr*)&clientAdress, &clientLen);
+		if (clientFd == -1)
+		{
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+				break ;
+			Print::Error("accept() failed");
+			break ;
+		}
+
+		setNonBlocking(clientFd);
+		epollAdd(clientFd, EPO);
+
+		
+	}
+}
+
+void Server::disconnectClient(int fd)
+{
+	
+}
+
+
+void Server::handleNewConnection()
+{
+	
+}
+
+// while (g_running)
+// 	{
+
+// 		// TODO HANDLE NEW CONNECTION handleNewConnection();
+// 		// Accept incoming connection
+// 		struct sockaddr_in clientAdress;
+// 		socklen_t clientLen = sizeof(clientAdress);
+
+// 		int clientFd = accept(_fd, (struct sockaddr*)&clientAdress, &clientLen);
+// 		if (clientFd < 0)
+// 		{
+// 			//Print::Error("Couldn't accept connection");
+// 			continue ;
+// 		}
+
+// 		Print::Ok("New connection accepted. FD: " + toString(clientFd));
+
+// 		// TODO handleClientRead(int fd);
+// 		// Receive data from client
+// 		char buffer[BUFFER_SIZE] = {0};
+// 		ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+
+// 		if (bytesRead > 0)
+// 		{
+// 			buffer[bytesRead] = '\0';
+// 			Print::Debug("Recieved " + toString(bytesRead)
+// 							+ " bytes from client FD: " + toString(clientFd)
+// 							+ " -> " + buffer);
+			
+// 			// Echo back to client
+// 			const char* response = "Message received!\n";
+// 			send(clientFd, response, strlen(response), 0);
+// 		}
+// 		else if (bytesRead == 0)
+// 			Print::StdOut("Client disconnected!");
+// 		else
+// 			Print::Error("Failed receiving data");
+
+// 		// Close client connection
+// 		close(clientFd);
+// 		Print::Ok("Client connection closed Succefully");
+// 	}
