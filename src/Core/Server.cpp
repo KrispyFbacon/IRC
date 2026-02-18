@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/18 13:01:54 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/18 17:58:55 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ bool Server::initServer()
 		return false;
 
 	// Set socket to non-blocking
-	if (!setNonBlocking())
+	if (!setNonBlocking(_fd))
 		return false;
 
 	// Bind socket to address and port 
@@ -101,7 +101,7 @@ void Server::run()
 			else
 				// TODO Receive data from client
 				handleClientRead(currentFd);
-			// TODO Disconnect Client // void disconnectClient(int fd);
+			// TODO else - Disconnect Client // void disconnectClient(int fd);
 		}
 	}
 }
@@ -204,7 +204,7 @@ bool Server::epollMod (int fd, uint32_t events)
 }
 
 // Removes a fd from the epoll instance
-bool Server::voidDel (int fd)
+bool Server::epollDel (int fd)
 {
 	if (epoll_ctl(_epfd, EPOLL_CTL_DEL, fd, NULL) == -1)
 	{
@@ -219,8 +219,7 @@ bool Server::voidDel (int fd)
 // ── Event handlers ──────────────────────────────────────────────────────────
 
 
-
-void Server::handleClientRead(int fd)
+void Server::handleNewConnection()
 {
 	while (true)
 	{
@@ -237,62 +236,55 @@ void Server::handleClientRead(int fd)
 		}
 
 		setNonBlocking(clientFd);
-		epollAdd(clientFd, EPO);
+		epollAdd(clientFd, EPOLLIN);
 
+		// TODO Save client information into Client container
 		
+		Print::Ok("Client connected FD: " + toString(clientFd));
 	}
 }
 
-void Server::disconnectClient(int fd)
+void Server::handleClientRead(int fd)
 {
+	char buffer[BUFFER_SIZE] = {0};
 	
-}
+	ssize_t bytesRead = recv(fd, buffer, sizeof(buffer) - 1, 0);
+	if (bytesRead <= 0)
+	{
+		if (bytesRead == 0)
+			Print::StdOut("Client disconnected FD: " + toString(fd));
+		else
+			Print::Error("recv() failed FD: " + toString(fd));
 
+		epollDel(fd);
+		close(fd); // TODO when adding _clients delete this
+		
+		return;
+	}
 
-void Server::handleNewConnection()
-{
-	
-}
-
-// while (g_running)
-// 	{
-
-// 		// TODO HANDLE NEW CONNECTION handleNewConnection();
-// 		// Accept incoming connection
-// 		struct sockaddr_in clientAdress;
-// 		socklen_t clientLen = sizeof(clientAdress);
-
-// 		int clientFd = accept(_fd, (struct sockaddr*)&clientAdress, &clientLen);
-// 		if (clientFd < 0)
-// 		{
-// 			//Print::Error("Couldn't accept connection");
-// 			continue ;
-// 		}
-
-// 		Print::Ok("New connection accepted. FD: " + toString(clientFd));
-
-// 		// TODO handleClientRead(int fd);
-// 		// Receive data from client
-// 		char buffer[BUFFER_SIZE] = {0};
-// 		ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
-
-// 		if (bytesRead > 0)
-// 		{
-// 			buffer[bytesRead] = '\0';
-// 			Print::Debug("Recieved " + toString(bytesRead)
-// 							+ " bytes from client FD: " + toString(clientFd)
-// 							+ " -> " + buffer);
+	buffer[bytesRead] = '\0';
+	Print::Debug("Recieved " + toString(bytesRead)
+							+ " bytes from client FD: " + toString(fd)
+							+ " -> " + buffer);
 			
-// 			// Echo back to client
-// 			const char* response = "Message received!\n";
-// 			send(clientFd, response, strlen(response), 0);
-// 		}
-// 		else if (bytesRead == 0)
-// 			Print::StdOut("Client disconnected!");
-// 		else
-// 			Print::Error("Failed receiving data");
+	// Echo back to client
+	const char* response = "Message received!\r\n";
+	send(fd, response, std::strlen(response), 0);
 
-// 		// Close client connection
-// 		close(clientFd);
-// 		Print::Ok("Client connection closed Succefully");
-// 	}
+	
+	// TODO Need to buffer per client
+	// TODO This requires you to add _clients[clientFd] = Client(clientFd) in handleNewConnection and have a processMessage method.
+	// TODO One message in → one reply out, regardless of how TCP fragments it.
+	// _clients[fd].recv_buf.append(buffer, bytesRead);
+
+    // // Only process complete IRC messages (terminated by \r\n)
+    // size_t pos;
+    // while ((pos = _clients[fd].recv_buf.find("\r\n")) != std::string::npos)
+    // {
+    //     std::string msg = _clients[fd].recv_buf.substr(0, pos);
+    //     _clients[fd].recv_buf.erase(0, pos + 2);
+
+    //     if (!msg.empty())
+    //         processMessage(fd, msg);
+    // }
+}
