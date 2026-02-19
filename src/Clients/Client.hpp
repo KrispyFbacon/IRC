@@ -1,7 +1,7 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-#include "../Channel.hpp"
+#include "Channel.hpp"
 #include <string>
 #include <vector>
 #include <map>
@@ -23,11 +23,8 @@ class Client
 
 	public:
 	//orthodox cannonical form
-			Client();
-			Client(int);
-			Client(const Client &);
-			Client	&operator=(const Client &);
-			~Client();
+		Client(int);
+		~Client();
 
 	//getters
 		int	getFd() const;
