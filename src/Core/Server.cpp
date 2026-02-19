@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/19 14:20:40 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/19 18:46:10 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,11 +270,22 @@ void Server::handleClientMessage(int clientFd)
 {
 	char buffer[BUFFER_SIZE] = {0};
 	
-	
+	Client* client = getClient(clientFd);
+	if (!client)
+	{
+		Print::StdErr("ERROR: Client not found for FD: " + toString(clientFd));
+		return;
+	}
 	
 	ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 	if (bytesRead <= 0)
 	{
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+		{
+			Print::Debug("No data available, but connection is still open");
+			return;
+		}
+		
 		if (bytesRead == 0)
 			Print::StdOut("Client disconnected FD: " + toString(clientFd));
 		else
@@ -284,7 +295,8 @@ void Server::handleClientMessage(int clientFd)
 		return;
 	}
 	
-	_clients[clientFd]->_buffer.append(buffer, bytesRead);
+	
+	client->appendBuffer(buffer, bytesRead); // Client owns its buffer
 
 	// buffer[bytesRead] = '\0';
 	// Print::Debug("Recieved " + toString(bytesRead)

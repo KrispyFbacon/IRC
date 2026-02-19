@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:37:03 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/19 14:17:35 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/19 18:45:09 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,17 @@ class Client
 	public:
 		Client(int fd) : _fd(fd) {};
 		~Client();
+
+		
+		void appendBuffer(const char* data, ssize_t len)
+		{
+			_buffer.append(data, len);
+		}
+
+		void getNextMessage(std::string& out)
+		{
+			
+		}
 	
 };
 
