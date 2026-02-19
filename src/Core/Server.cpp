@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/18 17:58:55 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/19 14:20:40 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ void Server::run()
 
 	while (g_running)
 	{
+		// TODO save somewhere
 		epoll_event events[MAX_EVENTS];
 
 		int nfds = epoll_wait(_epfd, events, MAX_EVENTS, -1);
@@ -100,9 +101,12 @@ void Server::run()
 				handleNewConnection();
 			else
 				// TODO Receive data from client
-				handleClientRead(currentFd);
-			// TODO else - Disconnect Client // void disconnectClient(int fd);
-		}
+				handleClientMessage(currentFd);
+			// TODO else - Disconnect Client // void removeClient(int fd);
+			// TODO handle errors
+			// TODO handle hangup with data available
+			// TODO Handle hangup without data available
+			}
 	}
 }
 
@@ -123,6 +127,22 @@ void Server::cleanup()
 	}
 }
 
+
+// ── Client Management ───────────────────────────────────────────────────────
+
+Client* Server::getClient(int clientFd)
+{
+	clientIt it = _clients.find(clientFd);
+
+	if (it == _clients.end())
+		return NULL;
+
+	return it->second;
+}
+
+
+
+/* ================================= PRIVATE =============================== */
 
 // ── I/O helpers ─────────────────────────────────────────────────────────────
 
@@ -239,52 +259,64 @@ void Server::handleNewConnection()
 		epollAdd(clientFd, EPOLLIN);
 
 		// TODO Save client information into Client container
+		Client* newClient = new Client(clientFd);
+		_clients[clientFd] = newClient;
 		
 		Print::Ok("Client connected FD: " + toString(clientFd));
 	}
 }
 
-void Server::handleClientRead(int fd)
+void Server::handleClientMessage(int clientFd)
 {
 	char buffer[BUFFER_SIZE] = {0};
 	
-	ssize_t bytesRead = recv(fd, buffer, sizeof(buffer) - 1, 0);
+	
+	
+	ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 	if (bytesRead <= 0)
 	{
 		if (bytesRead == 0)
-			Print::StdOut("Client disconnected FD: " + toString(fd));
+			Print::StdOut("Client disconnected FD: " + toString(clientFd));
 		else
-			Print::Error("recv() failed FD: " + toString(fd));
+			Print::Error("recv() failed FD: " + toString(clientFd));
 
-		epollDel(fd);
-		close(fd); // TODO when adding _clients delete this
-		
+		removeClient(clientFd);
 		return;
 	}
+	
+	_clients[clientFd]->_buffer.append(buffer, bytesRead);
 
-	buffer[bytesRead] = '\0';
-	Print::Debug("Recieved " + toString(bytesRead)
-							+ " bytes from client FD: " + toString(fd)
-							+ " -> " + buffer);
+	// buffer[bytesRead] = '\0';
+	// Print::Debug("Recieved " + toString(bytesRead)
+	// 						+ " bytes from client FD: " + toString(clientFd)
+	// 						+ " -> " + buffer);
 			
-	// Echo back to client
-	const char* response = "Message received!\r\n";
-	send(fd, response, std::strlen(response), 0);
+	// // Echo back to client
+	// const char* response = "Message received!\r\n";
+	// send(clientFd, response, std::strlen(response), 0);
 
 	
 	// TODO Need to buffer per client
 	// TODO This requires you to add _clients[clientFd] = Client(clientFd) in handleNewConnection and have a processMessage method.
 	// TODO One message in → one reply out, regardless of how TCP fragments it.
-	// _clients[fd].recv_buf.append(buffer, bytesRead);
+	// _clients[clientFd].recv_buf.append(buffer, bytesRead);
 
     // // Only process complete IRC messages (terminated by \r\n)
     // size_t pos;
-    // while ((pos = _clients[fd].recv_buf.find("\r\n")) != std::string::npos)
+    // while ((pos = _clients[clientFd].recv_buf.find("\r\n")) != std::string::npos)
     // {
-    //     std::string msg = _clients[fd].recv_buf.substr(0, pos);
-    //     _clients[fd].recv_buf.erase(0, pos + 2);
+    //     std::string msg = _clients[clientFd].recv_buf.substr(0, pos);
+    //     _clients[clientFd].recv_buf.erase(0, pos + 2);
 
     //     if (!msg.empty())
-    //         processMessage(fd, msg);
+    //         processMessage(clientFd, msg);
     // }
+}
+
+void Server::removeClient(int fd)
+{
+	epollDel(fd);
+	close(fd);
+	_clients.erase(fd);
+	Print::StdOut("Client removed FD: " + toString(fd));
 }

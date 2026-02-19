@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:37:03 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/18 17:43:09 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/19 14:17:35 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,15 @@
 // ── Per-client ──────────────────────────────────────────────────────────────
 class Client
 {
-	//int		fd;
+	private:
+		int _fd;
 	
-	//clientStatus (class)
-		// bool isRegisted (maybe just check if the variables are not empty)
-		// bool hasUsername
-		// bool hasPassword
-		// bool hasNickName
-	// create and destroy (class)
+		std::string _buffer;
+
+	public:
+		Client(int fd) : _fd(fd) {};
+		~Client();
 	
-	//Message (class)
-		//std::string recv_buf; // IRC messages end with \r\n
-		//std::string send_buf; // holds data queued to send (drain it when EPOLLOUT fires)
 };
 
 
@@ -38,11 +35,16 @@ class Client
 class Server
 {
 	private:
+		typedef std::map<int, Client*>::iterator clientIt;
+
 		// Socket _serverSocked(); TODO maybe since server and clients will have their own socket
 		int _fd; // serverFd
-		int _epfd; // poll fd
+		int _epfd; // epoll Fd
 		int _port;
-		//std::map<int, Client*> _clients;
+		//std::string _password;
+		
+		std::map<int, Client*> _clients;
+		//std::map<string, Channels*> _channels;
 
 		// TODO I/O helpers
 			bool setOption(int level, int optname, const void *optval, socklen_t optlen);
@@ -54,9 +56,9 @@ class Server
 
 		// TODO Event handlers
 			void handleNewConnection();
-			void handleClientRead(int fd);
-			//void handleClientWrite(int fd);
-			//void disconnectClient(int fd);
+			void handleClientMessage(int clientFd);
+			void removeClient(int clientFd);
+
 
 		// TODO IRC logic (Parsing)
 			// void processMessage(int fd, const std::string& msg);
@@ -68,56 +70,10 @@ class Server
 		bool initServer();
 		void run();
 		void cleanup();
+
+		// TODO CLient management
+		Client* getClient(int clientFd);
+		// TODO Channel management
 };
 
 #endif
-
-// #define MAX_EVENTS 10
-
-// struct epoll_event ev, events[MAX_EVENTS];
-// int listen_sock, conn_sock, nfds, epollfd;
-
-// /* Code to set up listening socket, 'listen_sock',
-// 	(socket(), bind(), listen()) omitted */
-
-// epollfd = epoll_create1(0);
-// if (epollfd == -1) {
-// 	perror("epoll_create1");
-// 	exit(EXIT_FAILURE);
-// }
-
-// ev.events = EPOLLIN;
-// ev.data.fd = listen_sock;
-// if (epoll_ctl(epollfd, EPOLL_CTL_ADD, listen_sock, &ev) == -1) {
-// 	perror("epoll_ctl: listen_sock");
-// 	exit(EXIT_FAILURE);
-// }
-
-// for (;;) {
-// 	nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
-// 	if (nfds == -1) {
-// 		perror("epoll_wait");
-// 		exit(EXIT_FAILURE);
-// 	}
-
-// 	for (n = 0; n < nfds; ++n) {
-// 		if (events[n].data.fd == listen_sock) {
-// 			conn_sock = accept(listen_sock,
-// 								(struct sockaddr *) &addr, &addrlen);
-// 			if (conn_sock == -1) {
-// 				perror("accept");
-// 				exit(EXIT_FAILURE);
-// 			}
-// 			setnonblocking(conn_sock);
-// 			ev.events = EPOLLIN | EPOLLET;
-// 			ev.data.fd = conn_sock;
-// 			if (epoll_ctl(epollfd, EPOLL_CTL_ADD, conn_sock,
-// 						&ev) == -1) {
-// 				perror("epoll_ctl: conn_sock");
-// 				exit(EXIT_FAILURE);
-// 			}
-// 		} else {
-// 			do_use_fd(events[n].data.fd);
-// 		}
-// 	}
-// }

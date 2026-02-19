@@ -1,0 +1,44 @@
+graph TB
+    subgraph "Main Program"
+        Main[main.cpp<br/>- Parse args port/password<br/>- Create Server<br/>- Run event loop<br/>- Handle signals]
+    end
+    
+    subgraph "Server Class"
+        Server["<b>Server</b><br/>---<br/>- serverSocket: int<br/>- port: int<br/>- password: string<br/>- clients: map&lt;int, Client*&gt;<br/>- channels: map&lt;string, Channel*&gt;<br/>- pollfds: vector&lt;pollfd&gt;<br/>---<br/>+ init<br/>+ run<br/>+ acceptNewClient<br/>+ handleClientData<br/>+ removeClient<br/>+ findClient<br/>+ findOrCreateChannel<br/>+ broadcastToChannel<br/>+ sendToClient"]
+    end
+    
+    subgraph "Client Class"
+        Client["<b>Client</b><br/>---<br/>- fd: int<br/>- nickname: string<br/>- username: string<br/>- realname: string<br/>- hostname: string<br/>- authenticated: bool<br/>- registered: bool<br/>- buffer: string<br/>- channels: set&lt;Channel*&gt;<br/>---<br/>+ isRegistered<br/>+ addToChannel<br/>+ removeFromChannel<br/>+ getChannels"]
+    end
+    
+    subgraph "Channel Class"
+        Channel["<b>Channel</b><br/>---<br/>- name: string<br/>- topic: string<br/>- members: map&lt;Client*, bool&gt;<br/>  (Client* → isOperator)<br/>- inviteOnly: bool<br/>- topicRestricted: bool<br/>- key: string<br/>- userLimit: int<br/>- invitedUsers: set&lt;Client*&gt;<br/>---<br/>+ addMember<br/>+ removeMember<br/>+ isOperator<br/>+ setOperator<br/>+ broadcast<br/>+ setMode<br/>+ isInvited"]
+    end
+    
+    subgraph "Message Parser"
+        Parser["<b>MessageParser</b><br/>---<br/>+ parseCommand<br/>+ extractParams<br/>+ splitMessage"]
+    end
+    
+    subgraph "Command Handlers"
+        Commands["<b>Commands</b><br/>---<br/>+ cmdPass<br/>+ cmdNick<br/>+ cmdUser<br/>+ cmdJoin<br/>+ cmdPart<br/>+ cmdPrivmsg<br/>+ cmdKick<br/>+ cmdInvite<br/>+ cmdTopic<br/>+ cmdMode<br/>+ cmdQuit"]
+    end
+    
+    subgraph "Numeric Replies"
+        Replies["<b>Replies</b><br/>---<br/>RPL_WELCOME 001<br/>RPL_TOPIC 332<br/>ERR_NOSUCHNICK 401<br/>ERR_NOSUCHCHANNEL 403<br/>ERR_CHANOPRIVSNEEDED 482<br/>etc."]
+    end
+    
+    Main --> Server
+    Server --> Client
+    Server --> Channel
+    Server --> Parser
+    Server --> Commands
+    Commands --> Replies
+    Client -.-> Channel
+    Channel -.-> Client
+    
+    style Server fill:#bbdefb,stroke:#1976d2,stroke-width:3px
+    style Client fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
+    style Channel fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    style Parser fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    style Commands fill:#ffccbc,stroke:#e64a19,stroke-width:2px
+    style Replies fill:#cfd8dc,stroke:#455a64,stroke-width:2px

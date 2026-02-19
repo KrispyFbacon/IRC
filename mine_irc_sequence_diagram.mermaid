@@ -1,0 +1,85 @@
+sequenceDiagram
+    participant C1 as Client 1
+    participant S as Server
+    participant CH as Channel #general
+    participant C2 as Client 2
+    
+    Note over C1,S: Phase 1: Connection & Authentication
+    C1->>S: TCP Connect
+    S->>S: accept() - Create Client object
+    S->>C1: Connection Established
+    
+    C1->>S: PASS secretpassword
+    S->>S: Validate password
+    Note over S: client.authenticated = true
+    
+    C1->>S: NICK alice
+    S->>S: Check nickname uniqueness
+    Note over S: client.nickname = "alice"
+    
+    C1->>S: USER alice 0 * :Alice Smith
+    S->>S: Check if registration complete<br/>(PASS+NICK+USER)
+    Note over S: client.registered = true
+    S->>C1: 001 RPL_WELCOME :Welcome alice!
+    S->>C1: 002-004 Server info
+    
+    Note over C1,CH: Phase 2: Joining Channel
+    C1->>S: JOIN #general
+    S->>S: Find or create channel
+    S->>CH: Add alice to #general
+    S->>C1: 353 RPL_NAMREPLY :alice
+    S->>C1: 366 RPL_ENDOFNAMES
+    
+    Note over C2,S: Client 2 Connection (Abbreviated)
+    C2->>S: Connect + PASS + NICK bob + USER
+    S->>C2: 001-004 Welcome
+    
+    Note over C2,CH: Client 2 Joins Same Channel
+    C2->>S: JOIN #general
+    S->>CH: Add bob to #general
+    S->>C1: :bob!bob@host JOIN #general
+    S->>C2: 353 RPL_NAMREPLY :alice bob
+    S->>C2: 366 RPL_ENDOFNAMES
+    
+    Note over C1,C2: Phase 3: Messaging
+    C1->>S: PRIVMSG #general :Hello everyone!
+    S->>CH: Broadcast to all members except alice
+    S->>C2: :alice!alice@host PRIVMSG #general :Hello everyone!
+    
+    C2->>S: PRIVMSG #general :Hi alice!
+    S->>CH: Broadcast to all members except bob
+    S->>C1: :bob!bob@host PRIVMSG #general :Hi alice!
+    
+    Note over C1,C2: Phase 4: Private Message
+    C1->>S: PRIVMSG bob :Private message
+    S->>S: Find client "bob"
+    S->>C2: :alice!alice@host PRIVMSG bob :Private message
+    
+    Note over C1,CH: Phase 5: Operator Commands
+    Note over C1: alice is channel operator
+    C1->>S: TOPIC #general :New topic here
+    S->>CH: Update topic
+    S->>C1: :alice!alice@host TOPIC #general :New topic here
+    S->>C2: :alice!alice@host TOPIC #general :New topic here
+    
+    C1->>S: MODE #general +i
+    S->>CH: Set invite-only mode
+    S->>C1: :alice!alice@host MODE #general +i
+    S->>C2: :alice!alice@host MODE #general +i
+    
+    C1->>S: KICK #general bob :Breaking rules
+    S->>CH: Remove bob from channel
+    S->>C1: :alice!alice@host KICK #general bob :Breaking rules
+    S->>C2: :alice!alice@host KICK #general bob :Breaking rules
+    S->>S: Remove bob from channel members
+    
+    Note over C2,S: Phase 6: Disconnection
+    C2->>S: QUIT :Goodbye
+    S->>CH: Remove from all channels
+    S->>C1: :bob!bob@host QUIT :Goodbye
+    S->>S: Close socket, delete client
+    
+    Note over C1,S: Server Shutdown
+    Note over S: SIGINT received
+    S->>C1: ERROR :Server shutting down
+    S->>S: Close all sockets<br/>Cleanup resources
