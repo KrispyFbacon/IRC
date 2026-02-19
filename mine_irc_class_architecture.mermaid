@@ -1,3 +1,19 @@
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#1e1e1e",
+    "primaryColor": "#2d2d30",
+    "primaryTextColor": "#d4d4d4",
+    "primaryBorderColor": "#569cd6",
+    "lineColor": "#6a9955",
+    "secondaryColor": "#252526",
+    "tertiaryColor": "#1e1e1e",
+    "clusterBkg": "#252526",
+    "clusterBorder": "#3c3c3c",
+    "fontSize": "14px"
+  }
+}}%%
+
 graph TB
     subgraph "Main Program"
         Main[main.cpp<br/>- Parse args port/password<br/>- Create Server<br/>- Run event loop<br/>- Handle signals]
@@ -35,10 +51,3 @@ graph TB
     Commands --> Replies
     Client -.-> Channel
     Channel -.-> Client
-    
-    style Server fill:#bbdefb,stroke:#1976d2,stroke-width:3px
-    style Client fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
-    style Channel fill:#fff9c4,stroke:#f57f17,stroke-width:2px
-    style Parser fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    style Commands fill:#ffccbc,stroke:#e64a19,stroke-width:2px
-    style Replies fill:#cfd8dc,stroke:#455a64,stroke-width:2px
