@@ -1,10 +1,10 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-#include "Channel.hpp"
 #include <string>
-#include <vector>
 #include <map>
+
+class Channel;
 
 class Client
 {
