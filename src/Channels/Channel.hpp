@@ -1,8 +1,8 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
-# include<string>
-#include <map>
+# include <string>
+# include <map>
 
 class Client;
 
