@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/24 16:39:32 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/24 18:50:02 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,7 @@ void Server::run()
 			break;
 		}
 
+		//TODO TRY EXCEPTION
 		for (int n = 0; n < nfds; ++n)
 		{
 			int	currentFd = events[n].data.fd;
@@ -120,6 +121,18 @@ void Server::run()
 
 			if (ev & EPOLLIN)
 				handleClientMessage(currentFd);
+			//TODO CATCH 
+				//remove client
+				// close fd
+			// catch (const std::exception& e) 
+			// {
+			// 	if (isThisAFatalError(e)) 
+			// 	{
+			// 		throw; // Sends the exact same exception up to main()
+			// 	}
+			// 	// Otherwise, just remove client and keep going
+			// 	removeClient(currentFd);
+			// }
 		}
 	}
 }
