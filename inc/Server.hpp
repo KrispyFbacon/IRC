@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:37:03 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/19 18:45:09 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/24 13:06:34 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,16 +28,46 @@ class Client
 		Client(int fd) : _fd(fd) {};
 		~Client();
 
+
+		//  ── Buffer Handler ──
+		// Getters
+		// std::string& getBuffer();
+		// size_t getBufferSize() const;
+		
+		// Helpers
+		// void appendBuffer(const char* data, ssize_t len);
+		// bool getNextMessage(std::string& msg);
+		// void clearBuffer();
+		
+		std::string& getBuffer()
+		{
+			return _buffer;
+		}
+		
+		size_t getBufferSize() const
+		{
+			return _buffer.size();
+		};
 		
 		void appendBuffer(const char* data, ssize_t len)
 		{
 			_buffer.append(data, len);
-		}
+		};
 
-		void getNextMessage(std::string& out)
+		bool getNextMessage(std::string& msg)
 		{
-			
-		}
+			size_t pos = _buffer.find("\r\n");
+			if (pos == std::string::npos)
+				return false;
+			msg = _buffer.substr(0, pos);
+			_buffer.erase(0, pos + 2);
+			return true;
+		};
+
+		void clearBuffer()
+		{
+			std::string().swap(_buffer);
+		};
 	
 };
 

@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/19 18:46:10 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/24 13:19:48 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,34 +295,38 @@ void Server::handleClientMessage(int clientFd)
 		return;
 	}
 	
+	Print::Debug("Recieved " + toString(bytesRead)
+						+ " bytes from client FD: " + toString(clientFd)
+						+ " -> " + "[" + buffer + "]");
 	
+	//TODO maybe change to MessageParse class?
 	client->appendBuffer(buffer, bytesRead); // Client owns its buffer
 
-	// buffer[bytesRead] = '\0';
-	// Print::Debug("Recieved " + toString(bytesRead)
-	// 						+ " bytes from client FD: " + toString(clientFd)
-	// 						+ " -> " + buffer);
-			
-	// // Echo back to client
-	// const char* response = "Message received!\r\n";
-	// send(clientFd, response, std::strlen(response), 0);
-
-	
 	// TODO Need to buffer per client
 	// TODO This requires you to add _clients[clientFd] = Client(clientFd) in handleNewConnection and have a processMessage method.
 	// TODO One message in → one reply out, regardless of how TCP fragments it.
 	// _clients[clientFd].recv_buf.append(buffer, bytesRead);
+	std::string line;
+	while (client->getNextMessage(line))
+	{
+		// TODO Message and Command classes
+		// Message msg = Message(line);
+		// Command::execute(server, client, msg);
+		
+		Print::Debug("FD: " + toString(clientFd) + " -> [" + line + "]");
+		
+		// Echo back to client
+		const char* response = "Message received!\r\n";
+		send(clientFd, response, std::strlen(response), 0);
+	
+	}
 
-    // // Only process complete IRC messages (terminated by \r\n)
-    // size_t pos;
-    // while ((pos = _clients[clientFd].recv_buf.find("\r\n")) != std::string::npos)
-    // {
-    //     std::string msg = _clients[clientFd].recv_buf.substr(0, pos);
-    //     _clients[clientFd].recv_buf.erase(0, pos + 2);
+	if (client->getBufferSize() > MAX_MESSAGE_SIZE)
+	{
+		client->clearBuffer();
+		Print::Warn("Buffer overflow, clearing buffer of FD: " + toString(clientFd));
+	}
 
-    //     if (!msg.empty())
-    //         processMessage(clientFd, msg);
-    // }
 }
 
 void Server::removeClient(int fd)
@@ -332,3 +336,13 @@ void Server::removeClient(int fd)
 	_clients.erase(fd);
 	Print::StdOut("Client removed FD: " + toString(fd));
 }
+
+
+// buffer[bytesRead] = '\0';
+	// Print::Debug("Recieved " + toString(bytesRead)
+	// 						+ " bytes from client FD: " + toString(clientFd)
+	// 						+ " -> " + buffer);
+			
+	// // Echo back to client
+	// const char* response = "Message received!\r\n";
+	// send(clientFd, response, std::strlen(response), 0);

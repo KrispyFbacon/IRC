@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 17:27:40 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/18 11:29:45 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/24 12:58:41 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@
 // --- Network / Socket Core ---
 #define PORT 6667
 #define BUFFER_SIZE 1024
+#define MAX_MESSAGE_SIZE 4096
 #define MAX_EVENTS 64 // 128 (64: clean & efficent, 128: very safe but more resource intensive)
 
 // --- Colors ---
@@ -89,6 +90,7 @@ class Print
 		static void Ok (const std::string& str);
 		static void Error (const std::string& str);
 		static void Fail (const std::string& str);
+		static void Warn (const std::string& str);
 		
 };
 

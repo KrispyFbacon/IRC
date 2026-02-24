@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/11 17:40:17 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/12 17:44:42 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/24 13:00:19 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,5 +69,11 @@ void Print::Fail(const std::string &str)
 	std::cerr << BOLD_R << "[ FAIL ] " << RST
 			  << str << ": " 
 			  << NUM_COLOR << strerror(errno) << RST
+	<< std::endl;
+}
+
+void Print::Warn(const std::string &str)
+{
+	std::cerr << BOLD_Y << "[ FAIL ] " << RST << str
 	<< std::endl;
 }
