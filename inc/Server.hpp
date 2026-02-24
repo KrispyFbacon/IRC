@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:37:03 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/24 13:06:34 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/24 15:57:20 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ class Client
 
 	public:
 		Client(int fd) : _fd(fd) {};
-		~Client();
+		~Client() {};
 
 
 		//  ── Buffer Handler ──
@@ -38,6 +38,11 @@ class Client
 		// void appendBuffer(const char* data, ssize_t len);
 		// bool getNextMessage(std::string& msg);
 		// void clearBuffer();
+
+		int	getFd() const
+		{
+			return _fd;
+		}
 		
 		std::string& getBuffer()
 		{

@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:56:10 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/18 11:33:00 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/24 16:37:06 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,17 @@ int main(void)
 
 	server.run();
 
+	// try
+	// {
+	// 	Server server(PORT);
+	// 	server.initServer();
+	// 	server.run();
+	// }
+	// catch(const std::exception& e)
+	// {
+	// 	Print::Error(e.what());
+	// 	return 1;
+	// }
+	
 	return 0;
 }

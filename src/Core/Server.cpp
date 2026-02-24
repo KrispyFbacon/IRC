@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/24 13:19:48 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/24 16:39:32 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,17 @@ bool Server::initServer()
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_fd == -1)
 	{
+		// TODO THROW
 		Print::Error("Failed to create socket");
 		return false;
 	}
 
+	// TODO THROW
 	int opt = 1;
 	if (!setOption(SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
 		return false;
 
+	// TODO THROW
 	// Set socket to non-blocking
 	if (!setNonBlocking(_fd))
 		return false;
@@ -45,6 +48,7 @@ bool Server::initServer()
 	address.sin_port = htons(_port);
 	address.sin_addr.s_addr = INADDR_ANY;
 
+	//TODO THROW
 	if (bind(_fd, (struct sockaddr*)&address, sizeof(address)) < 0)
 	{
 		Print::Error("Bind() failed");
@@ -54,16 +58,19 @@ bool Server::initServer()
 	// Start listening
 	// TODO maybe Socket::listen(backlog)
 	int backlog = 10;
+	//TODO THROW
 	if (listen(_fd, backlog) < 0)
 	{
 		Print::Error("Listen() failed");
 		return false;
 	}
 
+	//TODO THROW
 	// TODO Create the epoll instance
 	if (!epollCreate(0))
 		return false;
 	
+	//TODO THROW
 	// TODO Register the listening socket with epoll
 	if (!epollAdd(_fd, EPOLLIN))
 		return false;
@@ -80,7 +87,7 @@ void Server::run()
 
 	while (g_running)
 	{
-		// TODO save somewhere
+		// TODO save somewhere?
 		epoll_event events[MAX_EVENTS];
 
 		int nfds = epoll_wait(_epfd, events, MAX_EVENTS, -1);
@@ -95,30 +102,45 @@ void Server::run()
 		for (int n = 0; n < nfds; ++n)
 		{
 			int	currentFd = events[n].data.fd;
+			uint32_t ev = events[n].events;
 			
 			if (currentFd == _fd)
-				// TODO Accept incoming connection
+			{
 				handleNewConnection();
-			else
-				// TODO Receive data from client
-				handleClientMessage(currentFd);
-			// TODO else - Disconnect Client // void removeClient(int fd);
-			// TODO handle errors
-			// TODO handle hangup with data available
-			// TODO Handle hangup without data available
+				continue;
 			}
+
+			// Error and HangUp
+			if (ev & (EPOLLHUP | EPOLLRDHUP | EPOLLERR))
+			{
+				Print::Debug("Client hangup FD: " + toString(currentFd));
+				removeClient(currentFd);
+				continue;
+			}
+
+			if (ev & EPOLLIN)
+				handleClientMessage(currentFd);
+		}
 	}
 }
 
 // cleanup
 void Server::cleanup()
 {
+	// Client cleanup
+	for (clientIt it = _clients.begin(); it != _clients.end(); ++it)
+		delete it->second;
+	_clients.clear();
+	
+	// Epoll fd
 	if (_epfd != -1)
 	{
-		close(_fd);
-		_fd = -1;
+		close(_epfd);
+		_epfd = -1;
 		Print::Debug("Epoll socket closed Succefully");
 	}
+
+	// Server fd
 	if (_fd != -1)
 	{
 		close(_fd);
@@ -126,6 +148,7 @@ void Server::cleanup()
 		Print::Ok("Server socket closed Succefully");
 	}
 }
+
 
 
 // ── Client Management ───────────────────────────────────────────────────────
@@ -139,6 +162,7 @@ Client* Server::getClient(int clientFd)
 
 	return it->second;
 }
+
 
 
 
@@ -156,7 +180,7 @@ bool Server::setNonBlocking(int fd)
 		return false;
 	}
 
-	if (fcntl(_fd, F_SETFL, fdFlags | O_NONBLOCK) == -1)
+	if (fcntl(fd, F_SETFL, fdFlags | O_NONBLOCK) == -1)
 	{
 		Print::Error("fcntl() F_SETFL failed");
 		return false;
@@ -236,6 +260,8 @@ bool Server::epollDel (int fd)
 }
 
 
+
+
 // ── Event handlers ──────────────────────────────────────────────────────────
 
 
@@ -278,34 +304,35 @@ void Server::handleClientMessage(int clientFd)
 	}
 	
 	ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
-	if (bytesRead <= 0)
+	if (bytesRead < 0)
 	{
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
 		{
 			Print::Debug("No data available, but connection is still open");
 			return;
 		}
-		
-		if (bytesRead == 0)
-			Print::StdOut("Client disconnected FD: " + toString(clientFd));
-		else
-			Print::Error("recv() failed FD: " + toString(clientFd));
-
+		Print::Error("recv() failed FD: " + toString(clientFd));
 		removeClient(clientFd);
 		return;
 	}
+
+	if (bytesRead == 0)
+	{
+		Print::Debug("Client disconnected FD: " + toString(clientFd));
+		removeClient(clientFd);
+		return;
+		
+	}
 	
 	Print::Debug("Recieved " + toString(bytesRead)
-						+ " bytes from client FD: " + toString(clientFd)
-						+ " -> " + "[" + buffer + "]");
+						+ " bytes from client FD: " + toString(clientFd));
 	
 	//TODO maybe change to MessageParse class?
-	client->appendBuffer(buffer, bytesRead); // Client owns its buffer
+	client->appendBuffer(buffer, bytesRead);
 
 	// TODO Need to buffer per client
 	// TODO This requires you to add _clients[clientFd] = Client(clientFd) in handleNewConnection and have a processMessage method.
 	// TODO One message in → one reply out, regardless of how TCP fragments it.
-	// _clients[clientFd].recv_buf.append(buffer, bytesRead);
 	std::string line;
 	while (client->getNextMessage(line))
 	{
@@ -334,15 +361,22 @@ void Server::removeClient(int fd)
 	epollDel(fd);
 	close(fd);
 	_clients.erase(fd);
-	Print::StdOut("Client removed FD: " + toString(fd));
+	Print::Debug("Client removed FD: " + toString(fd));
 }
 
+// if (bytesRead <= 0)
+	// {
+	// 	if (errno == EAGAIN || errno == EWOULDBLOCK)
+	// 	{
+	// 		Print::Debug("No data available, but connection is still open");
+	// 		return;
+	// 	}
+		
+	// 	if (bytesRead == 0)
+	// 		Print::StdOut("Client disconnected FD: " + toString(clientFd));
+	// 	else
+	// 		Print::Error("recv() failed FD: " + toString(clientFd));
 
-// buffer[bytesRead] = '\0';
-	// Print::Debug("Recieved " + toString(bytesRead)
-	// 						+ " bytes from client FD: " + toString(clientFd)
-	// 						+ " -> " + buffer);
-			
-	// // Echo back to client
-	// const char* response = "Message received!\r\n";
-	// send(clientFd, response, std::strlen(response), 0);
+	// 	removeClient(clientFd);
+	// 	return;
+	// }
