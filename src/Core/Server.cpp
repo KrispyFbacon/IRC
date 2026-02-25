@@ -6,13 +6,13 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/25 13:30:39 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/25 16:58:57 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-Server::Server(int port) : _fd(-1), _port(port) {}
+Server::Server(int port) : _fd(-1), _epfd(-1), _port(port) {}
 
 Server::~Server()
 {
@@ -32,10 +32,8 @@ void Server::initServer()
 	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
 		throw SocketException("setsockopt() failed");
 
-	// TODO THROW
 	// Set socket to non-blocking
-	if (!setNonBlocking(_fd))
-		return false;
+	setNonBlocking(_fd);
 
 	// Bind socket to address and port 
 	// TODO maybe Socket::bind(port)
@@ -44,36 +42,20 @@ void Server::initServer()
 	address.sin_port = htons(_port);
 	address.sin_addr.s_addr = INADDR_ANY;
 
-	//TODO THROW
 	if (bind(_fd, (struct sockaddr*)&address, sizeof(address)) < 0)
-	{
-		Print::Error("Bind() failed");
-		return false;
-	}
+		throw (SocketException("Bind() failed"));
 
 	// Start listening
 	// TODO maybe Socket::listen(backlog)
 	int backlog = 10;
-	//TODO THROW
 	if (listen(_fd, backlog) < 0)
-	{
-		Print::Error("Listen() failed");
-		return false;
-	}
+		throw (SocketException("Listen() failed"));
 
-	//TODO THROW
-	// TODO Create the epoll instance
-	if (!epollCreate(0))
-		return false;
-	
-	//TODO THROW
-	// TODO Register the listening socket with epoll
-	if (!epollAdd(_fd, EPOLLIN))
-		return false;
+	epollCreate(0);
+	// Register the listening socket with epoll
+	epollAdd(_fd, EPOLLIN);
 
 	Print::Ok("Server listening on port: " + toString(_port));
-
-	return true;
 }
 
 // run
@@ -91,8 +73,7 @@ void Server::run()
 		{
 			if (errno == EINTR) // signal interrupted wait
 				continue;
-			Print::Error("epoll_wait() failed");
-			break;
+			throw (EpollException("epoll_wait() failed"));
 		}
 
 		//TODO TRY EXCEPTION
@@ -101,34 +82,35 @@ void Server::run()
 			int	currentFd = events[n].data.fd;
 			uint32_t ev = events[n].events;
 			
-			if (currentFd == _fd)
+			try
 			{
-				handleNewConnection();
-				continue;
-			}
+				if (currentFd == _fd)
+				{
+					handleNewConnection();
+					continue;
+				}
 
-			// Error and HangUp
-			if (ev & (EPOLLHUP | EPOLLRDHUP | EPOLLERR))
+				// Error and HangUp
+				if (ev & (EPOLLHUP | EPOLLRDHUP | EPOLLERR))
+					// DEBUG
+					throw ClientException("Client hangup FD: " + toString(currentFd));
+
+				if (ev & EPOLLIN)
+					handleClientMessage(currentFd);
+			}
+			catch (const SocketException& e)
 			{
-				Print::Debug("Client hangup FD: " + toString(currentFd));
+				Print::Warn(e.what());
+			}
+			catch (const EpollException& e)
+			{
+				Print::Warn(e.what());
+			}
+			catch (const ClientException& e)
+			{
+				Print::Warn(e.what());
 				removeClient(currentFd);
-				continue;
 			}
-
-			if (ev & EPOLLIN)
-				handleClientMessage(currentFd);
-			//TODO CATCH 
-				//remove client
-				// close fd
-			// catch (const std::exception& e) 
-			// {
-			// 	if (isThisAFatalError(e)) 
-			// 	{
-			// 		throw; // Sends the exact same exception up to main()
-			// 	}
-			// 	// Otherwise, just remove client and keep going
-			// 	removeClient(currentFd);
-			// }
 		}
 	}
 }
@@ -184,76 +166,47 @@ void Server::setNonBlocking(int fd)
 {
 	int fdFlags = fcntl(fd, F_GETFL, 0);
 	if (fdFlags == -1)
-	{
-		Print::Error("fcntl() F_GETFL failed");
-		return false;
-	}
+		throw (SocketException("fcntl() F_GETFL failed"));
 
 	if (fcntl(fd, F_SETFL, fdFlags | O_NONBLOCK) == -1)
-	{
-		Print::Error("fcntl() F_SETFL failed");
-		return false;
-	}
-	
-	return true;
+		throw (SocketException("fcntl() F_SETFL failed"));
 }
 
 // Creates an epoll instance
-bool Server::epollCreate (int flags)
+void Server::epollCreate (int flags)
 {
 	_epfd = epoll_create1(flags);
-	
 	if (_epfd == -1)
-	{
-		Print::Error("epoll_create1() failed");
-		return false;
-	}
-
-	return true;
+		throw (EpollException("epoll_create1() failed"));
 }
 
 // Adds a fd to the epoll instance with specified events
-bool Server::epollAdd (int fd, uint32_t events)
+void Server::epollAdd (int fd, uint32_t events)
 {
 	epoll_event ev;
 	ev.events = events; 
 	ev.data.fd = fd; // kernel hands this back to us when the event fires
 	
 	if (epoll_ctl(_epfd, EPOLL_CTL_ADD, fd, &ev) == -1)
-	{
-		Print::Error("epoll_ctl ADD FD: " + toString(fd));
-		return false;
-	}
-
-	return true;
+		throw (EpollException("epoll_ctl ADD FD: " + toString(fd)));
 }
 
 // Modifies the events associated with a fd in the epoll instance
-bool Server::epollMod (int fd, uint32_t events)
+void Server::epollMod (int fd, uint32_t events)
 {
 	epoll_event ev;
 	ev.events = events;
 	ev.data.fd = fd;
 	
 	if (epoll_ctl(_epfd, EPOLL_CTL_MOD, fd, &ev) == -1)
-	{
-		Print::Error("epoll_ctl MOD FD: " + toString(fd));
-		return false;
-	}
-
-	return true;
+		throw (EpollException("epoll_ctl MOD FD: " + toString(fd)));
 }
 
 // Removes a fd from the epoll instance
-bool Server::epollDel (int fd)
+void Server::epollDel (int fd)
 {
 	if (epoll_ctl(_epfd, EPOLL_CTL_DEL, fd, NULL) == -1)
-	{
-		Print::Error("epoll_ctl DEL FD: " + toString(fd));
-		return false;
-	}
-
-	return true;
+		throw (EpollException("epoll_ctl DEL FD: " + toString(fd)));
 }
 
 
@@ -274,8 +227,7 @@ void Server::handleNewConnection()
 		{
 			if (errno == EAGAIN || errno == EWOULDBLOCK)
 				break ;
-			Print::Error("accept() failed");
-			break ;
+			throw(SocketException("accept() failed"));
 		}
 
 		setNonBlocking(clientFd);
@@ -295,11 +247,8 @@ void Server::handleClientMessage(int clientFd)
 	
 	Client* client = getClient(clientFd);
 	if (!client)
-	{
-		Print::StdErr("ERROR: Client not found for FD: " + toString(clientFd));
-		return;
-	}
-	
+		throw ClientException("Client not found for FD: " + toString(clientFd));
+
 	ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 	if (bytesRead < 0)
 	{
@@ -308,14 +257,12 @@ void Server::handleClientMessage(int clientFd)
 			Print::Debug("No data available, but connection is still open");
 			return;
 		}
-		Print::Error("recv() failed FD: " + toString(clientFd));
-		removeClient(clientFd);
-		return;
+		throw ClientException("recv() failed FD: " + toString(clientFd));
 	}
 
 	if (bytesRead == 0)
 	{
-		Print::Debug("Client disconnected FD: " + toString(clientFd));
+		Print::Debug("Client gracefully disconnected FD: " + toString(clientFd));
 		removeClient(clientFd);
 		return;
 		
@@ -357,23 +304,13 @@ void Server::removeClient(int fd)
 {
 	epollDel(fd);
 	close(fd);
-	_clients.erase(fd);
+	
+	clientIt it = _clients.find(fd);
+	if (it != _clients.end())
+	{
+		delete it->second;
+		_clients.erase(it); // Removes the entry from the map
+	}
+	
 	Print::Debug("Client removed FD: " + toString(fd));
 }
-
-// if (bytesRead <= 0)
-	// {
-	// 	if (errno == EAGAIN || errno == EWOULDBLOCK)
-	// 	{
-	// 		Print::Debug("No data available, but connection is still open");
-	// 		return;
-	// 	}
-		
-	// 	if (bytesRead == 0)
-	// 		Print::StdOut("Client disconnected FD: " + toString(clientFd));
-	// 	else
-	// 		Print::Error("recv() failed FD: " + toString(clientFd));
-
-	// 	removeClient(clientFd);
-	// 	return;
-	// }

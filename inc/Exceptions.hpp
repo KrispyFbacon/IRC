@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/25 11:30:56 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/25 13:20:43 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/25 16:57:35 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class ServerException : public std::exception
 		
 	public:
 		explicit ServerException(const std::string& message) : _message(message) {};
-		~ServerException();
+		virtual ~ServerException() throw() {};
 		
 		const char* what() const throw()
 		{
@@ -40,15 +40,31 @@ class ServerException : public std::exception
 class SocketException : public ServerException
 {
 	public:
-		explicit SocketException(const std::string& message) : ServerException("SocketException()-> " + message) {}
-		~SocketException() throw() {}
+		explicit SocketException(const std::string& message) : ServerException("SocketException(): " + message) {}
+		virtual ~SocketException() throw() {}
 };
 
 class EpollException : public ServerException
 {
 	public:
-		explicit EpollException(const std::string& message) : ServerException("EpollException()-> " + message) {}
-		~EpollException() throw() {}
+		explicit EpollException(const std::string& message) : ServerException("EpollException(): " + message) {}
+		virtual ~EpollException() throw() {}
+};
+
+
+class ClientException : public std::exception
+{
+	private:
+		std::string _message;
+		
+	public:
+		explicit ClientException(const std::string& message) : _message(message) {};
+		virtual ~ClientException() throw() {};
+		
+		const char* what() const throw()
+		{
+			return _message.c_str();
+		};
 };
 
 #endif

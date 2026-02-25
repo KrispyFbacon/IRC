@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:37:03 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/25 13:30:45 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/25 14:19:55 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,10 +94,10 @@ class Server
 
 		// TODO I/O helpers
 			void setNonBlocking(int fd);
-			bool epollCreate (int flags);
-			bool epollAdd (int fd, uint32_t events);
-			bool epollMod (int fd, uint32_t events);
-			bool epollDel (int fd);
+			void epollCreate (int flags);
+			void epollAdd (int fd, uint32_t events);
+			void epollMod (int fd, uint32_t events);
+			void epollDel (int fd);
 
 		// TODO Event handlers
 			void handleNewConnection();
