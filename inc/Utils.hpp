@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 17:27:40 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/24 12:58:41 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/25 11:36:31 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@
 #include <cstring>		// std::memset, std::strlen, std::strcmp
 #include <errno.h>		// errno
 
+#include "Exceptions.hpp"
 #include "Color.hpp"
 
 //https://www.tutorialspoint.com/cplusplus/cpp_socket_programming.html

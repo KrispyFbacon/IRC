@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/24 18:50:02 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/25 13:30:39 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,21 +20,17 @@ Server::~Server()
 }
 
 // initServer
-bool Server::initServer()
+void Server::initServer()
 {
 	// Create socket
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (_fd == -1)
-	{
-		// TODO THROW
-		Print::Error("Failed to create socket");
-		return false;
-	}
+		throw SocketException("Failed to create socket");
 
 	// TODO THROW
 	int opt = 1;
-	if (!setOption(SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
-		return false;
+	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+		throw SocketException("setsockopt() failed");
 
 	// TODO THROW
 	// Set socket to non-blocking
@@ -184,7 +180,7 @@ Client* Server::getClient(int clientFd)
 // ── I/O helpers ─────────────────────────────────────────────────────────────
 
 // Makes a file descriptor non-blocking
-bool Server::setNonBlocking(int fd)
+void Server::setNonBlocking(int fd)
 {
 	int fdFlags = fcntl(fd, F_GETFL, 0);
 	if (fdFlags == -1)
@@ -199,18 +195,6 @@ bool Server::setNonBlocking(int fd)
 		return false;
 	}
 	
-	return true;
-}
-
-// Sets a socket options (e.g. SO_REUSEADDR)
-bool Server::setOption(int level, int optname, const void *optval, socklen_t optlen)
-{
-	if (setsockopt(_fd, level, optname, optval, optlen) < 0)
-	{
-		Print::Error("setsockopt() failed");
-		return false;
-	}
-
 	return true;
 }
 
