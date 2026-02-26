@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/10 16:56:10 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/25 14:34:56 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/26 12:40:14 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,6 @@ void signalHandler(int signum)
 int main(void)
 {
 	signal(SIGINT, signalHandler);
-
-	//Server server(PORT);
-	
-	// TODO exceptions
-	// if (!server.initServer())
-	// {
-	// 	return 1;
-	// }
-
-	//server.run();
 
 	try
 	{
@@ -60,3 +50,17 @@ int main(void)
 	
 	return 0;
 }
+
+//SERVER CLASS
+// TODO Socket class?
+// TODO Epoll class/struct? with inBuffer and outBuffer?
+
+// CHANNEL CLASS
+// TODO Invite only flag
+// TODO Password
+// TODO Operator priveledge (if topic / password can be changed by non-moderators)
+// TODO Channel Client limit
+// TODO List of moderators
+
+// CLIENT CLASS
+// TODO ClientStatus class?

@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 17:27:40 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/25 11:36:31 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/26 14:09:28 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 
 // --- Network / Socket Core ---
 #include <sys/socket.h>	// socket, setsockopt, getsockname, bind, connect, listen, accept, send, recv
+#include <sys/types.h> // socklen_t, ssize_t, pid_t
 #include <netinet/in.h>	// htons, htonl, ntohs, ntohl, INADDR_ANY (IPv4)
 #include <arpa/inet.h> 	// inet_addr, inet_ntoa, inet_ntop
 #include <netdb.h> 		// getprotobyname, gethostbyname, getaddrinfo, freeaddrinfo
@@ -60,6 +61,7 @@
 
 // --- Network / Socket Core ---
 #define PORT 6667
+#define BACKLOG 10
 #define BUFFER_SIZE 1024
 #define MAX_MESSAGE_SIZE 4096
 #define MAX_EVENTS 64 // 128 (64: clean & efficent, 128: very safe but more resource intensive)

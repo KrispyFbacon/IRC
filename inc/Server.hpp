@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:37:03 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/25 14:19:55 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/26 14:11:25 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ class Server
 		//std::map<string, Channels*> _channels;
 
 		// TODO I/O helpers
+			void createAndBindSocket();
 			void setNonBlocking(int fd);
 			void epollCreate (int flags);
 			void epollAdd (int fd, uint32_t events);

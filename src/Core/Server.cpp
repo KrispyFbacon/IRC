@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/25 16:58:57 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/26 15:06:22 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,36 +19,83 @@ Server::~Server()
 	cleanup();
 }
 
+void Server::createAndBindSocket()
+{
+	struct addrinfo hints;
+
+	std::memset(&hints, 0, sizeof hints);
+	hints.ai_family = AF_UNSPEC; // Support both IPv4 and IPv6
+	hints.ai_socktype = SOCK_STREAM; // TCP
+	hints.ai_flags = AI_PASSIVE; // Bind to all available interfaces
+
+	
+	// Get address information
+	struct addrinfo* servinfo;
+	std::string portStr = toString(_port);
+	if (getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo) != 0)
+		throw SocketException("getaddrinfo() failed");
+
+	// Loop through results and bind to the first working address
+	struct addrinfo *p;
+	for (p = servinfo; p != NULL; p = p->ai_next)
+	{
+		_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+		if (_fd == -1)
+			continue;
+		
+		int opt = 1;
+		if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) 
+		{
+			freeaddrinfo(servinfo);
+			throw SocketException("setsockopt() failed");
+		}
+
+		if (bind(_fd, p->ai_addr, p->ai_addrlen) < 0) 
+		{
+			close(_fd);
+			_fd = -1;
+			continue;
+		}
+
+		break;
+	}
+
+	freeaddrinfo(servinfo);
+	
+	if (p == NULL)
+		throw SocketException("Failed to bind to any available address");
+}
+
+
 // initServer
 void Server::initServer()
 {
 	// Create socket
-	_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (_fd == -1)
-		throw SocketException("Failed to create socket");
+	createAndBindSocket();
+	// _fd = socket(AF_INET, SOCK_STREAM, 0);
+	// if (_fd == -1)
+	// 	throw SocketException("Failed to create socket");
 
-	// TODO THROW
-	int opt = 1;
-	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
-		throw SocketException("setsockopt() failed");
+	// int opt = 1;
+	// if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+	// 	throw SocketException("setsockopt() failed");
 
 	// Set socket to non-blocking
 	setNonBlocking(_fd);
 
-	// Bind socket to address and port 
-	// TODO maybe Socket::bind(port)
-	sockaddr_in address;
-	address.sin_family = AF_INET;
-	address.sin_port = htons(_port);
-	address.sin_addr.s_addr = INADDR_ANY;
+	// // Bind socket to address and port 
+	// // TODO maybe Socket::bind(port)
+	// sockaddr_in address;
+	// address.sin_family = AF_INET; // use IPv4
+	// address.sin_port = htons(_port);
+	// address.sin_addr.s_addr = INADDR_ANY;
 
-	if (bind(_fd, (struct sockaddr*)&address, sizeof(address)) < 0)
-		throw (SocketException("Bind() failed"));
+	// if (bind(_fd, (struct sockaddr*)&address, sizeof(address)) < 0)
+	// 	throw (SocketException("Bind() failed"));
 
 	// Start listening
 	// TODO maybe Socket::listen(backlog)
-	int backlog = 10;
-	if (listen(_fd, backlog) < 0)
+	if (listen(_fd, BACKLOG) < 0)
 		throw (SocketException("Listen() failed"));
 
 	epollCreate(0);
@@ -161,6 +208,8 @@ Client* Server::getClient(int clientFd)
 
 // ── I/O helpers ─────────────────────────────────────────────────────────────
 
+
+
 // Makes a file descriptor non-blocking
 void Server::setNonBlocking(int fd)
 {
@@ -219,7 +268,7 @@ void Server::handleNewConnection()
 {
 	while (true)
 	{
-		struct sockaddr_in clientAdress;
+		struct sockaddr_storage clientAdress;
 		socklen_t clientLen = sizeof(clientAdress);
 	
 		int clientFd = accept(_fd, (struct sockaddr*)&clientAdress, &clientLen);
