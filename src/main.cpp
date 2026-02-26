@@ -21,9 +21,16 @@ void signalHandler(int signum)
 	g_running = false;
 }
 
-int main(void)
+int main(int argc, char* argv[])
 {
 	signal(SIGINT, signalHandler);
+
+	if (argc != 3)
+	{
+		Print::StdErr("ERROR: Invalid input\n");
+		Print::StdErr("Usage: ./ircserv <port 1024-65535> <password>");
+		return 1;
+	}
 
 	try
 	{
