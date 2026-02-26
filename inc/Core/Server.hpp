@@ -20,7 +20,7 @@
 class Client;
 class Channel;
 
-// ── Server ──────────────────────────────────────────────────────────────────
+
 class Server
 {
 	private:
@@ -35,7 +35,7 @@ class Server
 		std::map<int, Client*> _clients;
 		//std::map<string, Channels*> _channels;
 
-		// TODO I/O helpers
+		// ── I/O helpers ──
 			void createAndBindSocket();
 			void setNonBlocking(int fd);
 			void epollCreate (int flags);
@@ -43,7 +43,7 @@ class Server
 			void epollMod (int fd, uint32_t events);
 			void epollDel (int fd);
 
-		// TODO Event handlers
+		// ── Event handlers ──
 			void handleNewConnection();
 			void handleClientMessage(int clientFd);
 			void removeClient(int clientFd);

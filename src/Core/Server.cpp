@@ -6,7 +6,7 @@
 /*   By: frbranda <frbranda@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/23 15:35:52 by frbranda          #+#    #+#             */
-/*   Updated: 2026/02/26 15:06:22 by frbranda         ###   ########.fr       */
+/*   Updated: 2026/02/26 17:52:42 by frbranda         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,87 +19,23 @@ Server::~Server()
 	cleanup();
 }
 
-void Server::createAndBindSocket()
-{
-	struct addrinfo hints;
-
-	std::memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_UNSPEC; // Support both IPv4 and IPv6
-	hints.ai_socktype = SOCK_STREAM; // TCP
-	hints.ai_flags = AI_PASSIVE; // Bind to all available interfaces
-
-	
-	// Get address information
-	struct addrinfo* servinfo;
-	std::string portStr = toString(_port);
-	if (getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo) != 0)
-		throw SocketException("getaddrinfo() failed");
-
-	// Loop through results and bind to the first working address
-	struct addrinfo *p;
-	for (p = servinfo; p != NULL; p = p->ai_next)
-	{
-		_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-		if (_fd == -1)
-			continue;
-		
-		int opt = 1;
-		if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) 
-		{
-			freeaddrinfo(servinfo);
-			throw SocketException("setsockopt() failed");
-		}
-
-		if (bind(_fd, p->ai_addr, p->ai_addrlen) < 0) 
-		{
-			close(_fd);
-			_fd = -1;
-			continue;
-		}
-
-		break;
-	}
-
-	freeaddrinfo(servinfo);
-	
-	if (p == NULL)
-		throw SocketException("Failed to bind to any available address");
-}
-
 
 // initServer
 void Server::initServer()
 {
-	// Create socket
+	// Create and bind the socket using our helper
 	createAndBindSocket();
-	// _fd = socket(AF_INET, SOCK_STREAM, 0);
-	// if (_fd == -1)
-	// 	throw SocketException("Failed to create socket");
 
-	// int opt = 1;
-	// if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
-	// 	throw SocketException("setsockopt() failed");
-
-	// Set socket to non-blocking
+	// Set the listening socket to non-blocking
 	setNonBlocking(_fd);
 
-	// // Bind socket to address and port 
-	// // TODO maybe Socket::bind(port)
-	// sockaddr_in address;
-	// address.sin_family = AF_INET; // use IPv4
-	// address.sin_port = htons(_port);
-	// address.sin_addr.s_addr = INADDR_ANY;
-
-	// if (bind(_fd, (struct sockaddr*)&address, sizeof(address)) < 0)
-	// 	throw (SocketException("Bind() failed"));
-
-	// Start listening
 	// TODO maybe Socket::listen(backlog)
+	// Start listening for incoming connections
 	if (listen(_fd, BACKLOG) < 0)
 		throw (SocketException("Listen() failed"));
 
+	// Set up epoll and register the listening socket
 	epollCreate(0);
-	// Register the listening socket with epoll
 	epollAdd(_fd, EPOLLIN);
 
 	Print::Ok("Server listening on port: " + toString(_port));
@@ -123,7 +59,6 @@ void Server::run()
 			throw (EpollException("epoll_wait() failed"));
 		}
 
-		//TODO TRY EXCEPTION
 		for (int n = 0; n < nfds; ++n)
 		{
 			int	currentFd = events[n].data.fd;
@@ -189,7 +124,7 @@ void Server::cleanup()
 
 
 
-// ── Client Management ───────────────────────────────────────────────────────
+/* =========================== Client Management =========================== */
 
 Client* Server::getClient(int clientFd)
 {
@@ -203,12 +138,57 @@ Client* Server::getClient(int clientFd)
 
 
 
-
 /* ================================= PRIVATE =============================== */
 
-// ── I/O helpers ─────────────────────────────────────────────────────────────
 
+/* ============================== I/O helpers ============================== */
 
+void Server::createAndBindSocket()
+{
+	struct addrinfo hints;
+
+	std::memset(&hints, 0, sizeof hints);
+	hints.ai_family = AF_UNSPEC; // Support both IPv4 and IPv6
+	hints.ai_socktype = SOCK_STREAM; // TCP
+	hints.ai_flags = AI_PASSIVE; // Bind to all available interfaces
+
+	
+	// Get address information
+	struct addrinfo* servinfo;
+	std::string portStr = toString(_port);
+	if (getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo) != 0)
+		throw SocketException("getaddrinfo() failed");
+
+	// Loop through results and bind to the first working address
+	struct addrinfo *p;
+	for (p = servinfo; p != NULL; p = p->ai_next)
+	{
+		_fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+		if (_fd == -1)
+			continue;
+		
+		int opt = 1;
+		if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) 
+		{
+			freeaddrinfo(servinfo);
+			throw SocketException("setsockopt() failed");
+		}
+
+		if (bind(_fd, p->ai_addr, p->ai_addrlen) < 0) 
+		{
+			close(_fd);
+			_fd = -1;
+			continue;
+		}
+
+		break;
+	}
+
+	freeaddrinfo(servinfo);
+	
+	if (p == NULL)
+		throw SocketException("Failed to bind to any available address");
+}
 
 // Makes a file descriptor non-blocking
 void Server::setNonBlocking(int fd)
@@ -261,8 +241,7 @@ void Server::epollDel (int fd)
 
 
 
-// ── Event handlers ──────────────────────────────────────────────────────────
-
+/* ============================ Event handlers ============================= */
 
 void Server::handleNewConnection()
 {
@@ -273,16 +252,19 @@ void Server::handleNewConnection()
 	
 		int clientFd = accept(_fd, (struct sockaddr*)&clientAdress, &clientLen);
 		if (clientFd == -1)
-		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)
-				break ;
-			throw(SocketException("accept() failed"));
-		}
+			return; // Can't use errno to loop!
+		// if (clientFd == -1)
+		// {
+		// 	if (errno == EAGAIN || errno == EWOULDBLOCK)
+		// 		break ;
+		// 	throw(SocketException("accept() failed"));
+		// }
+
 
 		setNonBlocking(clientFd);
 		epollAdd(clientFd, EPOLLIN);
 
-		// TODO Save client information into Client container
+
 		Client* newClient = new Client(clientFd);
 		_clients[clientFd] = newClient;
 		
@@ -323,9 +305,6 @@ void Server::handleClientMessage(int clientFd)
 	//TODO maybe change to MessageParse class?
 	client->appendBuffer(buffer, bytesRead);
 
-	// TODO Need to buffer per client
-	// TODO This requires you to add _clients[clientFd] = Client(clientFd) in handleNewConnection and have a processMessage method.
-	// TODO One message in → one reply out, regardless of how TCP fragments it.
 	std::string line;
 	while (client->getNextMessage(line))
 	{

@@ -52,7 +52,7 @@
 
 
 
-/* ========================== Defines =========================== */
+/* ================================ Defines ================================ */
 
 // --- Debug ---
 #ifndef DEBUG
@@ -72,13 +72,12 @@
 
 
 
-/* ========================== Variables and Constants =========================== */
+/* ======================== Variables and Constants ======================== */
 
 // --- Global Variables ---
 extern bool g_running;
 
 
-// TODO exceptions
 // --- Utility Classes ---
 class Print
 {

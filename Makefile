@@ -17,7 +17,15 @@
 NAME = ircserv
 
 CC = c++
-FLAGS = -Wall -Wextra -Werror -std=c++98 -Iinc
+
+INC_DIRS = -Iinc \
+			-Iinc/Channels \
+			-Iinc/Clients \
+			-Iinc/Core \
+			-Iinc/Parsing \
+			-Iinc/Utils
+
+FLAGS = -Wall -Wextra -Werror -std=c++98 $(INC_DIRS)
 
 RM = rm -rf
 
