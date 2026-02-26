@@ -107,4 +107,6 @@ std::string toString(T src)
 	return ss.str();
 }
 
+std::string	getFirstString(const std::string);
+
 #endif

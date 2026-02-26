@@ -43,17 +43,23 @@ RESET = \033[0m
 VPATH = src
 VPATH += src/Core
 VPATH += src/Utils
+VPATH += src/Channels
+VPATH += src/Clients
 
 
 # Source Files
 SRC = main.cpp 
 CORE = Server.cpp
 UTILS = Utils.cpp
+CHANNELS = Channel.cpp
+CLIENTS = Client.cpp
 
 
 # Object Files
 SRC += $(CORE)
 SRC += $(UTILS)
+SRC += $(CHANNELS)
+SRC += $(CLIENTS)
 
 
 OBJ_DIR = obj

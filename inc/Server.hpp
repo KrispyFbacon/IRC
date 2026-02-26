@@ -14,68 +14,11 @@
 #define SERVER_HPP
 
 #include "Utils.hpp"
+#include "Client.hpp"
+#include "Channel.hpp"
 
-
-// ── Per-client ──────────────────────────────────────────────────────────────
-class Client
-{
-	private:
-		int _fd;
-	
-		std::string _buffer;
-
-	public:
-		Client(int fd) : _fd(fd) {};
-		~Client() {};
-
-
-		//  ── Buffer Handler ──
-		// Getters
-		// std::string& getBuffer();
-		// size_t getBufferSize() const;
-		
-		// Helpers
-		// void appendBuffer(const char* data, ssize_t len);
-		// bool getNextMessage(std::string& msg);
-		// void clearBuffer();
-
-		int	getFd() const
-		{
-			return _fd;
-		}
-		
-		std::string& getBuffer()
-		{
-			return _buffer;
-		}
-		
-		size_t getBufferSize() const
-		{
-			return _buffer.size();
-		};
-		
-		void appendBuffer(const char* data, ssize_t len)
-		{
-			_buffer.append(data, len);
-		};
-
-		bool getNextMessage(std::string& msg)
-		{
-			size_t pos = _buffer.find("\r\n");
-			if (pos == std::string::npos)
-				return false;
-			msg = _buffer.substr(0, pos);
-			_buffer.erase(0, pos + 2);
-			return true;
-		};
-
-		void clearBuffer()
-		{
-			std::string().swap(_buffer);
-		};
-	
-};
-
+class Client;
+class Channel;
 
 // ── Server ──────────────────────────────────────────────────────────────────
 class Server

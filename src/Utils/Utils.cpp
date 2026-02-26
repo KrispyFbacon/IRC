@@ -77,3 +77,14 @@ void Print::Warn(const std::string &str)
 	std::cerr << BOLD_Y << "[ FAIL ] " << RST << str
 	<< std::endl;
 }
+
+
+/* ============================= String Helper ============================= */
+
+std::string	getFirstString(const std::string str)
+{
+	size_t	pos = str.find_first_of(" ");
+	std::string	firstString = str.substr(0, pos);
+
+	return (firstString);
+}

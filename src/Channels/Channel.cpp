@@ -1,5 +1,4 @@
 #include "Channel.hpp"
-#include "Client.hpp"
 
 Channel::Channel(std::string name) : _name(name), _topic(""){}
 

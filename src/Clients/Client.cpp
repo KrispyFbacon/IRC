@@ -1,5 +1,4 @@
 #include "Client.hpp"
-#include "Channel.hpp"
 
 Client::Client(int fd) : _fd(fd), _isRegistered(false), _isAuthenticated(false){}
 
@@ -42,7 +41,7 @@ std::string	Client::getNickname() const
 
 std::string	Client::getStrBuffer() const
 {
-	return (_strBuffer);
+	return (_outBuffer);
 }
 
 // Setters
@@ -62,9 +61,9 @@ void	Client::setNickname(std::string nickname)
 	_nickname = nickname;
 }
 
-void	Client::setStrBuffer(std::string strBuffer)
+void	Client::setOutBuffer(std::string outBuffer)
 {
-	_strBuffer = strBuffer;
+	_outBuffer = outBuffer;
 }
 
 void	Client::setRegistered(bool isRegistered)
@@ -76,3 +75,35 @@ void	Client::setAuthenticated(bool isAuthenticated)
 {
 	_isAuthenticated = isAuthenticated;
 }
+
+std::string	&Client::getBuffer()
+{
+	return (_buffer);
+}
+
+size_t	Client::getBufferSize() const
+{
+	return (_buffer.size());
+};
+
+void	Client::appendBuffer(const char *data, size_t len)
+{
+	_buffer.append(data, len);
+};
+
+bool	Client::getNextMessage(std::string &msg)
+{
+	size_t	pos = _buffer.find("\r\n");
+	if (pos == std::string::npos)
+		return (false);
+
+	msg = _buffer.substr(0, pos);
+	_buffer.erase(0, pos + 2);
+
+	return (true);
+};
+
+void	Client::clearBuffer()
+{
+	std::string().swap(_buffer);
+};
