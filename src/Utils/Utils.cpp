@@ -81,9 +81,15 @@ void Print::Warn(const std::string &str)
 
 /* ============================= String Helper ============================= */
 
+
 std::string	getFirstString(const std::string str)
 {
-	size_t	pos = str.find_first_of(" ");
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (!(std::isprint(str[i])) || std::isspace(str[i]))
+			break ;
+	}
+	size_t	pos = i;
 	std::string	firstString = str.substr(0, pos);
 
 	return (firstString);
