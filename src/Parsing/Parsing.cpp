@@ -34,10 +34,10 @@ std::vector<std::string>	tokenizeMessage(std::string *str, const std::string del
 	return (tokens);
 }
 
-Message	parseMessage()
+Message	parseMessage(const std::string str)
 {
 	Message	parsedMessage;
-	std::vector<std::string>	words= tokenizeMessage();
+	std::vector<std::string>	words= tokenizeMessage(str, " ");
 
 	parsedMessage.command = words[0];
 	parsedMessage.target = words[1];

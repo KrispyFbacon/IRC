@@ -8,3 +8,5 @@ struct Message
 	std::string	target;
 	std::string	message;
 };
+
+Message	parseMessage(const std::string);
