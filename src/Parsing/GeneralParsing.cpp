@@ -1,4 +1,4 @@
-#include "Parsing.hpp"
+#include "GeneralParsing.hpp"
 
 static size_t	skipDelimiters(const std::string *str, size_t i, const std::string &delimiter)
 {
@@ -10,7 +10,7 @@ static size_t	skipDelimiters(const std::string *str, size_t i, const std::string
 	return (i);
 }
 
-std::vector<std::string>	tokenizeMessage(std::string *str, const std::string delimiter)
+std::vector<std::string>	tokenizeMessage(const std::string *str, const std::string delimiter)
 {
 	std::vector<std::string>	tokens;
 	size_t	i = 0;
@@ -34,10 +34,10 @@ std::vector<std::string>	tokenizeMessage(std::string *str, const std::string del
 	return (tokens);
 }
 
-Message	parseMessage(const std::string str)
+Message	parseGeneralMessage(const std::string str)
 {
 	Message	parsedMessage;
-	std::vector<std::string>	words= tokenizeMessage(str, " ");
+	std::vector<std::string>	words= tokenizeMessage(&str, " ");
 
 	parsedMessage.command = words[0];
 	parsedMessage.target = words[1];
