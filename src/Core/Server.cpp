@@ -12,7 +12,8 @@
 
 #include "Server.hpp"
 
-Server::Server(int port) : _fd(-1), _epfd(-1), _port(port) {}
+Server::Server(const std::string& port, const std::string& password)
+	: _fd(-1), _epfd(-1), _port(port), _password(password) {}
 
 Server::~Server()
 {
@@ -38,7 +39,7 @@ void Server::initServer()
 	epollCreate(0);
 	epollAdd(_fd, EPOLLIN);
 
-	Print::Ok("Server listening on port: " + toString(_port));
+	Print::Ok("Server listening on port: " + _port);
 }
 
 // run
@@ -155,8 +156,7 @@ void Server::createAndBindSocket()
 	
 	// Get address information
 	struct addrinfo* servinfo;
-	std::string portStr = toString(_port);
-	if (getaddrinfo(NULL, portStr.c_str(), &hints, &servinfo) != 0)
+	if (getaddrinfo(NULL, _port.c_str(), &hints, &servinfo) != 0)
 		throw SocketException("getaddrinfo() failed");
 
 	// Loop through results and bind to the first working address

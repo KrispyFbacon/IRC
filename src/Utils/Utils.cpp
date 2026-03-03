@@ -79,6 +79,78 @@ void Print::Warn(const std::string &str)
 }
 
 
+void Print::InputError(const std::string& str)
+{
+	std::cerr << BOLD_R << "[ ERROR ] " << RST << str << "\n" << std::endl;
+	std::cerr << BOLD_Y << "USAGE:" 
+			  << RST << " ./ircserv <port 1-65535> <password>"
+	<< std::endl;
+}
+
+/* ============================ Args Validation ============================ */
+
+bool isValidPort(const std::string& port)
+{
+	if (port.empty())
+		return false;
+	
+	for (std::string::size_type i = 0; i < port.size(); ++i)
+	{
+		if (!std::isdigit(static_cast<unsigned char>(port[i])))
+			return false;
+	}
+
+	long n = std::strtol(port.c_str(), NULL, 10);
+	return (n >= 1 && n <= 65535);
+}
+
+bool isValidPassword(const std::string& password)
+{
+	if (password.empty())
+		return false;
+
+	for (std::string::size_type i = 0; i < password.size(); ++i)
+	{
+		if (std::isspace(static_cast<unsigned char>(password[i])))
+			return false;
+		if (!std::isprint(static_cast<unsigned char>(password[i])))
+			return false;
+	}
+	return true;
+}
+
+// bool isValidPort(const char* port)
+// {
+// 	if (!port || !(*port))
+// 		return false;
+	
+// 	for (int i = 0; port[i] != '\0'; ++i)
+// 	{
+// 		if (!std::isdigit(static_cast<unsigned char>(port[i])))
+// 			return false;
+// 	}
+
+// 	long n = std::strtol(port, NULL, 10);
+// 	return (n >= 1 && n <= 65535);
+// }
+
+//
+// bool isValidPassword(const char* password)
+// {
+// 	if (!password || !(*password))
+// 		return false;
+
+// 	for (int i = 0; password[i] != '\0'; ++i)
+// 	{
+// 		if (std::isspace(static_cast<unsigned char>(password[i])))
+// 			return false;
+// 		if (!std::isprint(static_cast<unsigned char>(password[i])))
+// 			return false;
+// 	}
+// 	return true;
+// }
+
+
 /* ============================= String Helper ============================= */
 
 std::string	getFirstString(const std::string str)

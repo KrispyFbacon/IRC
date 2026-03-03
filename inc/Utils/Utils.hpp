@@ -94,6 +94,8 @@ class Print
 		static void Fail (const std::string& str);
 		static void Warn (const std::string& str);
 		
+		
+		static void InputError (const std::string& str);
 };
 
 
@@ -106,6 +108,12 @@ std::string toString(T src)
 	return ss.str();
 }
 
+
+// --- Args Validation ---
+bool isValidPort(const std::string& port);
+bool isValidPassword(const std::string& password);
+
+// --- String Helper ---
 std::string	getFirstString(const std::string);
 
 #endif

@@ -93,13 +93,13 @@ $(NAME): $(OBJS)
 	@echo "╚══════════════════════════╝"
 
 r: all
-	@./$(NAME)
+	@./$(NAME) 6667 123
 
 rr: re
-	@./$(NAME)
+	@./$(NAME) 6667 123
 
 rv: all
-	@$(VAL) ./$(NAME)
+	@$(VAL) ./$(NAME) 6667 123
 
 clean:
 	@$(RM) $(OBJS)

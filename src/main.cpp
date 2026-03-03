@@ -15,26 +15,42 @@
 
 bool g_running = true;
 
-void signalHandler(int signum)
+void sigHandler(int signum)
 {
 	(void)signum;
 	g_running = false;
 }
 
+
 int main(int argc, char* argv[])
 {
-	signal(SIGINT, signalHandler);
+	signal(SIGINT, sigHandler);
+	signal(SIGTERM, sigHandler);
 
 	if (argc != 3)
 	{
-		Print::StdErr("ERROR: Invalid input\n");
-		Print::StdErr("Usage: ./ircserv <port 1024-65535> <password>");
+		Print::InputError("Invalid Input");
 		return 1;
 	}
 
+	std::string port(argv[1]);
+	if (!isValidPort(port))
+	{
+		Print::InputError("Invalid Port");
+		return 1;
+	}
+	
+	std::string password(argv[2]);
+	if (!isValidPassword(password))
+	{
+		Print::InputError("Invalid Password (Cannot be empty or contain spaces)");
+		return 1;
+	}
+
+	
 	try
 	{
-		Server server(PORT);
+		Server server(port, password);
 		server.initServer();
 		server.run();
 	}
