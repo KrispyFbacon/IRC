@@ -13,7 +13,7 @@
 #include "Server.hpp"
 
 Server::Server(const std::string& port, const std::string& password)
-	: _fd(-1), _epfd(-1), _port(port), _password(password) {}
+	: _fd(-1), _epfd(-1), _port(port), _password(password), _cmdHandler() {}
 
 Server::~Server()
 {
@@ -311,6 +311,8 @@ void Server::handleClientMessage(int clientFd)
 		// TODO Message and Command classes
 		// Message msg = Message(line);
 		// Command::execute(server, client, msg);
+
+		//_cmdFactory.execute(*this, *client, msg);
 		
 		Print::Debug("FD: " + toString(clientFd) + " -> [" + line + "]");
 		

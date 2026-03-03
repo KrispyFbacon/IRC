@@ -16,10 +16,11 @@
 #include "Utils.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "CommandFactory.hpp"
 
 class Client;
 class Channel;
-
+class CommandFactory;
 
 class Server
 {
@@ -34,6 +35,7 @@ class Server
 		
 		std::map<int, Client*> _clients;
 		//std::map<string, Channels*> _channels;
+		CommandFactory _cmdFactory;
 
 		// ── I/O helpers ──
 			void createAndBindSocket();
