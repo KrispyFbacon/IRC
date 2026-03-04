@@ -1,3 +1,6 @@
+#ifndef PARSING_HPP
+#define PARSING_HPP
+
 #include <string>
 #include <vector>
 #include "Utils.hpp"
@@ -10,3 +13,6 @@ struct Message
 };
 
 Message	parseMessage(const std::string);
+
+#endif
+

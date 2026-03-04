@@ -8,15 +8,27 @@ CommandFactory::CommandFactory()
 
 CommandFactory::~CommandFactory() {}
 
-void CommandFactory::execute()
+void CommandFactory::execute(Server& server, Client& client, const Message& msg)
 {
 	//TODO Continue
-	//commandIt it = _commands.find(msg.command);
-	// if (it == _commands.end())
-	// 	return; // THROW ERR_UNKNOWNCOMMAND 
+	CommandIt it = _commands.find(msg.command); // TODO toupper?
+	if (it == _commands.end())
+	{
+		Print::Debug("Unknown command '" + msg.command + "' from FD: " + toString(client.getFd()));
 
-	// ACommand* cmd = it->second();
-	// cmd->execute(server, client, msg);
+		std::string errorMsg = ":server 421 "; // ERR_UNKNOWNCOMMAND 
+		if (client.getNickname().empty())
+			errorMsg += "*";
+		else
+			errorMsg += client.getNickname();
+		
+		errorMsg += " " + msg.command + " :Unknown command\r\n";
+		client.sendMessage(errorMsg);
+		return;
+	}
 
-	// delete cmd;
+	ACommand* cmd = it->second();
+	cmd->execute(server, client, msg);
+
+	delete cmd;
 }

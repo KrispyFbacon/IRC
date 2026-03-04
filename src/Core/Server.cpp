@@ -308,18 +308,14 @@ void Server::handleClientMessage(int clientFd)
 	std::string line;
 	while (client->getNextMessage(line))
 	{
-		// TODO Message and Command classes
-		// Message msg = Message(line);
-		// Command::execute(server, client, msg);
+		//TODO REMOVE "\r\n" from message
 
-		//_cmdFactory.execute(*this, *client, msg);
-		
+		// TODO Message and Command classes
+		Message msg = parseMessage(line); // use calss message isntead of struct?
+
 		Print::Debug("FD: " + toString(clientFd) + " -> [" + line + "]");
-		
-		// Echo back to client
-		const char* response = "Message received!\r\n";
-		send(clientFd, response, std::strlen(response), 0);
-	
+
+		_cmdFactory.execute(*this, *client, msg);
 	}
 
 	if (client->getBufferSize() > MAX_MESSAGE_SIZE)

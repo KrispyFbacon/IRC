@@ -1,4 +1,4 @@
-#include "GeneralParsing.hpp"
+#include "Parsing.hpp" //TODO changed
 
 static size_t	skipDelimiters(const std::string *str, size_t i, const std::string &delimiter)
 {
@@ -34,7 +34,8 @@ std::vector<std::string>	tokenizeMessage(const std::string *str, const std::stri
 	return (tokens);
 }
 
-Message	parseGeneralMessage(const std::string str)
+//TODO changed it to parseMessage? 
+Message	parseMessage(const std::string str) // TODO changed
 {
 	Message	parsedMessage;
 	std::vector<std::string>	words= tokenizeMessage(&str, " ");

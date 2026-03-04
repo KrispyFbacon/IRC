@@ -16,11 +16,12 @@
 #include "Utils.hpp"
 #include "Client.hpp"
 #include "Channel.hpp"
+#include "Parsing.hpp"
 #include "CommandFactory.hpp"
 
 class Client;
 class Channel;
-class CommandFactory;
+//class CommandFactory;
 
 class Server
 {

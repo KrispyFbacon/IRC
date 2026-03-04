@@ -107,3 +107,9 @@ void	Client::clearBuffer()
 {
 	std::string().swap(_buffer);
 };
+
+void	Client::sendMessage(const std::string& msg)
+{
+	std::string line = msg + "\r\n";
+	send(_fd, line.c_str(), line.size(), 0);
+}

@@ -4,11 +4,11 @@
 #include "Utils.hpp"
 #include "Server.hpp"
 #include "Client.hpp"
+#include "Parsing.hpp"
 //#include "Message.hpp"
 
 class Server;
 class Client;
-class Message;
 
 class ACommand
 {
@@ -18,7 +18,7 @@ class ACommand
 		ACommand();
 		virtual ~ACommand() {}
 
-		//virtual void execute(Server& server, Client& client, const Message& msg) = 0;
+		virtual void execute(Server& server, Client& client, const Message& msg) = 0;
 };
 
 #endif

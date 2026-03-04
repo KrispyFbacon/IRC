@@ -21,6 +21,7 @@ CC = c++
 INC_DIRS = -Iinc \
 			-Iinc/Channels \
 			-Iinc/Clients \
+			-Iinc/Commands \
 			-Iinc/Core \
 			-Iinc/Parsing \
 			-Iinc/Utils
@@ -50,6 +51,7 @@ RESET = \033[0m
 # Source Directories
 VPATH = src
 VPATH += src/Core
+VPATH += src/Commands
 VPATH += src/Utils
 VPATH += src/Channels
 VPATH += src/Clients
@@ -58,6 +60,7 @@ VPATH += src/Clients
 # Source Files
 SRC = main.cpp 
 CORE = Server.cpp
+COMMANDS = ACommand.cpp CommandFactory.cpp
 UTILS = Utils.cpp
 CHANNELS = Channel.cpp
 CLIENTS = Client.cpp
@@ -65,6 +68,7 @@ CLIENTS = Client.cpp
 
 # Object Files
 SRC += $(CORE)
+SRC += $(COMMANDS)
 SRC += $(UTILS)
 SRC += $(CHANNELS)
 SRC += $(CLIENTS)

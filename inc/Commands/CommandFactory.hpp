@@ -3,8 +3,12 @@
 
 #include "Utils.hpp"
 #include "ACommand.hpp"
-#include "JoinCommand.hpp"
+#include "Parsing.hpp"
 //#include "Message.hpp"
+#include "JoinCommand.hpp"
+
+class Server;
+class Client;
 
 class CommandFactory
 {
@@ -19,8 +23,7 @@ class CommandFactory
 		CommandFactory();
 		~CommandFactory();
 
-		//void execute(Server& server, Client& client, const Message& msg);
-		void execute();
+		void execute(Server& server, Client& client, const Message& msg);
 	};
 
 #endif
