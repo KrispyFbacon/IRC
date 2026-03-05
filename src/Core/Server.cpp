@@ -138,6 +138,22 @@ Client* Server::getClient(int clientFd)
 }
 
 
+/* =========================== Channel Management =========================== */
+
+
+Channel* Server::getChannel(std::string channelName)
+{
+	channelIt it = _channels.find(channelName);
+
+	if (it == _channels.end())
+		return NULL;
+
+	return it->second;
+}
+
+
+
+
 
 /* ================================= PRIVATE =============================== */
 
@@ -311,7 +327,7 @@ void Server::handleClientMessage(int clientFd)
 		//TODO REMOVE "\r\n" from message
 
 		// TODO Message and Command classes
-		Message msg = parseMessage(line); // use calss message isntead of struct?
+		Message msg = parseMessage(line);
 
 		Print::Debug("FD: " + toString(clientFd) + " -> [" + line + "]");
 

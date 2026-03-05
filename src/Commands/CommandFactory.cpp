@@ -11,7 +11,7 @@ CommandFactory::~CommandFactory() {}
 void CommandFactory::execute(Server& server, Client& client, const Message& msg)
 {
 	//TODO Continue
-	CommandIt it = _commands.find(msg.command); // TODO toupper?
+	CommandIt it = _commands.find(msg.command);
 	if (it == _commands.end())
 	{
 		Print::Debug("Unknown command '" + msg.command + "' from FD: " + toString(client.getFd()));
