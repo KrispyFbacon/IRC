@@ -12,7 +12,12 @@ class Channel
 	private:
 		std::string	_name;
 		std::string	_topic;
-		std::map<std::string, Client*>	_clients;
+
+		//TODO std::map<Client*, bool isMod>
+		
+		// TODO pair? <name/fd, isMod>
+		std::map<int, Client*>	_clients;
+		std::map<int, Client*>	_moderators;
 
 	public:
 		Channel(std::string);

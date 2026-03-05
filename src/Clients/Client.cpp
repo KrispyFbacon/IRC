@@ -100,6 +100,8 @@ bool	Client::getNextMessage(std::string &msg)
 	msg = _buffer.substr(0, pos);
 	_buffer.erase(0, pos + 2);
 
+	
+
 	return (true);
 };
 

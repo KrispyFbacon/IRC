@@ -16,7 +16,10 @@ void CommandFactory::execute(Server& server, Client& client, const Message& msg)
 	{
 		Print::Debug("Unknown command '" + msg.command + "' from FD: " + toString(client.getFd()));
 
-		std::string errorMsg = ":server 421 "; // ERR_UNKNOWNCOMMAND 
+		// TODO error Message handler
+		std::string errorMsg = ":42IRC 421 "; // ERR_UNKNOWNCOMMAND
+		//errorMsg += (client.getNickname().empty() ? "*" : client.getNickname());
+
 		if (client.getNickname().empty())
 			errorMsg += "*";
 		else

@@ -315,6 +315,8 @@ void Server::handleClientMessage(int clientFd)
 
 		Print::Debug("FD: " + toString(clientFd) + " -> [" + line + "]");
 
+		
+
 		_cmdFactory.execute(*this, *client, msg);
 	}
 
