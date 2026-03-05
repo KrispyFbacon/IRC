@@ -11,9 +11,9 @@ class KickCommand : public ACommand
 	private:
 
 	public:
-		static ACommand* make() { return new KickCommand(); }
+		static ACommand *make() { return new KickCommand(); }
 
-		void execute(Server& server, Client& client, const Message& msg);
+		void execute(Server &server, Client &client, const Message &msg);
 };
 
 #endif
