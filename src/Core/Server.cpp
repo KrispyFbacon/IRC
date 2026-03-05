@@ -13,7 +13,7 @@
 #include "Server.hpp"
 
 Server::Server(const std::string& port, const std::string& password)
-	: _fd(-1), _epfd(-1), _port(port), _password(password) {}
+	: _fd(-1), _epfd(-1), _port(port), _password(password), _cmdFactory() {}
 
 Server::~Server()
 {
@@ -308,16 +308,16 @@ void Server::handleClientMessage(int clientFd)
 	std::string line;
 	while (client->getNextMessage(line))
 	{
+		//TODO REMOVE "\r\n" from message
+
 		// TODO Message and Command classes
-		// Message msg = Message(line);
-		// Command::execute(server, client, msg);
-		
+		Message msg = parseMessage(line); // use calss message isntead of struct?
+
 		Print::Debug("FD: " + toString(clientFd) + " -> [" + line + "]");
+
 		
-		// Echo back to client
-		const char* response = "Message received!\r\n";
-		send(clientFd, response, std::strlen(response), 0);
-	
+
+		_cmdFactory.execute(*this, *client, msg);
 	}
 
 	if (client->getBufferSize() > MAX_MESSAGE_SIZE)

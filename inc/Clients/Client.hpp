@@ -3,6 +3,7 @@
 
 # include <string>
 # include <map>
+# include "Utils.hpp"
 # include "Channel.hpp"
 
 class Channel;
@@ -55,6 +56,8 @@ class Client
 		bool	getNextMessage(std::string &msg);
 		void	appendBuffer(const char *data, size_t len);
 		void	clearBuffer();
+
+		void	sendMessage(const std::string& msg);
 
 };
 

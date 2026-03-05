@@ -100,6 +100,8 @@ bool	Client::getNextMessage(std::string &msg)
 	msg = _buffer.substr(0, pos);
 	_buffer.erase(0, pos + 2);
 
+	
+
 	return (true);
 };
 
@@ -107,3 +109,9 @@ void	Client::clearBuffer()
 {
 	std::string().swap(_buffer);
 };
+
+void	Client::sendMessage(const std::string& msg)
+{
+	std::string line = msg + "\r\n";
+	send(_fd, line.c_str(), line.size(), 0);
+}
