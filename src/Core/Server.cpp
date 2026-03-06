@@ -13,7 +13,8 @@
 #include "Server.hpp"
 
 Server::Server(const std::string& port, const std::string& password)
-	: _fd(-1), _epfd(-1), _port(port), _password(password), _cmdFactory() {}
+	: _fd(-1), _epfd(-1), _port(port), _password(password)
+		,_serverName("42IRC"), _cmdFactory() {}
 
 Server::~Server()
 {
@@ -124,6 +125,13 @@ void Server::cleanup()
 }
 
 
+/* ================================ Getters ================================ */
+
+std::string Server::getServerName() const
+{
+	return _serverName;
+}
+
 
 /* =========================== Client Management =========================== */
 
@@ -139,7 +147,6 @@ Client* Server::getClient(int clientFd)
 
 
 /* =========================== Channel Management =========================== */
-
 
 Channel* Server::getChannel(std::string channelName)
 {

@@ -47,6 +47,7 @@
 
 #include "Exceptions.hpp"
 #include "Color.hpp"
+#include "IRCCodes.hpp"
 
 //https://www.tutorialspoint.com/cplusplus/cpp_socket_programming.html
 

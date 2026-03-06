@@ -29,9 +29,14 @@ void CommandFactory::execute(Server& server, Client& client, const Message& msg)
 		client.sendMessage(errorMsg);
 		return;
 	}
+	
 
 	ACommand* cmd = it->second();
 	cmd->execute(server, client, msg);
 
 	delete cmd;
 }
+
+//std::string errorMsg = ":" + server. _serverName + "421";
+
+//std::string errorMsg = ":" + server._hostName + " PONG " + server._hostName + 421 "

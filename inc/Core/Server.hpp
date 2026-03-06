@@ -32,8 +32,9 @@ class Server
 		// Socket _serverSocked(); TODO maybe since server and clients will have their own socket
 		int _fd; // serverFd
 		int _epfd; // epoll Fd
-		std::string _port;
+		std::string _port; //TODO turn into const
 		std::string _password;
+		std::string _serverName;
 		
 		std::map<int, Client*> _clients;
 		std::map<std::string, Channel*> _channels;
@@ -63,6 +64,9 @@ class Server
 		void initServer();
 		void run();
 		void cleanup();
+
+		// Getters
+		std::string getServerName() const;
 
 		// TODO CLient management
 		Client* getClient(int clientFd);
