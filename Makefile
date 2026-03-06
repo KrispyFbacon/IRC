@@ -22,7 +22,9 @@ INC_DIRS = -Iinc \
 			-Iinc/Channels \
 			-Iinc/Clients \
 			-Iinc/Commands \
+			-Iinc/Commands/ConnectionCommands \
 			-Iinc/Core \
+			-Iinc/Replies \
 			-Iinc/Parsing \
 			-Iinc/Utils
 
@@ -53,8 +55,10 @@ VPATH = src
 VPATH += src/Channels
 VPATH += src/Clients
 VPATH += src/Commands
+VPATH += src/Commands/ConnectionCommands
 VPATH += src/Core
 VPATH += src/Parsing
+VPATH += src/Replies
 VPATH += src/Utils
 
 
@@ -63,10 +67,13 @@ SRC = main.cpp
 CHANNELS = Channel.cpp
 CLIENTS = Client.cpp
 COMMANDS = CommandFactory.cpp \
-			JoinCommand.cpp
+			PingCommand.cpp \
+			JoinCommand.cpp 
 CORE = Server.cpp
+REPLIES = IRCReply.cpp
 PARSING = GeneralParsing.cpp
-UTILS = Utils.cpp
+UTILS =  IRCCodes.cpp \
+			Utils.cpp
 
 
 # Object Files
@@ -75,6 +82,7 @@ SRC += $(CLIENTS)
 SRC += $(COMMANDS)
 SRC += $(CORE)
 SRC += $(PARSING)
+SRC += $(REPLIES)
 SRC += $(UTILS)
 
 

@@ -5,13 +5,16 @@
 #include "Client.hpp"
 
 #include "Parsing.hpp"
+#include "IRCReply.hpp"
 //#include "Message.hpp"
 
 #include "ACommand.hpp"
 #include "JoinCommand.hpp"
+#include "PingCommand.hpp"
 
 class Server;
 class Client;
+
 
 class CommandFactory
 {

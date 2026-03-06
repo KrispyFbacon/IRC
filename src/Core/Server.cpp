@@ -13,8 +13,7 @@
 #include "Server.hpp"
 
 Server::Server(const std::string& port, const std::string& password)
-	: _fd(-1), _epfd(-1), _port(port), _password(password)
-		,_serverName("42IRC"), _cmdFactory() {}
+	: _fd(-1), _epfd(-1), _port(port), _password(password), _cmdFactory() {}
 
 Server::~Server()
 {
@@ -33,7 +32,7 @@ void Server::initServer()
 
 	// TODO maybe Socket::listen(backlog)
 	// Start listening for incoming connections
-	if (listen(_fd, BACKLOG) < 0)
+	if (listen(_fd, Config::BACKLOG) < 0)
 		throw (SocketException("Listen() failed"));
 
 	// Set up epoll and register the listening socket
@@ -51,9 +50,9 @@ void Server::run()
 	while (g_running)
 	{
 		// TODO save somewhere?
-		epoll_event events[MAX_EVENTS];
+		epoll_event events[Config::MAX_EVENTS];
 
-		int nfds = epoll_wait(_epfd, events, MAX_EVENTS, -1);
+		int nfds = epoll_wait(_epfd, events, Config::MAX_EVENTS, -1);
 		if (nfds == -1)
 		{
 			if (errno == EINTR) // signal interrupted wait
@@ -123,15 +122,6 @@ void Server::cleanup()
 		Print::Ok("Server socket closed Succefully");
 	}
 }
-
-
-/* ================================ Getters ================================ */
-
-std::string Server::getServerName() const
-{
-	return _serverName;
-}
-
 
 /* =========================== Client Management =========================== */
 
@@ -297,7 +287,7 @@ void Server::handleNewConnection()
 
 void Server::handleClientMessage(int clientFd)
 {
-	char buffer[BUFFER_SIZE] = {0};
+	char buffer[Config::BUFFER_SIZE] = {0};
 	
 	Client* client = getClient(clientFd);
 	if (!client)
@@ -343,7 +333,7 @@ void Server::handleClientMessage(int clientFd)
 		_cmdFactory.execute(*this, *client, msg);
 	}
 
-	if (client->getBufferSize() > MAX_MESSAGE_SIZE)
+	if (client->getBufferSize() > Config::MAX_MESSAGE_SIZE)
 	{
 		client->clearBuffer();
 		Print::Warn("Buffer overflow, clearing buffer of FD: " + toString(clientFd));

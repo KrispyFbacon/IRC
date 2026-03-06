@@ -6,57 +6,57 @@
 namespace IRC
 {
 	// Registration replies
-	const std::string RPL_WELCOME			= "001";
-	const std::string RPL_YOURHOST			= "002";
-	const std::string RPL_CREATED			= "003";
-	const std::string RPL_MYINFO			= "004";
+	extern const std::string RPL_WELCOME;
+	extern const std::string RPL_YOURHOST;
+	extern const std::string RPL_CREATED;
+	extern const std::string RPL_MYINFO;
 
 	// Channel replies
-	const std::string RPL_CHANNELMODEIS		= "324";
-	const std::string RPL_NOTOPIC			= "331";
-	const std::string RPL_TOPIC				= "332";
-	const std::string RPL_INVITING			= "341";
-	const std::string RPL_NAMREPLY			= "353";
-	const std::string RPL_ENDOFNAMES		= "366";
+	extern const std::string RPL_CHANNELMODEIS;
+	extern const std::string RPL_NOTOPIC;
+	extern const std::string RPL_TOPIC;
+	extern const std::string RPL_INVITING;
+	extern const std::string RPL_NAMREPLY;
+	extern const std::string RPL_ENDOFNAMES;
 
 	// MOTD replies
-	const std::string RPL_MOTDSTART			= "375";
-	const std::string RPL_MOTD				= "372";
-	const std::string RPL_ENDOFMOTD			= "376";
+	extern const std::string RPL_MOTDSTART;
+	extern const std::string RPL_MOTD;
+	extern const std::string RPL_ENDOFMOTD;
 
 	// Connection errors
-	const std::string ERR_NOSUCHNICK		= "401";
-	const std::string ERR_NOSUCHCHANNEL		= "403";
-	const std::string ERR_CANNOTSENDTOCHAN	= "404";
-	const std::string ERR_UNKNOWNCOMMAND	= "421";
-	const std::string ERR_NOMOTD			= "422";
+	extern const std::string ERR_NOSUCHNICK;
+	extern const std::string ERR_NOSUCHCHANNEL;
+	extern const std::string ERR_CANNOTSENDTOCHAN;
+	extern const std::string ERR_UNKNOWNCOMMAND;
+	extern const std::string ERR_NOMOTD;
 
 	// Nickname errors
-	const std::string ERR_NONICKNAMEGIVEN	= "431";
-	const std::string ERR_ERRONEUSNICKNAME	= "432";
-	const std::string ERR_NICKNAMEINUSE		= "433";
+	extern const std::string ERR_NONICKNAMEGIVEN;
+	extern const std::string ERR_ERRONEUSNICKNAME;
+	extern const std::string ERR_NICKNAMEINUSE;
 
 	// Channel membership errors
-	const std::string ERR_USERNOTINCHANNEL	= "441";
-	const std::string ERR_NOTONCHANNEL		= "442";
-	const std::string ERR_USERONCHANNEL		= "443";
+	extern const std::string ERR_USERNOTINCHANNEL;
+	extern const std::string ERR_NOTONCHANNEL;
+	extern const std::string ERR_USERONCHANNEL;
 
 	// Authentication errors
-	const std::string ERR_NOTREGISTERED		= "451";
-	const std::string ERR_NEEDMOREPARAMS	= "461";
-	const std::string ERR_ALREADYREGISTRED	= "462";
-	const std::string ERR_PASSWDMISMATCH	= "464";
+	extern const std::string ERR_NOTREGISTERED;
+	extern const std::string ERR_NEEDMOREPARAMS;
+	extern const std::string ERR_ALREADYREGISTRED;
+	extern const std::string ERR_PASSWDMISMATCH;
 
 	// Channel operator errors
-	const std::string ERR_CHANNELISFULL		= "471";
-	const std::string ERR_INVITEONLYCHAN	= "473";
-	const std::string ERR_BADCHANNELKEY		= "475";
-	const std::string ERR_CHANOPRIVSNEEDED	= "482";
+	extern const std::string ERR_CHANNELISFULL;
+	extern const std::string ERR_INVITEONLYCHAN;
+	extern const std::string ERR_BADCHANNELKEY;
+	extern const std::string ERR_CHANOPRIVSNEEDED;
 
 	// MODE errors
-	const std::string ERR_UNKNOWNMODE		= "472";
-	const std::string ERR_KEYSET			= "467";
-	const std::string ERR_INVALIDLIMIT		= "696";
+	extern const std::string ERR_UNKNOWNMODE;
+	extern const std::string ERR_KEYSET;
+	extern const std::string ERR_INVALIDLIMIT;
 }
 
 #endif

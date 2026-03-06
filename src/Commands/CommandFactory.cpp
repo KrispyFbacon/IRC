@@ -3,6 +3,11 @@
 CommandFactory::CommandFactory()
 {
 	//TODO add other commands
+
+	// Connection Commands
+	_commands["PING"] = &PingCommand::make;
+
+	// Channels Commands
 	_commands["JOIN"] = &JoinCommand::make;
 }
 
@@ -16,17 +21,8 @@ void CommandFactory::execute(Server& server, Client& client, const Message& msg)
 	{
 		Print::Debug("Unknown command '" + msg.command + "' from FD: " + toString(client.getFd()));
 
-		// TODO error Message handler
-		std::string errorMsg = ":42IRC 421 "; // ERR_UNKNOWNCOMMAND
-		//errorMsg += (client.getNickname().empty() ? "*" : client.getNickname());
-
-		if (client.getNickname().empty())
-			errorMsg += "*";
-		else
-			errorMsg += client.getNickname();
-		
-		errorMsg += " " + msg.command + " :Unknown command\r\n";
-		client.sendMessage(errorMsg);
+		// TODO Error Message handler
+		sendError(client, IRC::ERR_UNKNOWNCOMMAND, msg.command + " :Unknown command");
 		return;
 	}
 	
@@ -36,7 +32,5 @@ void CommandFactory::execute(Server& server, Client& client, const Message& msg)
 
 	delete cmd;
 }
-
-//std::string errorMsg = ":" + server. _serverName + "421";
 
 //std::string errorMsg = ":" + server._hostName + " PONG " + server._hostName + 421 "

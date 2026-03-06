@@ -1,18 +1,10 @@
 #ifndef IRCREPLY_HPP
 #define IRCREPLY_HPP
 
-#include <iostream>
+#include "IRCCodes.hpp"
+#include "Client.hpp"
 
-class IRCReply
-{
-	private:
-	
-	public:
-		IRCReply();
-		IRCReply(const IRCReply& other);
-		~IRCReply();
-
-		IRCReply& operator=(const IRCReply& other);
-};
+void sendError(Client& client, const std::string& code, const std::string& msg);
+void sendReply(Client& client, const std::string& code, const std::string& msg);
 
 #endif
