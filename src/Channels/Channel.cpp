@@ -27,7 +27,7 @@ Client	*Channel::getModerator(int clientFd)
 {
 	std::map<int, Client*>::iterator it = _moderators.find(clientFd);
 
-	if (it == _clients.end())
+	if (it == _moderators.end())
 		return (NULL);
 
 	return (it->second);

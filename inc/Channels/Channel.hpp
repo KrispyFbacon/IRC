@@ -24,7 +24,7 @@ class Channel
 		Channel(std::string, const Channel &);
 		~Channel();
 
-		std::string	Channel::getChannelName();
+		std::string	getChannelName();
 
 		void	copyChannelInfo(Channel &, const Channel &);
 
