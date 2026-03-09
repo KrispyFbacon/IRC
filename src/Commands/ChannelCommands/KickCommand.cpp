@@ -25,10 +25,10 @@ void	KickCommand::execute(Server &server, Client &client, const Message &msg)
 	if (!target || !channel->hasClient(target->getFd()))
 		return (client.sendMessage(":42IRC 441 " + client.getNickname() + " " + targetNick + " " + channelName + " :They aren't on that channel"));
 
-	// If broadcast then remove
+	// Broadcast then remove
 	std::string	kickMsg = ":" + client.getNickname() + " KICK " + channelName + " " + targetNick + " :" + reason;
 	channel->broadcast(kickMsg);
-	if (channel->getModerator(client.getFd()))
+	if (channel->getModerator(client.getFd()) != NULL)
 		channel->removeModerator(client);
 	channel->removeClient(target);
 }
