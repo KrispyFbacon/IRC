@@ -18,9 +18,19 @@ void	Channel::copyChannelInfo(Channel &dest, const Channel &src)
 	dest._clients = src._clients;
 }
 
-std::string	Channel::getChannelName()
+std::string	Channel::getChannelName() const
 {
 	return(_name);
+}
+
+std::string	channel::getTopic() const
+{
+	return (_topic);
+}
+
+void	channel::setTopic(const std::string topic)
+{
+	_topic = topic;
 }
 
 Client	*Channel::getModerator(int clientFd)

@@ -65,8 +65,10 @@ SRC = main.cpp
 CHANNELS = Channel.cpp
 CLIENTS = Client.cpp
 COMMANDS = CommandFactory.cpp \
-			JoinCommand.cpp\
-			KickCommand.cpp
+			JoinCommand.cpp \
+			KickCommand.cpp \
+			InviteCommand.cpp \
+			TopicCommand.cpp
 CORE = Server.cpp
 PARSING = GeneralParsing.cpp
 UTILS = Utils.cpp

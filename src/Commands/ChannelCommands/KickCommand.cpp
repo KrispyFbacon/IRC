@@ -1,5 +1,9 @@
 #include "KickCommand.hpp"
 
+// command = "KICK"
+// target  = "#channel"
+// message = "nick :reason ..."
+
 void	KickCommand::execute(Server &server, Client &client, const Message &msg)
 {
 	std::string	channelName = msg.target;
