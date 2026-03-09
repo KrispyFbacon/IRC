@@ -3,11 +3,12 @@
 void	KickCommand::execute(Server &server, Client &client, const Message &msg)
 {
 	std::string	channelName = msg.target;
-	std::string	targetNick, reason;
+	std::string	targetNick;
+	std::string	reason;
 	parseKickParams(msg, targetNick, reason);
 
 	// If channel exists
-	Channel* channel = server.getChannel(channelName);
+	Channel	*channel = server.getChannel(channelName);
 	if (!channel)
 		return (client.sendMessage(":42IRC 403 " + client.getNickname() + " " + channelName + " :No such channel"));
 
@@ -27,5 +28,7 @@ void	KickCommand::execute(Server &server, Client &client, const Message &msg)
 	// If broadcast then remove
 	std::string	kickMsg = ":" + client.getNickname() + " KICK " + channelName + " " + targetNick + " :" + reason;
 	channel->broadcast(kickMsg);
+	if (channel->getModerator(client.getFd()))
+		channel->removeModerator(client);
 	channel->removeClient(target);
 }
