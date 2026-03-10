@@ -1,10 +1,10 @@
-#include "Parsing.hpp" //TODO changed
+#include "Parsing.hpp"
 
 static size_t	skipDelimiters(const std::string *str, size_t i, const std::string &delimiter)
 {
 	size_t	len = str->length();
 
-	while (i < len && (str->find(delimiter, i) == i || !std::isprint((*str)[i]) || std::isspace((*str)[i])))
+	while (i < len && (str->find(delimiter, i) == i))
 		i += (str->find(delimiter, i) == i) ? delimiter.length() : 1;
 
 	return (i);
@@ -18,11 +18,13 @@ std::vector<std::string>	tokenizeMessage(const std::string *str, const std::stri
 	size_t	start;
 
 	// Extract command then extract target
-	for (size_t j = 0; j < 2; j++)
+	for (std::string::size_type i = 0; i < str->length(); ++i)
 	{
+		if (str[i] == ":")
+			break ;
 		i = skipDelimiters(str, i, delimiter);
 		start = i;
-		while (i < len && str->find(delimiter, i) != i && std::isprint((*str)[i]) && !std::isspace((*str)[i]))
+		while (i < len && str->find(delimiter, i) != i)
 			i++;
 		tokens.push_back(str->substr(start, i - start));
 	}
@@ -34,15 +36,14 @@ std::vector<std::string>	tokenizeMessage(const std::string *str, const std::stri
 	return (tokens);
 }
 
-//TODO changed it to parseMessage? 
-Message	parseMessage(const std::string str) // TODO changed
+Message	parseMessage(const std::string str)
 {
 	Message	parsedMessage;
-	std::vector<std::string>	words= tokenizeMessage(&str, " ");
 
-	parsedMessage.command = words[0];
-	parsedMessage.target = words[1];
-	parsedMessage.message = words[2];
+	std::vector<std::string>	words= tokenizeMessage(&str, " ");
+	parsedMessage.command = toUpper(words[0]);
+	for (std::string::size_type i = 1; i < words.size(); i++)
+		parsedMessage.params.push_back(words[i]);
 
 	return (parsedMessage);
 }
