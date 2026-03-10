@@ -5,7 +5,11 @@ CommandFactory::CommandFactory()
 	//TODO add other commands
 
 	// Connection Commands
+	_commands["NICK"] = &NickCommand::make;
+	_commands["PASS"] = &PassCommand::make;
 	_commands["PING"] = &PingCommand::make;
+	_commands["PONG"] = &PongCommand::make;
+	_commands["USER"] = &UserCommand::make;
 
 	// Channels Commands
 	_commands["JOIN"] = &JoinCommand::make;

@@ -123,6 +123,16 @@ void Server::cleanup()
 	}
 }
 
+
+/* ================================ Getters ================================ */
+
+std::string Server::getPassword() const
+{
+	return _password;
+}
+
+
+
 /* =========================== Client Management =========================== */
 
 Client* Server::getClient(int clientFd)
@@ -321,8 +331,6 @@ void Server::handleClientMessage(int clientFd)
 	std::string line;
 	while (client->getNextMessage(line))
 	{
-		//TODO REMOVE "\r\n" from message
-
 		// TODO Message and Command classes
 		Message msg = parseMessage(line);
 

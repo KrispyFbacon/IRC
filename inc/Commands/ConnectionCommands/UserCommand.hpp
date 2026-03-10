@@ -1,17 +1,17 @@
-#ifndef PINGCOMMAND_HPP
-#define PINGCOMMAND_HPP
+#ifndef USERCOMMAND_HPP
+#define USERCOMMAND_HPP
 
 #include "ACommand.hpp"
 
 class Server;
 class Client;
 
-class PingCommand : public ACommand
+class UserCommand : public ACommand
 {
 	private:
 
 	public:
-		static ACommand* make() { return new PingCommand(); }
+		static ACommand* make() { return new UserCommand(); }
 
 		void execute(Server& server, Client& client, const Message& msg);
 };

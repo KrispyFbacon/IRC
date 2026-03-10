@@ -10,6 +10,7 @@ struct Message
 	std::string	command;
 	std::string	target;
 	std::string	message;
+	std::vector<std::string> params;
 };
 
 Message	parseMessage(const std::string);

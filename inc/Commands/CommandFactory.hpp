@@ -9,8 +9,13 @@
 //#include "Message.hpp"
 
 #include "ACommand.hpp"
-#include "JoinCommand.hpp"
+#include "NickCommand.hpp"
+#include "PassCommand.hpp"
 #include "PingCommand.hpp"
+#include "PongCommand.hpp"
+#include "UserCommand.hpp"
+
+#include "JoinCommand.hpp"
 
 class Server;
 class Client;

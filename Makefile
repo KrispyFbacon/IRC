@@ -68,6 +68,7 @@ CHANNELS = Channel.cpp
 CLIENTS = Client.cpp
 COMMANDS = CommandFactory.cpp \
 			PingCommand.cpp \
+			PongCommand.cpp \
 			JoinCommand.cpp 
 CORE = Server.cpp
 REPLIES = IRCReply.cpp

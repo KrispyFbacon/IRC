@@ -7,5 +7,5 @@ void PingCommand::execute(Server& server, Client& client, const Message& msg)
 	(void)server;
 	std::string pongMsg = ":" + Config::SERVER_NAME + " PONG " + Config::SERVER_NAME + " :";
 
-	client.sendMessage(pongMsg + msg.target);
+	client.sendMessage(pongMsg + msg.target); // msg.params[0];
 }

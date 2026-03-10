@@ -64,6 +64,9 @@ class Server
 		void run();
 		void cleanup();
 
+		// Getters
+		std::string getPassword() const; // TODO inline?
+
 		// TODO CLient management
 		Client* getClient(int clientFd);
 		// TODO Channel management
