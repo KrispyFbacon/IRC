@@ -22,6 +22,7 @@ INC_DIRS = -Iinc \
 			-Iinc/Channels \
 			-Iinc/Clients \
 			-Iinc/Commands \
+			-Iinc/Commands/ChannelCommands\
 			-Iinc/Core \
 			-Iinc/Parsing \
 			-Iinc/Utils
@@ -53,6 +54,7 @@ VPATH = src
 VPATH += src/Channels
 VPATH += src/Clients
 VPATH += src/Commands
+VPATH += src/Commands/ChannelCommands
 VPATH += src/Core
 VPATH += src/Parsing
 VPATH += src/Utils
@@ -63,9 +65,12 @@ SRC = main.cpp
 CHANNELS = Channel.cpp
 CLIENTS = Client.cpp
 COMMANDS = CommandFactory.cpp \
-			JoinCommand.cpp
+			JoinCommand.cpp \
+			KickCommand.cpp \
+			InviteCommand.cpp \
+			TopicCommand.cpp
 CORE = Server.cpp
-PARSING = GeneralParsing.cpp
+PARSING = Parsing.cpp
 UTILS = Utils.cpp
 
 

@@ -9,6 +9,9 @@
 
 #include "ACommand.hpp"
 #include "JoinCommand.hpp"
+#include "KickCommand.hpp"
+#include "TopicCommand.hpp"
+#include "InviteCommand.hpp"
 
 class Server;
 class Client;

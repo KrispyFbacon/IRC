@@ -24,7 +24,19 @@ class Channel
 		Channel(std::string, const Channel &);
 		~Channel();
 
+		std::string	getChannelName() const;
+
+		std::string	getTopic() const;
+		void	setTopic(const std::string);
+
 		void	copyChannelInfo(Channel &, const Channel &);
+
+		Client	*getModerator(int clientFd);
+		bool	addModerator(Client *client);
+		bool	removeModerator(Client *client);
+		
+		bool	addClient(Client *client);
+		bool	removeClient(Client *client);
 };
 
 #endif

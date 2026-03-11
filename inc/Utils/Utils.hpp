@@ -24,6 +24,7 @@
 #include <iomanip>
 #include <sstream>
 #include <fstream>
+#include <cctype>
 
 // --- Network / Socket Core ---
 #include <sys/socket.h>	// socket, setsockopt, getsockname, bind, connect, listen, accept, send, recv
@@ -115,6 +116,7 @@ bool isValidPassword(const std::string& password);
 
 // --- String Helper ---
 std::string	getFirstString(const std::string);
+std::string	toUpper(const std::string &str);
 
 
 
