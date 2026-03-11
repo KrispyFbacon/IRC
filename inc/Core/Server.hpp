@@ -27,29 +27,30 @@ class Server
 {
 	private:
 		typedef std::map<int, Client*>::iterator clientIt;
+		typedef std::map<std::string, Channel*>::iterator channelIt;
 
 		// Socket _serverSocked(); TODO maybe since server and clients will have their own socket
 		int _fd; // serverFd
 		int _epfd; // epoll Fd
-		std::string _port;
+		std::string _port; //TODO turn into const
 		std::string _password;
 		
 		std::map<int, Client*> _clients;
-		//std::map<string, Channels*> _channels;
+		std::map<std::string, Channel*> _channels;
 		CommandFactory _cmdFactory;
 
 		// ── I/O helpers ──
-			void createAndBindSocket();
-			void setNonBlocking(int fd);
-			void epollCreate (int flags);
-			void epollAdd (int fd, uint32_t events);
-			void epollMod (int fd, uint32_t events);
-			void epollDel (int fd);
+		void createAndBindSocket();
+		void setNonBlocking(int fd);
+		void epollCreate (int flags);
+		void epollAdd (int fd, uint32_t events);
+		void epollMod (int fd, uint32_t events);
+		void epollDel (int fd);
 
 		// ── Event handlers ──
-			void handleNewConnection();
-			void handleClientMessage(int clientFd);
-			void removeClient(int clientFd);
+		void handleNewConnection();
+		void handleClientMessage(int clientFd);
+		void removeClient(int clientFd);
 
 
 		// TODO IRC logic (Parsing)
@@ -63,9 +64,13 @@ class Server
 		void run();
 		void cleanup();
 
+		// Getters
+		std::string getPassword() const; // TODO inline?
+
 		// TODO CLient management
 		Client* getClient(int clientFd);
 		// TODO Channel management
+		Channel* getChannel(std::string channelName);
 };
 
 #endif
