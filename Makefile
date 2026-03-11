@@ -70,7 +70,7 @@ COMMANDS = CommandFactory.cpp \
 			InviteCommand.cpp \
 			TopicCommand.cpp
 CORE = Server.cpp
-PARSING = GeneralParsing.cpp
+PARSING = Parsing.cpp
 UTILS = Utils.cpp
 
 

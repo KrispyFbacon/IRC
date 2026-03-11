@@ -160,3 +160,13 @@ std::string	getFirstString(const std::string str)
 
 	return (firstString);
 }
+
+std::string	toUpper(const std::string &str)
+{
+	std::string	result = str;
+
+	for (std::string::size_type i = 0; i < result.length(); i++)
+		result[i] = std::toupper(static_cast<unsigned char>(result[i]));
+
+	return (result);
+}
