@@ -31,12 +31,12 @@ class Channel
 
 		void	copyChannelInfo(Channel &, const Channel &);
 
-		Client	*Channel::getModerator(int clientFd);
-		bool	Channel::addModerator(Client *client);
-		bool	Channel::removeModerator(Client *client);
+		Client	*getModerator(int clientFd);
+		bool	addModerator(Client *client);
+		bool	removeModerator(Client *client);
 		
-		bool	Channel::addClient(Client *client);
-		bool	Channel::removeClient(Client *client);
+		bool	addClient(Client *client);
+		bool	removeClient(Client *client);
 };
 
 #endif

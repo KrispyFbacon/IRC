@@ -9,79 +9,79 @@ Client::~Client()
 
 // Getters
 
-int	Client::getFd() const
+inline int	Client::getFd() const
 {
 	return (_fd);
 }
 
-bool	Client::isRegistered() const
+inline bool	Client::isRegistered() const
 {
 	return (_isRegistered);
 }
 
-bool	Client::isAuthenticated() const
+inline bool	Client::isAuthenticated() const
 {
 	return (_isAuthenticated);
 }
 
-std::string	Client::getUsername() const
+inline std::string	Client::getUsername() const
 {
 	return (_username);
 }
 
-std::string	Client::getPassword() const
+inline std::string	Client::getPassword() const
 {
 	return (_password);
 }
 
-std::string	Client::getNickname() const
+inline std::string	Client::getNickname() const
 {
 	return (_nickname);
 }
 
-std::string	Client::getStrBuffer() const
+inline std::string	Client::getStrBuffer() const
 {
 	return (_outBuffer);
 }
 
 // Setters
 
-void	Client::setUsername(std::string username)
+inline void	Client::setUsername(std::string username)
 {
 	_username = username;
 }
 
-void	Client::setPassword(std::string password)
+inline void	Client::setPassword(std::string password)
 {
 	_password = password;
 }
 
-void	Client::setNickname(std::string nickname)
+inline void	Client::setNickname(std::string nickname)
 {
 	_nickname = nickname;
 }
 
-void	Client::setOutBuffer(std::string outBuffer)
+inline void	Client::setOutBuffer(std::string outBuffer)
 {
 	_outBuffer = outBuffer;
 }
 
-void	Client::setRegistered(bool isRegistered)
+inline void	Client::setRegistered(bool isRegistered)
 {
 	_isRegistered = isRegistered;
 }
 
-void	Client::setAuthenticated(bool isAuthenticated)
+inline void	Client::setAuthenticated(bool isAuthenticated)
 {
 	_isAuthenticated = isAuthenticated;
 }
 
-std::string	&Client::getBuffer()
+inline std::string	&Client::getBuffer()
 {
 	return (_buffer);
 }
 
-size_t	Client::getBufferSize() const
+inline size_t	Client::getBufferSize() const
 {
 	return (_buffer.size());
 };

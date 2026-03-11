@@ -12,6 +12,10 @@
 
 #include "Utils.hpp"
 
+namespace Config
+{
+	const std::string SERVER_NAME = "42IRC";
+}
 
 void Print::StdOut(const std::string &str)
 {
@@ -159,4 +163,14 @@ std::string	getFirstString(const std::string str)
 	std::string	firstString = str.substr(0, pos);
 
 	return (firstString);
+}
+
+std::string	toUpper(const std::string &str)
+{
+	std::string	result = str;
+
+	for (std::string::size_type i = 0; i < result.length(); i++)
+		result[i] = std::toupper(static_cast<unsigned char>(result[i]));
+
+	return (result);
 }

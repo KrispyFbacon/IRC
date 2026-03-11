@@ -9,7 +9,6 @@ void	KickCommand::execute(Server &server, Client &client, const Message &msg)
 	std::string	channelName = msg.target;
 	std::string	targetNick;
 	std::string	reason;
-	parseKickParams(msg, targetNick, reason);
 
 	// If channel exists
 	Channel	*channel = server.getChannel(channelName);
@@ -17,7 +16,7 @@ void	KickCommand::execute(Server &server, Client &client, const Message &msg)
 		return (client.sendMessage(":42IRC 403 " + client.getNickname() + " " + channelName + " :No such channel"));
 
 	// If kicker is in the channel
-	if (!channel->hasClient(client.getFd()))
+	if (!channel->getClient(client.getFd()))
 		return (client.sendMessage(":42IRC 442 " + client.getNickname() + " " + channelName + " :You're not on that channel"));
 
 	// If kicker is a moderator

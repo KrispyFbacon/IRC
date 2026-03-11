@@ -5,13 +5,24 @@
 #include "Client.hpp"
 
 #include "Parsing.hpp"
+#include "IRCReply.hpp"
 //#include "Message.hpp"
 
 #include "ACommand.hpp"
+#include "NickCommand.hpp"
+#include "PassCommand.hpp"
+#include "PingCommand.hpp"
+#include "PongCommand.hpp"
+#include "UserCommand.hpp"
+
 #include "JoinCommand.hpp"
+#include "KickCommand.hpp"
+#include "TopicCommand.hpp"
+#include "InviteCommand.hpp"
 
 class Server;
 class Client;
+
 
 class CommandFactory
 {
