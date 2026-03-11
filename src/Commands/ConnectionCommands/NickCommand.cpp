@@ -5,6 +5,12 @@ void NickCommand::execute(Server& server, Client& client, const Message& msg)
 	(void)server;
 	Print::Debug ("NICK Command Called!");
 
+	if (client.isAuthenticated() == false)
+	{
+		sendError(client, IRC::ERR_NOTREGISTERED, ":You have not register");
+		return ;
+	}
+
 	if (msg.params.empty()) // msg.param [0]
 	{
 		sendError(client, IRC::ERR_NEEDMOREPARAMS, "NICK :Not enough parameters");
