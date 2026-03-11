@@ -11,7 +11,7 @@ void NickCommand::execute(Server& server, Client& client, const Message& msg)
 		return;
 	}
 
-	//TODO ERR_NONICKNAMEGIVEN	ERR_ERRONEUSNICKNAME
+	//ERR_NONICKNAMEGIVEN	ERR_ERRONEUSNICKNAME
 	//ERR_NICKNAMEINUSE	ERR_NICKCOLLISION
 	// TODO: Check if newNick is already in use by looping through server._clients!
 	// if (isTaken) { sendError 433; return; }
