@@ -48,6 +48,7 @@
 
 #include "Exceptions.hpp"
 #include "Color.hpp"
+#include "IRCCodes.hpp"
 
 //https://www.tutorialspoint.com/cplusplus/cpp_socket_programming.html
 
@@ -60,12 +61,24 @@
 	#define DEBUG 1
 #endif
 
-// --- Network / Socket Core ---
-#define PORT 6667
-#define BACKLOG 10
-#define BUFFER_SIZE 1024
-#define MAX_MESSAGE_SIZE 4096
-#define MAX_EVENTS 64 // 128 (64: clean & efficent, 128: very safe but more resource intensive)
+// // 
+// #define SERVER_NAME "42IRC"
+// #define BACKLOG 10
+// #define BUFFER_SIZE 1024
+// #define MAX_MESSAGE_SIZE 4096
+// #define MAX_EVENTS 64 // 128 (64: clean & efficent, 128: very safe but more resource intensive)
+
+namespace Config
+{
+	// Server options
+	extern const std::string SERVER_NAME;
+
+	//--- Network / Socket Core ---
+	const int BACKLOG          = 10;
+	const int BUFFER_SIZE      = 1024;
+	const int MAX_MESSAGE_SIZE = 4096;
+	const int MAX_EVENTS       = 64;
+}
 
 // --- Colors ---
 #define NUM_COLOR	RGB_BOLD(255, 165, 0)

@@ -12,6 +12,10 @@
 
 #include "Utils.hpp"
 
+namespace Config
+{
+	const std::string SERVER_NAME = "42IRC";
+}
 
 void Print::StdOut(const std::string &str)
 {
