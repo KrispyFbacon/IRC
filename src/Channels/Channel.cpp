@@ -23,12 +23,12 @@ std::string	Channel::getChannelName() const
 	return(_name);
 }
 
-std::string	channel::getTopic() const
+std::string	Channel::getTopic() const
 {
 	return (_topic);
 }
 
-void	channel::setTopic(const std::string topic)
+void	Channel::setTopic(const std::string topic)
 {
 	_topic = topic;
 }
@@ -43,50 +43,83 @@ Client	*Channel::getModerator(int clientFd)
 	return (it->second);
 }
 
-bool	Channel::addModerator(Client *client)
+Client	*Channel::getClient(int clientFd)
 {
-	int	fd = client->getFd();
+	std::map<int, Client*>::iterator it = _clients.find(clientFd);
+
+	if (it == _clients.end())
+		return (NULL);
+
+	return (it->second);
+}
+
+Client	*Channel::getClientByNickname(const std::string nick)
+{
+	std::map<int, Client*>::iterator it = _clients.begin();
+
+	for (; it != _clients.end(); ++it)
+	{
+		Client	*client = it->second;
+
+		if (client->getNickname() == nick)
+			return (it->second);
+	}
+	return (NULL);
+}
+
+bool	Channel::addModerator(Client &client)
+{
+	int	fd = client.getFd();
 
 	if (_moderators.find(fd) != _moderators.end())
 		return (false);
 
-	_moderators.insert(std::make_pair(fd, client));
+	_moderators[fd] = &client;
 	return (true);
 }
 
-bool	Channel::removeModerator(Client *client)
+bool	Channel::removeModerator(const int clientFd)
 {
-	int	fd = client->getFd();
-
-	std::map<int, Client*>::iterator	it = _moderators.find(fd);
+	std::map<int, Client*>::iterator	it = _moderators.find(clientFd);
 	if (it == _moderators.end())
 		return (false);
 
-	_moderators.erase(fd);
+	_moderators.erase(it);
 
 	return (true);
 }
 
-bool	Channel::addClient(Client *client)
+bool	Channel::addClient(Client &client)
 {
-	int	fd = client->getFd();
+	int	fd = client.getFd();
 
 	if (_clients.find(fd) != _clients.end())
 		return (false);
 
-	_clients.insert(std::make_pair(fd, client));
+	_clients[fd] = &client;
 	return (true);
 }
 
-bool	Channel::removeClient(Client *client)
+bool	Channel::removeClient(const int clientFd)
 {
-	int	fd = client->getFd();
-
-	std::map<int, Client*>::iterator	it = _clients.find(fd);
+	std::map<int, Client*>::iterator	it = _clients.find(clientFd);
 	if (it == _clients.end())
 		return (false);
 
 	_clients.erase(it);
 
 	return (true);
+}
+
+void	Channel::broadcast(const std::string msg)
+{
+	std::map<int, Client*>::iterator it = _clients.begin();
+
+	for (; it != _clients.end(); ++it)
+	{
+		Client	*client = it->second;
+		std::string	clientName = client->getNickname();
+
+		client->sendMessage(msg);
+	}
 }

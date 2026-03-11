@@ -4,6 +4,7 @@
 # include <string>
 # include <map>
 # include "Client.hpp"
+# include "IRCReply.hpp"
 
 class Client;
 
@@ -31,12 +32,16 @@ class Channel
 
 		void	copyChannelInfo(Channel &, const Channel &);
 
-		Client	*getModerator(int clientFd);
-		bool	addModerator(Client *client);
-		bool	removeModerator(Client *client);
+		Client	*getModerator(int);
+		bool	addModerator(Client &client);
+		bool	removeModerator(const int);
 		
-		bool	addClient(Client *client);
-		bool	removeClient(Client *client);
+		Client	*getClient(int);
+		Client	*getClientByNickname(const std::string);
+		bool	addClient(Client &client);
+		bool	removeClient(const int);
+
+		void	broadcast(const std::string);
 };
 
 #endif
