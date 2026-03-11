@@ -59,7 +59,7 @@ std::vector<std::string> tokenizeMessage(const std::string *str, const std::stri
 		if (i >= len)
 			break;
 
-		if ((*str)[i] == ':' && i > 0 && (*str)[i - 1] == ' ')
+		if ((*str)[i] == ':' && ((i > 0 && (*str)[i - 1] == ' ') || i == 0))
 		{
 			std::string	trailing = str->substr(i + 1);
 			if (!trailing.empty())
@@ -138,7 +138,7 @@ int	main()
 
 	testCases.push_back("pass ::: ::123");
 	testCases.push_back("pass 123:::::");
-	testCases.push_back(":pass 123: pass 123");
+	testCases.push_back(": pass 123: pass 123");
 	testCases.push_back(":pass 123: :pass 123");
 	testCases.push_back(":pass 123");
 	testCases.push_back("PRIVMSG : user Hello\x01\x02");
