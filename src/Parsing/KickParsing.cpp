@@ -1,4 +1,4 @@
-#include "KickParsing.hpp"
+#include "Parsing.hpp"
 
 void	parseKickParams(const Message &msg, std::string &targetNick, std::string &reason)
 {
