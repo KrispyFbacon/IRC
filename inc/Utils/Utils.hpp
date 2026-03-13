@@ -25,6 +25,7 @@
 #include <sstream>
 #include <fstream>
 #include <cctype>
+#include <limits>
 
 // --- Network / Socket Core ---
 #include <sys/socket.h>	// socket, setsockopt, getsockname, bind, connect, listen, accept, send, recv

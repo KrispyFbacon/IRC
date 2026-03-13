@@ -23,7 +23,8 @@ INC_DIRS = -Iinc \
 			-Iinc/Clients \
 			-Iinc/Commands \
 			-Iinc/Commands/ConnectionCommands \
-			-Iinc/Commands/ChannelCommands\
+			-Iinc/Commands/ChannelCommands \
+			-Iinc/Commands/ChannelCommands/ModeCommand \
 			-Iinc/Core \
 			-Iinc/Replies \
 			-Iinc/Parsing \
@@ -58,6 +59,7 @@ VPATH += src/Clients
 VPATH += src/Commands
 VPATH += src/Commands/ConnectionCommands
 VPATH += src/Commands/ChannelCommands
+VPATH += src/Commands/ChannelCommands/ModeCommand
 VPATH += src/Core
 VPATH += src/Parsing
 VPATH += src/Replies
@@ -74,6 +76,7 @@ COMMANDS = CommandFactory.cpp \
 			JoinCommand.cpp  \
 			KickCommand.cpp \
 			InviteCommand.cpp \
+			ModeICommand.cpp \
 			TopicCommand.cpp
 CORE = Server.cpp
 REPLIES = IRCReply.cpp

@@ -1,4 +1,4 @@
-#include "InviteCommand.hpp"
+#include "ModeICommand.hpp"
 
 // command = "INVITE"
 // target  = "nickname"
@@ -27,14 +27,14 @@ void	InviteCommand::execute(Server &server, Client &client, const Message &msg)
 		sendError(client, IRC::ERR_NOSUCHNICK, targetName + " :No such nick");
 
 	// If target already in channel
-	Client	&targetRef = *target;
-	if (channel->getClient(targetRef.getFd()))
+	if (channel->getClient(client.getFd()))
 		sendError(client, IRC::ERR_USERONCHANNEL, targetName + " " + channelName + " :is already on channel");
 
 	// Send invite to target + confirmation to inviter
 	target->sendMessage(":" + client.getNickname() + " INVITE " + targetName + " :" + channelName);
 
-	channel->addInvited(targetRef);
-
+	Client	&targetRef = *target;
+	channel->addClient(targetRef);
+	
 	sendError(client, IRC::RPL_INVITING, targetName + " :" + channelName);
 }
