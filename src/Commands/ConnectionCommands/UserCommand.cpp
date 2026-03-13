@@ -2,33 +2,21 @@
 
 void UserCommand::execute(Server& server, Client& client, const Message& msg)
 {
-	(void)server;
 	Print::Debug ("USER Command Called!");
 
+	if (client.isAuthenticated() == false)
+		return(sendError(client, IRC::ERR_NOTREGISTERED, ":You have not registered"));
 
-	if (client.isAuthenticated() || client.isRegistered())
-	{
-		sendError(client, IRC::ERR_ALREADYREGISTRED, " :You cannot reregister");
-		return ;
-	}
+	if (client.isRegistered() || !client.getUsername().empty())
+		return(sendError(client, IRC::ERR_ALREADYREGISTRED, " :You cannot reregister"));
 
-	if (msg.params.empty())
-	{
-		sendError(client, IRC::ERR_NEEDMOREPARAMS, " PASS :Not enough parameters");
-		return ;
-	}
+	if (msg.params.size() < 4 || (msg.params[0]).empty())
+		return(sendError(client, IRC::ERR_NEEDMOREPARAMS, "USER :Not enough parameters"));
 
+	std::string newUser = msg.params[0];
 
-	
-	// TODO USER <username> <mode> <unused> :<realname>
-	// TODO USER <username> * 0 :<realname>
+	client.setUsername(newUser);
 
-	//TODO ALREADY REGISTED? IRC::ERR_ALREADYREGISTRED, "USER :Unauthorized command (already registered)""
-	// TODO min 4 params
-	// TODO client.setUserName param 0
-	// PARAMS 1 2 IGNORE 3? IGNORE
-
-	//TODO FULLY REGISTED?
-		// trigger 001, 002, 003, 004 welcome messages!
+	server.checkRegistration(client);
 }
 
