@@ -69,6 +69,7 @@ class Server
 
 		// TODO CLient management
 		Client* getClient(int clientFd);
+		Client* getClientByNickname(const std::string& nickname);
 		// TODO Channel management
 		Channel* getChannel(std::string channelName);
 };
