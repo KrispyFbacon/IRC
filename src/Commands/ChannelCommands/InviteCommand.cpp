@@ -32,5 +32,9 @@ void	InviteCommand::execute(Server &server, Client &client, const Message &msg)
 
 	// Send invite to target + confirmation to inviter
 	target->sendMessage(":" + client.getNickname() + " INVITE " + targetName + " :" + channelName);
+
+	Client	&targetRef = *target;
+	channel->addClient(targetRef);
+	
 	sendError(client, IRC::RPL_INVITING, targetName + " :" + channelName);
 }

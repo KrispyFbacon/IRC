@@ -136,6 +136,7 @@ int	main()
 {
 	std::vector<std::string>	testCases;
 
+	testCases.push_back("pass 123 :");
 	testCases.push_back("pass ::: ::123");
 	testCases.push_back("pass 123:::::");
 	testCases.push_back(": pass 123: pass 123");
