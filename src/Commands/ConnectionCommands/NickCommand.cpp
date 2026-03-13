@@ -5,11 +5,32 @@ void NickCommand::execute(Server& server, Client& client, const Message& msg)
 	(void)server;
 	Print::Debug ("NICK Command Called!");
 
-	if (msg.params.empty()) // msg.param [0]
+	if (client.isAuthenticated() == false)
 	{
-		sendError(client, IRC::ERR_NEEDMOREPARAMS, "NICK :Not enough parameters");
+		sendError(client, IRC::ERR_NOTREGISTERED, ":You have not register");
+		return ;
+	}
+
+	if (msg.params.empty() || msg.params[0].empty())
+	{
+		sendError(client, IRC::ERR_NONICKNAMEGIVEN, ":No nickname given");
 		return;
 	}
+
+	// Check if it's already taken!
+	std::string newNick = msg.params[0];
+
+	Client* existingClient = server.getClientByNickname(newNick);
+	if (existingClient)
+	{
+		if (existingClient->getFd() == client.getFd())
+			return ;
+		
+		sendError(client, IRC::ERR_NICKNAMEINUSE, ":Nickname is already in use");
+		return;
+	}
+
+
 
 	//ERR_NONICKNAMEGIVEN	ERR_ERRONEUSNICKNAME
 	//ERR_NICKNAMEINUSE	ERR_NICKCOLLISION
@@ -17,16 +38,6 @@ void NickCommand::execute(Server& server, Client& client, const Message& msg)
 	// if (isTaken) { sendError 433; return; }
 	
 	// TODO std::string oldNick = client.getNickname();
-	
-	// TODO : Cant be changed if not registed
-	// if (client.isRegistered()) {
-	// 	// Build the broadcast message
-	// 	std::string broadcast = ":" + oldNick + "!" + client.getUsername() + Config::SERVERNAME + " NICK :" + newNick;
-		
-	// 	// TODO: Send this broadcast to the client AND everyone in their channels
-	//  // TODO DO BRODCAST
-	// 	client.sendMessage(broadcast);
-	// }
 	
 
 	client.setNickname(msg.target); // msg.param[0]?;

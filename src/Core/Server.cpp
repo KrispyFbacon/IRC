@@ -145,6 +145,18 @@ Client* Server::getClient(int clientFd)
 	return it->second;
 }
 
+Client* Server::getClientByNickname(const std::string& nickname)
+{
+	clientIt it = _clients.begin();
+
+	for(; it != _clients.end(); ++it)
+	{
+		if (it->second->getNickname() == nickname)
+			return it->second;
+	}
+
+	return NULL;
+}
 
 /* =========================== Channel Management =========================== */
 

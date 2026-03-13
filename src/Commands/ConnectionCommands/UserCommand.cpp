@@ -17,6 +17,8 @@ void UserCommand::execute(Server& server, Client& client, const Message& msg)
 		sendError(client, IRC::ERR_NEEDMOREPARAMS, " PASS :Not enough parameters");
 		return ;
 	}
+
+
 	
 	// TODO USER <username> <mode> <unused> :<realname>
 	// TODO USER <username> * 0 :<realname>
