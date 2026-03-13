@@ -375,3 +375,33 @@ void Server::removeClient(int fd)
 	
 	Print::Debug("Client removed FD: " + toString(fd));
 }
+
+// TODO CHECK REGISTRATION
+void Server::checkRegistration(Client& client)
+{
+	// If they are already registered, do nothing
+	if (client.isRegistered())
+		return;
+
+	// Check if they have finished all the required steps
+	bool hasPassword = client.isAuthenticated();
+	bool hasNickname = !client.getNickname().empty();
+	bool hasUsername = !client.getUsername().empty();
+
+	// Nick and User filled?
+	if (hasPassword && hasNickname && hasUsername)
+	{
+		// Success!
+		client.setRegistered(true);
+
+		// Send the 4 welcome replies
+		sendReply(client, IRC::RPL_WELCOME, ":Welcome to the Internet Relay Network " + client.getPrefix());
+		sendReply(client, IRC::RPL_YOURHOST, ":Your host is " + Config::SERVER_NAME + ", running version 1.0");
+		sendReply(client, IRC::RPL_CREATED, ":This server was created today");
+		sendReply(client, IRC::RPL_MYINFO, ":" + Config::SERVER_NAME + " 1.0 o o");
+		
+		Print::Ok("Client FD:" + toString(client.getFd()) + " '" + client.getNickname() + "' " + "has fully registered!");
+
+		// TODO (Optional: Send MOTD here if you implement it)
+	}
+}

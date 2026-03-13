@@ -124,12 +124,15 @@ std::string toString(T src)
 
 
 // --- Args Validation ---
-bool isValidPort(const std::string& port);
-bool isValidPassword(const std::string& password);
+bool	isValidPort(const std::string& port);
+bool	isValidPassword(const std::string& password);
 
 // --- String Helper ---
 std::string	getFirstString(const std::string);
 std::string	toUpper(const std::string &str);
+
+// --- Command Helpers ---
+bool	isValidNickname(const std::string& nick);
 
 
 

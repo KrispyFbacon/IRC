@@ -17,5 +17,16 @@ void JoinCommand::execute(Server& server, Client& client, const Message& msg)
 	
 	//TODO BRODCAST MESSAGE(client, channel, "brodcast message")?
 	// :client + " JOIN " + channelName
+
+	//TODO
+	// std::vector<std::string> channels = splitArguments(message.getParams(0), ',');
+	// std::vector<std::string> keys = (message.getSize() > 1 ?
+	// 	splitArguments(message.getParams(1), ',') : std::vector<std::string>());
+
+	// for (size_t i = 0; i < channels.size(); i++)
+	// {
+	// 	joinChannel(client, channels[i],
+	// 				(i >= keys.size() ? "" : keys[i]));
+	//}
 	
 }

@@ -39,6 +39,7 @@ class Client
 		inline std::string	getPassword() const;
 		inline std::string	getNickname() const;
 		inline std::string	getStrBuffer() const;
+		inline std::string	getPrefix() const;
 
 		inline std::string	&getBuffer();
 		inline size_t	getBufferSize() const;

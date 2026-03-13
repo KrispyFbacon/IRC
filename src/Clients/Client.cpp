@@ -44,6 +44,12 @@ inline std::string	Client::getStrBuffer() const
 	return (_outBuffer);
 }
 
+inline std::string	Client::getPrefix() const
+{
+	return (_nickname + "!" + _username + "@localhost");
+}
+
+
 // Setters
 
 inline void	Client::setUsername(std::string username)

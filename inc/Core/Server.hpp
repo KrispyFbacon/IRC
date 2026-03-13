@@ -70,6 +70,8 @@ class Server
 		// TODO CLient management
 		Client* getClient(int clientFd);
 		Client* getClientByNickname(const std::string& nickname);
+		void Server::checkRegistration(Client& client);
+		
 		// TODO Channel management
 		Channel* getChannel(std::string channelName);
 };
