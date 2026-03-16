@@ -1,19 +1,17 @@
-#include "ModeICommand.hpp"
+#include "ModeTCommand.hpp"
 
 // Direct call from ModeCommand with pre-parsed sign
-void	ModeICommand::execute(Client &client, Channel &channel, char sign)
+void	ModeTCommand::execute(Client &client, Channel &channel, char sign)
 {
-	channel.setInviteOnly(sign == '+');
+	channel.setTopicLocked(sign == '+');
 
-	std::string	modeMsg = ":" + client.getNickname() + " MODE " + channel.getChannelName() + " " + sign + "i";
+	std::string	modeMsg = ":" + client.getNickname() + " MODE " + channel.getChannelName() + " " + sign + "t";
 	channel.broadcast(modeMsg);
 }
 
-// Standalone call: MODE #channel +i  or  MODE #channel -i
-void	ModeICommand::execute(Server &server, Client &client, const Message &msg)
+// Standalone call: MODE #channel +t  or  MODE #channel -t
+void	ModeTCommand::execute(Server &server, Client &client, const Message &msg)
 {
-	(void)server;
-
 	if (msg.params.size() < 2)
 	{
 		sendError(client, IRC::ERR_NEEDMOREPARAMS, "MODE :Not enough parameters");

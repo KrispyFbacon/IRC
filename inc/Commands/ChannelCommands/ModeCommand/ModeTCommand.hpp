@@ -1,5 +1,5 @@
-#ifndef MODEICOMMAND_HPP
-#define MODEICOMMAND_HPP
+#ifndef MODETCOMMAND_HPP
+#define MODETCOMMAND_HPP
 
 #include "ACommand.hpp"
 
@@ -7,10 +7,10 @@ class Server;
 class Client;
 class Channel;
 
-class ModeICommand : public ACommand
+class ModeTCommand : public ACommand
 {
 	public:
-		static ACommand *make() { return new ModeICommand(); }
+		static ACommand *make() { return new ModeTCommand(); }
 
 		void execute(Server &server, Client &client, const Message &msg);
 

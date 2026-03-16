@@ -76,7 +76,12 @@ COMMANDS = CommandFactory.cpp \
 			JoinCommand.cpp  \
 			KickCommand.cpp \
 			InviteCommand.cpp \
+			ModeCommand.cpp \
 			ModeICommand.cpp \
+			ModeKCommand.cpp \
+			ModeLCommand.cpp \
+			ModeOCommand.cpp \
+			ModeTCommand.cpp \
 			TopicCommand.cpp
 CORE = Server.cpp
 REPLIES = IRCReply.cpp
