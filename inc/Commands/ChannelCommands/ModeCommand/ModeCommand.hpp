@@ -2,6 +2,11 @@
 #define MODECOMMAND_HPP
 
 #include "ACommand.hpp"
+#include "ModeICommand.hpp"
+#include "ModeKCommand.hpp"
+#include "ModeLCommand.hpp"
+#include "ModeOCommand.hpp"
+#include "ModeTCommand.hpp"
 
 class Server;
 class Client;
