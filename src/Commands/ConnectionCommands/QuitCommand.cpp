@@ -37,6 +37,11 @@ void QuitCommand::execute(Server& server, Client& client, const Message& msg)
 		// TODO CLIENT:: client->removeChannel(this->getName());?
 				// _channels.erase(channelName);
 
+	//TODO CHANNEL::addCLient(Client* client)
+		// _clients[client->getFd()] = client;
+		// client->addChannel(this, this->getName());
+
+		
 	//TODO Client -> addChannel, removeChannel?
 	//TODO Channel -> addClient, removeClient?
 
