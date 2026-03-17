@@ -1,6 +1,8 @@
 #include "Client.hpp"
 
-Client::Client(int fd) : _fd(fd), _isRegistered(false), _isAuthenticated(false){}
+Client::Client(int fd) 
+		: _fd(fd), _isRegistered(false), _isAuthenticated(false), 
+			_isDisconnected(false) {}
 
 Client::~Client()
 {
@@ -22,6 +24,11 @@ inline bool	Client::isRegistered() const
 inline bool	Client::isAuthenticated() const
 {
 	return (_isAuthenticated);
+}
+
+inline bool Client::isDisconnected() const
+{ 
+	return (_isDisconnected);
 }
 
 inline std::string	Client::getUsername() const
@@ -80,6 +87,11 @@ inline void	Client::setRegistered(bool isRegistered)
 inline void	Client::setAuthenticated(bool isAuthenticated)
 {
 	_isAuthenticated = isAuthenticated;
+}
+
+inline void	Client::setDisconnected(bool status)
+{
+	_isDisconnected = status;
 }
 
 inline std::string	&Client::getBuffer()

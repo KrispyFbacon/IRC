@@ -71,6 +71,8 @@ CLIENTS = Client.cpp
 COMMANDS = CommandFactory.cpp \
 			PingCommand.cpp \
 			PongCommand.cpp \
+			QuitCommand.cpp \
+			UserCommand.cpp \
 			JoinCommand.cpp  \
 			KickCommand.cpp \
 			InviteCommand.cpp \

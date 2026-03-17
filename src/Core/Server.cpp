@@ -106,6 +106,9 @@ void Server::cleanup()
 		delete it->second;
 	_clients.clear();
 	
+	// Channel cleanup
+		//channelIt
+
 	// Epoll fd
 	if (_epfd != -1)
 	{
@@ -326,33 +329,43 @@ void Server::handleClientMessage(int clientFd)
 		throw ClientException("recv() failed FD: " + toString(clientFd));
 	}
 
+	// External Disconnect (Ctrl + C)
 	if (bytesRead == 0)
 	{
 		Print::Debug("Client gracefully disconnected FD: " + toString(clientFd));
 		removeClient(clientFd);
 		return;
-		
 	}
 	
 	Print::Debug("Recieved " + toString(bytesRead)
 						+ " bytes from client FD: " + toString(clientFd));
 	
-	//TODO maybe change to MessageParse class?
+	//TODO maybe change to MessageParse class? and have getNextMessage in MessageParse
 	client->appendBuffer(buffer, bytesRead);
 
 	std::string line;
-	while (client->getNextMessage(line))
+	while (client->getNextMessage(line)) // TODO weird? delete? save it in client and then use it for message?
 	{
 		// TODO Message and Command classes
 		Message msg = parseMessage(line);
 
 		Print::Debug("FD: " + toString(clientFd) + " -> [" + line + "]");
 
-		
-
 		_cmdFactory.execute(*this, *client, msg);
+
+		if (client->isDisconnected())
+			break ;
 	}
 
+	// Internal Disconnect (QUIT Command)
+	if (client->isDisconnected())
+	{
+		Print::Debug("Client requested disconnect FD: " + toString(clientFd));
+		removeClient(clientFd);
+		return;
+	}
+
+	// Safe Buffer Check
 	if (client->getBufferSize() > Config::MAX_MESSAGE_SIZE)
 	{
 		client->clearBuffer();
@@ -369,6 +382,13 @@ void Server::removeClient(int fd)
 	clientIt it = _clients.find(fd);
 	if (it != _clients.end())
 	{
+		// TODO remove this user from every channel
+			// channelIt
+				// chanIt->second->removeClient(fd);
+
+		// TODO Optional: If channel empty , delete it
+
+
 		delete it->second;
 		_clients.erase(it); // Removes the entry from the map
 	}

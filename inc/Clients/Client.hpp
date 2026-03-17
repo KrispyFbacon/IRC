@@ -22,6 +22,7 @@ class Client
 
 		bool	_isRegistered;
 		bool	_isAuthenticated;
+		bool	_isDisconnected;
 
 		std::map<std::string, Channel*>	_channels;
 
@@ -34,6 +35,8 @@ class Client
 
 		inline bool	isRegistered() const;
 		inline bool	isAuthenticated() const;
+		inline bool	isDisconnected() const;
+		
 
 		inline std::string	getUsername() const;
 		inline std::string	getPassword() const;
@@ -52,6 +55,7 @@ class Client
 
 		inline void	setRegistered(bool);
 		inline void	setAuthenticated(bool);
+		inline void	setDisconnected(bool status);
 
 	//buffer functions
 		bool	getNextMessage(std::string &msg);
