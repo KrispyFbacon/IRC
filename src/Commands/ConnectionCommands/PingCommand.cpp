@@ -3,12 +3,14 @@
 
 void PingCommand::execute(Server& server, Client& client, const Message& msg)
 {
+	(void)server;
 	Print::Debug ("PING Command Called!");
 
-	(void)server;
-	std::string pongMsg = ":" + Config::SERVER_NAME + " PONG " + Config::SERVER_NAME + " :";
+	if (msg.params.empty())
+		return(sendError(client, IRC::ERR_NOORIGIN, ":No origin specified"));
 
-	//TODO verifications
+
+	std::string pongMsg = ":" + Config::SERVER_NAME + " PONG " + Config::SERVER_NAME + " :";
 	
-	client.sendMessage(pongMsg + msg.params[0]); // msg.params[0];
+	client.sendMessage(pongMsg + msg.params[0]);
 }

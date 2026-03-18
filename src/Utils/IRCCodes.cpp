@@ -28,6 +28,9 @@ namespace IRC
 	const std::string ERR_UNKNOWNCOMMAND	= "421";
 	const std::string ERR_NOMOTD			= "422";
 
+	// PING/PONG
+	const std::string ERR_NOORIGIN			= "409";
+
 	// Nickname errors
 	const std::string ERR_NONICKNAMEGIVEN	= "431";
 	const std::string ERR_ERRONEUSNICKNAME	= "432";

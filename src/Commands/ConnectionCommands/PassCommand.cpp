@@ -6,7 +6,7 @@ void PassCommand::execute(Server& server, Client& client, const Message& msg)
 	Print::Debug ("PASS Command Called!");
 
 	if (client.isAuthenticated() || client.isRegistered())
-		return(sendError(client, IRC::ERR_ALREADYREGISTRED, " :You cannot reregistered"));
+		return(sendError(client, IRC::ERR_ALREADYREGISTRED, " :You cannot reregister"));
 
 
 	if (msg.params.empty())

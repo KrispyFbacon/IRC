@@ -196,8 +196,10 @@ bool	Channel::removeInvited(const std::string client)
 	for (size_t i = 0; i < _invited.size(); ++i)
 	{
 		if (_invited[i] == client)
+		{
 			_invited.erase(_invited.begin() + i);
 			return (true);
+		}
 	}
 
 	return (false);
