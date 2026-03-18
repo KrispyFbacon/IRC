@@ -71,23 +71,25 @@ SRC = main.cpp
 CHANNELS = Channel.cpp
 CLIENTS = Client.cpp
 COMMANDS = CommandFactory.cpp \
+			InviteCommand.cpp \
+			JoinCommand.cpp \
+			KickCommand.cpp \
+			TopicCommand.cpp \
+			NickCommand.cpp \
+			PassCommand.cpp \
 			PingCommand.cpp \
 			PongCommand.cpp \
 			QuitCommand.cpp \
 			UserCommand.cpp \
-			JoinCommand.cpp  \
-			KickCommand.cpp \
-			InviteCommand.cpp \
 			ModeCommand.cpp \
 			ModeICommand.cpp \
 			ModeKCommand.cpp \
 			ModeLCommand.cpp \
 			ModeOCommand.cpp \
-			ModeTCommand.cpp \
-			TopicCommand.cpp
+			ModeTCommand.cpp
 CORE = Server.cpp
 REPLIES = IRCReply.cpp
-PARSING = GeneralParsing.cpp
+PARSING = Parsing.cpp
 UTILS =  IRCCodes.cpp \
 			Utils.cpp
 

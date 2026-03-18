@@ -1,4 +1,5 @@
 #include "ModeLCommand.hpp"
+#include "Server.hpp"
 
 // Direct call from ModeCommand with pre-parsed sign and limit string
 void	ModeLCommand::execute(Client &client, Channel &channel, char sign, const std::string &limitStr)

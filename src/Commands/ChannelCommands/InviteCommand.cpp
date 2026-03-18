@@ -1,4 +1,5 @@
 #include "InviteCommand.hpp"
+#include "Server.hpp"
 
 // command = "INVITE"
 // target  = "nickname"
@@ -6,11 +7,8 @@
 
 void	InviteCommand::execute(Server &server, Client &client, const Message &msg)
 {
-	std::string	channelName = msg.params[0];
-	std::string	targetName = msg.params[1];
-	std::string	channelName = msg.params[2];
-
-	const int	clientFd = client.getFd();
+	std::string	targetName = msg.params[0];
+	std::string	channelName = msg.params[1];
 
 	// If channel exists
 	Channel	*channel = server.getChannel(channelName);

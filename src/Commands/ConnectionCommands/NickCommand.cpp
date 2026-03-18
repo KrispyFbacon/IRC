@@ -1,4 +1,5 @@
 #include "NickCommand.hpp"
+#include "Server.hpp"
 
 void NickCommand::execute(Server& server, Client& client, const Message& msg)
 {

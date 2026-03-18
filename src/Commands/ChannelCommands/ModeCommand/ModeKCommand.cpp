@@ -1,4 +1,5 @@
 #include "ModeKCommand.hpp"
+#include "Server.hpp"
 
 // Direct call from ModeCommand with pre-parsed sign and key
 void	ModeKCommand::execute(Client &client, Channel &channel, char sign, const std::string &key)

@@ -1,4 +1,5 @@
 #include "IRCReply.hpp"
+#include "Client.hpp"
 
 
 void sendError(Client& client, const std::string& code, const std::string& msg)

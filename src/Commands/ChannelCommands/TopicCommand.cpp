@@ -1,4 +1,5 @@
 #include "TopicCommand.hpp"
+#include "Server.hpp"
 
 // command = "KICK"
 // param[0] = "#channel"

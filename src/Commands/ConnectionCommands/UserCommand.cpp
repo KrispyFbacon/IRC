@@ -1,4 +1,5 @@
 #include "UserCommand.hpp"
+#include "Server.hpp"
 
 void UserCommand::execute(Server& server, Client& client, const Message& msg)
 {

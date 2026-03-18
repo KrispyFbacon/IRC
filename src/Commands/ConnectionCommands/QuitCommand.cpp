@@ -1,7 +1,9 @@
 #include "QuitCommand.hpp"
+#include "Server.hpp"
 
 void QuitCommand::execute(Server& server, Client& client, const Message& msg)
 {
+	(void)server;
 	Print::Debug ("QUIT Command Called!");
 
 	std::string reason = "Client Quit";

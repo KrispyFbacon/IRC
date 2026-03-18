@@ -1,4 +1,5 @@
 #include "ModeCommand.hpp"
+#include "Server.hpp"
 
 // Which flags consume a positional argument?
 //

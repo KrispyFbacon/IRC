@@ -36,5 +36,3 @@ void CommandFactory::execute(Server& server, Client& client, const Message& msg)
 
 	delete cmd;
 }
-
-//std::string errorMsg = ":" + server._hostName + " PONG " + server._hostName + 421 "

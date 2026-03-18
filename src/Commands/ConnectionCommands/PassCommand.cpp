@@ -1,4 +1,5 @@
 #include "PassCommand.hpp"
+#include "Server.hpp"
 
 void PassCommand::execute(Server& server, Client& client, const Message& msg)
 {

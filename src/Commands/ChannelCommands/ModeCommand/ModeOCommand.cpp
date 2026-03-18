@@ -1,4 +1,5 @@
 #include "ModeOCommand.hpp"
+#include "Server.hpp"
 
 // Direct call from ModeCommand with pre-parsed sign and target nick
 void	ModeOCommand::execute(Server &server, Client &client, Channel &channel, char sign, const std::string &targetNick)

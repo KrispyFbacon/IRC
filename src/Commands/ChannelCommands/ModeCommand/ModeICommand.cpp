@@ -1,4 +1,5 @@
 #include "ModeICommand.hpp"
+#include "Server.hpp"
 
 // Direct call from ModeCommand with pre-parsed sign
 void	ModeICommand::execute(Client &client, Channel &channel, char sign)
