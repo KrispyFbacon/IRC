@@ -48,7 +48,7 @@ void JoinCommand::execute(Server& server, Client& client, const Message& msg)
 	// TODO prefix client?  return ":" + client.username
 	// TODO WE HAVE PREFIX client.getPrefix();
 	(void)server;
-	client.sendMessage(":" + client.getUsername() + " JOIN " + "#" + msg.target); // TODO channel name // msg.params[1];
+	client.sendMessage(":" + client.getUsername() + " JOIN " + "#" + msg.params[0]); // TODO channel name // msg.params[1];
 	//std::string joinMessage =":" + client->getNickname() + " JOIN :" + channelName";
 
 	//TODO BRODCAST MESSAGE(client, channel, "brodcast message")?

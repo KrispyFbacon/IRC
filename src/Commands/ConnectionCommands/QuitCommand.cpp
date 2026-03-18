@@ -20,7 +20,6 @@ void QuitCommand::execute(Server& server, Client& client, const Message& msg)
 		//TODO Broadcast quit message
 	}
 
-
 	client.setDisconnected(true);
 }
 
@@ -31,7 +30,7 @@ void QuitCommand::execute(Server& server, Client& client, const Message& msg)
 		// Check if already sent message to that fd
 
 // TODO CAREFULL FOR LEAKS
-	//TODO CHANNEL::removeClient (int fd)
+	//TODO CHANNEL::removeClient (int fd) and Channel::removeClient(Client* client)?
 		//_clients.erase(fd);
 		//_moderators.erase(fd);
 		// TODO CLIENT:: client->removeChannel(this->getName());?

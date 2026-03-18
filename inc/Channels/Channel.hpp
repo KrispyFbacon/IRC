@@ -20,7 +20,7 @@ class Channel
 
 		std::map<int, Client*>	_clients;
 		std::map<int, Client*>	_moderators;
-		std::map<int, Client*>	_invited;
+		std::map<int, Client*>	_invited; //TODO vector // PHONEBOOK?
 
 	public:
 		Channel(std::string);
@@ -44,7 +44,7 @@ class Channel
 		void	setTopicLocked(bool);
 
 		int		getUserLimit() const;
-		void	Channel::setUserLimit(const int);
+		void	setUserLimit(const int);
 
 		Client	*getModerator(int);
 		bool	addModerator(Client &client);

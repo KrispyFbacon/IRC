@@ -161,11 +161,12 @@ bool	Channel::removeClient(const int clientFd)
 	return (true);
 }
 
+
 bool	Channel::addInvited(Client &client)
 {
 	int	fd = client.getFd();
 
-	if (_clients.find(fd) != _invited.end())
+	if (_clients.find(fd) != _invited.end()) //TODO _invited
 		return (false);
 
 	_invited[fd] = &client;
@@ -202,7 +203,7 @@ bool	Channel::removeInvited(const int clientFd)
 	if (it == _invited.end())
 		return (false);
 
-	_clients.erase(it);
+	_clients.erase(it); //TODO _invited.erase(it);
 
 	return (true);
 }

@@ -384,9 +384,15 @@ void Server::removeClient(int fd)
 	{
 		// TODO remove this user from every channel
 			// channelIt
-				// chanIt->second->removeClient(fd);
+				// channelIt->second->removeClient(fd);
+				// channelIt->second->removeModerator(fd);
+			
+		
 
 		// TODO Optional: If channel empty , delete it
+			// if (chan->getClients().empty())
+				//delete chan;
+				//_channels.erase(chanName);
 
 
 		delete it->second;

@@ -3,7 +3,6 @@
 
 #include "Utils.hpp"
 #include "Client.hpp"
-#include "Channel.hpp"
 
 #include "Parsing.hpp"
 #include "IRCReply.hpp"
@@ -24,5 +23,6 @@ class ACommand
 };
 
 #include "Server.hpp"
+#include "Channel.hpp"
 
 #endif

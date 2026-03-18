@@ -16,6 +16,13 @@ void	KickCommand::execute(Server &server, Client &client, const Message &msg)
 	Channel	*channel = server.getChannel(channelName);
 	Client	*targetPointer = channel->getClientByNickname(target);
 
+	//TODO 
+		// Returns
+		// sendError(client, IRC::ERR_NEEDMOREPARAMS, "KICK :Not enough parameters");
+		// reason
+		// optional ',' logic from join?
+
+
 	// If channel exists
 	if (!channel)
 		sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + ":No such channel");
