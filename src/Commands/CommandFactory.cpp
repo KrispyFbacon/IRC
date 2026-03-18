@@ -9,7 +9,7 @@ CommandFactory::CommandFactory()
 	_commands["PASS"] = &PassCommand::make;
 	_commands["PING"] = &PingCommand::make;
 	_commands["PONG"] = &PongCommand::make;
-	_commands["QUIT"] = &PongCommand::make;
+	_commands["QUIT"] = &QuitCommand::make;
 	_commands["USER"] = &UserCommand::make;
 
 	// Channels Commands

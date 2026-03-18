@@ -12,6 +12,7 @@
 #include "PassCommand.hpp"
 #include "PingCommand.hpp"
 #include "PongCommand.hpp"
+#include "QuitCommand.hpp"
 #include "UserCommand.hpp"
 
 #include "JoinCommand.hpp"
