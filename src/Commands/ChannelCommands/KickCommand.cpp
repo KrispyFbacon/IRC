@@ -17,27 +17,26 @@ void	KickCommand::execute(Server &server, Client &client, const Message &msg)
 	Client	*targetPointer = channel->getClientByNickname(target);
 
 	//TODO 
-		// Returns
-		// sendError(client, IRC::ERR_NEEDMOREPARAMS, "KICK :Not enough parameters");
-		// reason
+	if (msg.params.size() < 2)
+		return (sendError(client, IRC::ERR_NEEDMOREPARAMS, "KICK :Not enough parameters"));
 		// optional ',' logic from join?
 
 
 	// If channel exists
 	if (!channel)
-		sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + ":No such channel");
+		return (sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + ":No such channel"));
 
 	// If kicker is in the channel
 	if (!channel->getClient(clientFd))
-		sendError(client, IRC::ERR_NOTONCHANNEL, channelName + ":You're not on that channel");
+		return (sendError(client, IRC::ERR_NOTONCHANNEL, channelName + ":You're not on that channel"));
 
 	// If kicker is a moderator
 	if (!channel->getModerator(clientFd))
-		sendError(client, IRC::ERR_CHANOPRIVSNEEDED, channelName + ":You're not channel operator");
+		return (sendError(client, IRC::ERR_CHANOPRIVSNEEDED, channelName + ":You're not channel operator"));
 
 	// If target exists and is in channel
 	if (!channel->getClientByNickname(target))
-		sendError(client, IRC::ERR_USERNOTINCHANNEL, target + " " + channelName + " :They aren't on that channel");
+		return (sendError(client, IRC::ERR_USERNOTINCHANNEL, target + " " + channelName + " :They aren't on that channel"));
 
 	// Broadcast then remove
 	std::string	kickMsg = ":" + client.getNickname() + " KICK " + channelName + " " + target + " :" + reason;

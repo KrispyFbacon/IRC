@@ -21,8 +21,7 @@ static bool	flagNeedsArg(char flag, char sign)
 }
 
 std::vector<ModeCommand::ModeChange>
-ModeCommand::parseModeString(const std::string &modeStr,
-							const std::vector<std::string> &args) const
+ModeCommand::parseModeString(const std::string &modeStr, const std::vector<std::string> &args) const
 {
 	std::vector<ModeChange>	changes;
 	char					sign = '+';
@@ -54,19 +53,13 @@ ModeCommand::parseModeString(const std::string &modeStr,
 void	ModeCommand::execute(Server &server, Client &client, const Message &msg)
 {
 	if (msg.params.empty())
-	{
-		sendError(client, IRC::ERR_NEEDMOREPARAMS, "MODE :Not enough parameters");
-		return ;
-	}
+		return (sendError(client, IRC::ERR_NEEDMOREPARAMS, "MODE :Not enough parameters"));
 
 	const std::string	channelName = msg.params[0];
 
 	Channel	*channel = server.getChannel(channelName);
 	if (!channel)
-	{
-		sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel");
-		return ;
-	}
+		return (sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel"));
 
 	// MODE #channel with no mode string → reply with current modes
 	if (msg.params.size() < 2)
@@ -81,16 +74,12 @@ void	ModeCommand::execute(Server &server, Client &client, const Message &msg)
 		if (channel->getUserLimit() != std::numeric_limits<int>::max())
 		modeStr += "l";
 
-		client.sendMessage(":42IRC " + IRC::RPL_CHANNELMODEIS + " " + client.getNickname() + " " + channelName + " " + modeStr);
-		return ;
+		return (client.sendMessage(":42IRC " + IRC::RPL_CHANNELMODEIS + " " + client.getNickname() + " " + channelName + " " + modeStr));
 	}
 
 	// Only channel operators may change modes
 	if (!channel->getModerator(client.getFd()))
-	{
-		sendError(client, IRC::ERR_CHANOPRIVSNEEDED, channelName + " :You're not channel operator");
-		return ;
-	}
+		return (sendError(client, IRC::ERR_CHANOPRIVSNEEDED, channelName + " :You're not channel operator"));
 
 	const std::string	modeStr  = msg.params[1];
 	std::vector<std::string>	modeArgs(msg.params.begin() + 2, msg.params.end());
@@ -128,8 +117,7 @@ void	ModeCommand::execute(Server &server, Client &client, const Message &msg)
 		}
 		else
 		{
-			sendError(client, IRC::ERR_UNKNOWNMODE,
-					  std::string(1, mc.flag) + " :is unknown mode char to me");
+			return (sendError(client, IRC::ERR_UNKNOWNMODE, std::string(1, mc.flag) + " :is unknown mode char to me"));
 		}
 	}
 }

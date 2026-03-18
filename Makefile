@@ -87,7 +87,7 @@ COMMANDS = CommandFactory.cpp \
 			TopicCommand.cpp
 CORE = Server.cpp
 REPLIES = IRCReply.cpp
-PARSING = GeneralParsing.cpp
+PARSING = Parsing.cpp
 UTILS =  IRCCodes.cpp \
 			Utils.cpp
 
