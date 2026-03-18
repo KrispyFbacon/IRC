@@ -79,6 +79,7 @@ namespace Config
 	const int BUFFER_SIZE      = 1024;
 	const int MAX_MESSAGE_SIZE = 4096;
 	const int MAX_EVENTS       = 64;
+	const int MAX_INVITED      = 50;
 }
 
 // --- Colors ---

@@ -10,26 +10,17 @@ void	ModeLCommand::execute(Client &client, Channel &channel, char sign, const st
 	if (sign == '+')
 	{
 		if (limitStr.empty())
-		{
-			sendError(client, IRC::ERR_NEEDMOREPARAMS, "MODE :Not enough parameters");
-			return ;
-		}
+			return (sendError(client, IRC::ERR_NEEDMOREPARAMS, "MODE :Not enough parameters"));
 
 		// Validate: must be a non-zero positive integer
 		for (size_t i = 0; i < limitStr.size(); ++i)
 		{
 			if (!std::isdigit(static_cast<unsigned char>(limitStr[i])))
-			{
-				sendError(client, IRC::ERR_INVALIDLIMIT, channelName + " l * :Invalid limit mode parameter");
-				return ;
-			}
+				return (sendError(client, IRC::ERR_INVALIDLIMIT, channelName + " l * :Invalid limit mode parameter"));
 		}
 		long	limit = std::strtol(limitStr.c_str(), NULL, 10);
 		if (limit <= 0)
-		{
-			sendError(client, IRC::ERR_INVALIDLIMIT, channelName + " l * :Invalid limit mode parameter");
-			return ;
-		}
+			return (sendError(client, IRC::ERR_INVALIDLIMIT, channelName + " l * :Invalid limit mode parameter"));
 
 		channel.setUserLimit(static_cast<int>(limit));
 		channel.broadcast(":" + clientNick + " MODE " + channelName + " +l " + limitStr);
@@ -45,10 +36,7 @@ void	ModeLCommand::execute(Client &client, Channel &channel, char sign, const st
 void	ModeLCommand::execute(Server &server, Client &client, const Message &msg)
 {
 	if (msg.params.size() < 2)
-	{
-		sendError(client, IRC::ERR_NEEDMOREPARAMS, "MODE :Not enough parameters");
-		return ;
-	}
+		return (sendError(client, IRC::ERR_NEEDMOREPARAMS, "MODE :Not enough parameters"));
 
 	const std::string	channelName = msg.params[0];
 	const std::string	modeStr = msg.params[1];
@@ -56,16 +44,9 @@ void	ModeLCommand::execute(Server &server, Client &client, const Message &msg)
 
 	Channel	*channel = server.getChannel(channelName);
 	if (!channel)
-	{
-		sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel");
-		return ;
-	}
+		return (sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel"));
 	if (!channel->getModerator(client.getFd()))
-	{
-		sendError(client, IRC::ERR_CHANOPRIVSNEEDED,
-				  channelName + " :You're not channel operator");
-		return ;
-	}
+		return (sendError(client, IRC::ERR_CHANOPRIVSNEEDED, channelName + " :You're not channel operator"));
 
 	char	sign = (modeStr.size() > 0 && modeStr[0] == '-') ? '-' : '+';
 	execute(client, *channel, sign, limitStr);

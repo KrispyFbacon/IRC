@@ -13,26 +13,26 @@ void	InviteCommand::execute(Server &server, Client &client, const Message &msg)
 	// If channel exists
 	Channel	*channel = server.getChannel(channelName);
 	if (!channel)
-		sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel");
+		return (sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel"));
 
 	// Inviter is in the channel?
 	if (!channel->getClient(client.getFd()))
-		sendError(client, IRC::ERR_NOTONCHANNEL, channelName + " :You're not on that channel");
+		return (sendError(client, IRC::ERR_NOTONCHANNEL, channelName + " :You're not on that channel"));
 
 	// Target user exists?
 	Client	*target = server.getClientByNickname(targetName);
 	if (!target)
-		sendError(client, IRC::ERR_NOSUCHNICK, targetName + " :No such nick");
+		return (sendError(client, IRC::ERR_NOSUCHNICK, targetName + " :No such nick"));
 
 	// If target already in channel
 	Client	&targetRef = *target;
 	if (channel->getClient(targetRef.getFd()))
-		sendError(client, IRC::ERR_USERONCHANNEL, targetName + " " + channelName + " :is already on channel");
+		return (sendError(client, IRC::ERR_USERONCHANNEL, targetName + " " + channelName + " :is already on channel"));
 
 	// Send invite to target + confirmation to inviter
 	target->sendMessage(":" + client.getNickname() + " INVITE " + targetName + " :" + channelName);
 
-	channel->addInvited(targetRef);
+	channel->addInvited(targetName);
 
-	sendError(client, IRC::RPL_INVITING, targetName + " :" + channelName);
+	return (sendError(client, IRC::RPL_INVITING, targetName + " :" + channelName));
 }

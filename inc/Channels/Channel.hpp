@@ -15,12 +15,15 @@ class Channel
 		std::string	_topic;
 		int	_userLimit;
 
+		int	_oldestInvited;
+		int	_numberOfInvited;
+
 		bool	_inviteOnly;
 		bool	_topicLocked;
 
 		std::map<int, Client*>	_clients;
 		std::map<int, Client*>	_moderators;
-		std::map<int, Client*>	_invited; //TODO vector // PHONEBOOK?
+		std::vector<std::string>	_invited;
 
 	public:
 		Channel(std::string);
@@ -55,10 +58,9 @@ class Channel
 		bool	addClient(Client &client);
 		bool	removeClient(const int);
 
-		Client	*getInvited(const int);
-		Client	*getInvitedByNickname(const std::string);
-		bool	addInvited(Client &client);
-		bool	removeInvited(const int);
+		std::string	getInvited(const std::string) const;
+		bool	addInvited(const std::string);
+		bool	removeInvited(const std::string);
 
 		void	broadcast(const std::string);
 };
