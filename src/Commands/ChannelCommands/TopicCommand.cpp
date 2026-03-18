@@ -1,12 +1,13 @@
 #include "TopicCommand.hpp"
 
 // command = "KICK"
-// target  = "#channel"
-// message = "nick :reason"
+// param[0] = "#channel"
+// param[1] = "topic ..."
 
 void	TopicCommand::execute(Server &server, Client &client, const Message &msg)
 {
-	std::string	channelName = msg.target;
+	std::string	channelName = msg.params[0];
+	std::string	topic = msg.params[1];
 
 	// If channel exists
 	Channel	*channel = server.getChannel(channelName);
@@ -14,11 +15,11 @@ void	TopicCommand::execute(Server &server, Client &client, const Message &msg)
 		return (client.sendMessage(":42IRC 403 " + client.getNickname() + " " + channelName + " :No such channel"));
 
 	// Client is in the channel?
-	if (!channel->hasClient(client.getFd()))
+	if (!channel->getClient(client.getFd()))
 		return (client.sendMessage(":42IRC 442 " + client.getNickname() + " " + channelName + " :You're not on that channel"));
 
 	// No message -> view topic
-	if (msg.message.empty())
+	if (topic.empty())
 	{
 		std::string	topic = channel->getTopic();
 		if (topic.empty())
@@ -26,14 +27,9 @@ void	TopicCommand::execute(Server &server, Client &client, const Message &msg)
 		return (client.sendMessage(":42IRC 332 " + client.getNickname() + " " + channelName + " :" + topic));
 	}
 
-	// Set new topic (strip leading ':')
-	std::string	newTopic = msg.message;
-	if (!newTopic.empty() && newTopic[0] == ':')
-		newTopic = newTopic.substr(1);
-
-	channel->setTopic(newTopic);
+	channel->setTopic(topic);
 
 	// Broadcast to channel
-	std::string	topicMsg = ":" + client.getNickname() + " TOPIC " + channelName + " :" + newTopic;
+	std::string	topicMsg = ":" + client.getNickname() + " TOPIC " + channelName + " :" + topic;
 	channel->broadcast(topicMsg);
 }

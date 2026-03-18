@@ -1,37 +1,43 @@
 #include "KickCommand.hpp"
 
 // command = "KICK"
-// target  = "#channel"
-// message = "nick :reason ..."
+// param[0] = "#channel"
+// param[1] = "nick"
+// param[2] = ":reason ..."
 
 void	KickCommand::execute(Server &server, Client &client, const Message &msg)
 {
-	std::string	channelName = msg.target;
-	std::string	targetNick;
-	std::string	reason;
+	std::string	channelName = msg.params[0];
+	std::string	target = msg.params[1];
+	std::string	reason = msg.params[2];
+
+	const int	clientFd = client.getFd();
+
+	Channel	*channel = server.getChannel(channelName);
+	Client	*targetPointer = channel->getClientByNickname(target);
 
 	// If channel exists
-	Channel	*channel = server.getChannel(channelName);
 	if (!channel)
-		return (client.sendMessage(":42IRC 403 " + client.getNickname() + " " + channelName + " :No such channel"));
+		sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + ":No such channel");
 
 	// If kicker is in the channel
-	if (!channel->getClient(client.getFd()))
-		return (client.sendMessage(":42IRC 442 " + client.getNickname() + " " + channelName + " :You're not on that channel"));
+	if (!channel->getClient(clientFd))
+		sendError(client, IRC::ERR_NOTONCHANNEL, channelName + ":You're not on that channel");
 
 	// If kicker is a moderator
-	if (!channel->getModerator(client.getFd()))
-		return (client.sendMessage(":42IRC 482 " + client.getNickname() + " " + channelName + " :You're not channel operator"));
+	if (!channel->getModerator(clientFd))
+		sendError(client, IRC::ERR_CHANOPRIVSNEEDED, channelName + ":You're not channel operator");
 
 	// If target exists and is in channel
-	Client	*target = server.getClientByNick(targetNick);
-	if (!target || !channel->hasClient(target->getFd()))
-		return (client.sendMessage(":42IRC 441 " + client.getNickname() + " " + targetNick + " " + channelName + " :They aren't on that channel"));
+	if (!channel->getClientByNickname(target))
+		sendError(client, IRC::ERR_USERNOTINCHANNEL, target + " " + channelName + " :They aren't on that channel");
 
 	// Broadcast then remove
-	std::string	kickMsg = ":" + client.getNickname() + " KICK " + channelName + " " + targetNick + " :" + reason;
+	std::string	kickMsg = ":" + client.getNickname() + " KICK " + channelName + " " + target + " :" + reason;
+	if (channel->getModerator(clientFd) != NULL)
+		channel->removeModerator(clientFd);
+	channel->removeClient(targetPointer->getFd());
+
 	channel->broadcast(kickMsg);
-	if (channel->getModerator(client.getFd()) != NULL)
-		channel->removeModerator(client);
-	channel->removeClient(target);
 }
+
