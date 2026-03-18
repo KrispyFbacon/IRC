@@ -9,6 +9,7 @@ CommandFactory::CommandFactory()
 	_commands["PASS"] = &PassCommand::make;
 	_commands["PING"] = &PingCommand::make;
 	_commands["PONG"] = &PongCommand::make;
+	_commands["QUIT"] = &PongCommand::make;
 	_commands["USER"] = &UserCommand::make;
 
 	// Channels Commands
@@ -30,6 +31,9 @@ void CommandFactory::execute(Server& server, Client& client, const Message& msg)
 		return;
 	}
 	
+	// Verify if registered!
+	if (!client.isRegistered() && !isConnectionCommands(msg.command))
+		return(sendError(client, IRC::ERR_NOTREGISTERED, ":You have not registered"));
 
 	ACommand* cmd = it->second();
 	cmd->execute(server, client, msg);

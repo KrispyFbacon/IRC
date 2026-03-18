@@ -176,9 +176,9 @@ std::string	toUpper(const std::string &str)
 }
 
 
-/* ============================= String Helper ============================= */
+/* ============================ Command Helper ============================= */
 
-bool isValidNickname(const std::string& nick)
+bool	isValidNickname(const std::string& nick)
 {
 	if (nick.empty() || nick.length() > 32)
 		return false;
@@ -203,4 +203,11 @@ bool isValidNickname(const std::string& nick)
 	}
 
 	return true;
+}
+
+bool	isConnectionCommands(const std::string& cmd)
+{
+	return (cmd == "PASS" || cmd == "NICK" || cmd == "USER"
+			|| cmd == "QUIT" || cmd == "CAP"
+			|| cmd == "PING" || cmd == "PONG");
 }
