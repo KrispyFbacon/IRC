@@ -30,6 +30,9 @@ class Channel
 		Channel(std::string, const Channel &);
 		~Channel();
 
+		const std::map<int, Client*>	&getClients() const;
+		const std::map<int, Client*>	&getModerators() const;
+
 		std::string	getChannelName() const;
 
 		void	copyChannelInfo(Channel &, const Channel &);

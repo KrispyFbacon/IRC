@@ -25,6 +25,16 @@ void	Channel::copyChannelInfo(Channel &dest, const Channel &src)
 	dest._oldestInvited = src._oldestInvited;
 }
 
+const std::map<int, Client*>	&Channel::getClients() const
+{
+	return (_clients);
+}
+
+const std::map<int, Client*>	&Channel::getModerators() const
+{
+	return (_moderators);
+}
+
 std::string	Channel::getChannelName() const
 {
 	return(_name);

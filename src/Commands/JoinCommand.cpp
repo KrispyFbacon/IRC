@@ -1,75 +1,121 @@
 #include "JoinCommand.hpp"
 
+static bool isValidChannelName(const std::string& name)
+{
+	if (name.empty() || name[0] != '#' || name.size() < 2)
+		return (false);
+	for (size_t i = 1; i < name.size(); ++i)
+	{
+		if (name[i] == ' ' || name[i] == ',' || name[i] == '\a')
+			return (false);
+	}
+	return (true);
+}
+
+static void sendNamesReply(Client& client, Channel* channel)
+{
+	const std::map<int, Client*>& clients    = channel->getClients();
+	const std::map<int, Client*>& moderators = channel->getModerators();
+
+	std::string list;
+	std::map<int, Client*>::const_iterator it = clients.begin();
+	for (; it != clients.end(); ++it)
+	{
+		if (!list.empty())
+			list += " ";
+		if (moderators.find(it->first) != moderators.end())
+			list += "@";
+		list += it->second->getNickname();
+	}
+
+	sendReply(client, IRC::RPL_NAMREPLY,   "= " + channel->getChannelName() + " :" + list);
+	sendReply(client, IRC::RPL_ENDOFNAMES, channel->getChannelName() + " :End of NAMES list");
+}
+
+static void handleOneJoin(Server& server, Client& client,
+						const std::string& rawJoin, const std::string& rawKey)
+{
+	// rawJoin = "JOIN #chan", rawKey = "PASS thekey" or "PASS "
+	Message joinMsg = parseMessage(rawJoin);
+	Message keyMsg  = parseMessage(rawKey);
+
+	if (joinMsg.params.empty())
+		return ;
+
+	std::string channelName = joinMsg.params[0];
+	std::string key         = keyMsg.params.empty() ? "" : keyMsg.params[0];
+
+	if (!isValidChannelName(channelName))
+		return (sendError(client, IRC::ERR_NOSUCHCHANNEL,
+						channelName + " :No such channel"));
+
+	Channel* channel = server.getChannel(channelName);
+	bool     isNew   = (channel == NULL);
+
+	if (isNew)
+	{
+		// Create the channel and make the founder operator
+		channel = server.createChannel(channelName);
+		channel->addClient(client);
+		channel->addModerator(client);
+	}
+	else
+	{
+		// Already in channel?
+		if (channel->getClient(client.getFd()))
+			return (sendError(client, IRC::ERR_USERONCHANNEL,
+							client.getNickname() + " " + channelName + " :is already on channel"));
+
+		// Invite-only?
+		if (channel->getInviteOnly() && channel->getInvited(client.getNickname()).empty())
+			return (sendError(client, IRC::ERR_INVITEONLYCHAN,
+							channelName + " :Cannot join channel (+i)"));
+
+		// Wrong key?
+		if (!channel->getPass().empty() && channel->getPass() != key)
+			return (sendError(client, IRC::ERR_BADCHANNELKEY,
+							channelName + " :Cannot join channel (+k)"));
+
+		// Full?
+		if ((int)channel->getClients().size() >= channel->getUserLimit())
+			return (sendError(client, IRC::ERR_CHANNELISFULL,
+							channelName + " :Cannot join channel (+l)"));
+
+		channel->addClient(client);
+	}
+
+	// Broadcast JOIN to everyone in channel (including the joiner)
+	std::string joinMsg2 = ":" + client.getPrefix() + " JOIN " + channelName;
+	channel->broadcast(joinMsg2);
+
+	// Topic
+	std::string topic = channel->getTopic();
+	if (!topic.empty())
+		sendReply(client, IRC::RPL_TOPIC, channelName + " :" + topic);
+	else
+		sendReply(client, IRC::RPL_NOTOPIC, channelName + " :No topic is set");
+
+	// NAMES list
+	sendNamesReply(client, channel);
+}
 
 void JoinCommand::execute(Server& server, Client& client, const Message& msg)
 {
-	Print::Debug ("JOIN COMMAND CALLED!");
+	Print::Debug("JOIN COMMAND CALLED!");
 
-	//TODO Registered?
-	//TODO not enough params		-> ERR_NEEDMOREPARAMS
-	//TODO Split argument with ',' channel/key
-	//TODO isValidChannelName		-> ERR_NOSUCHCHANNEL
-	//TODO GetChannel
-		// Channel exists?
-			// Create Channel
-			// Channel limit?
-		//else
-			// already in channel?	-> ERR_USERONCHANNEL
-			// is invite only?		-> ERR_INVITEONLYCHAN
-			// has Password?		-> ERR_BADCHANNELKEY
-			// is it Full?			-> ERR_CHANNELISFULL
-			// channel.AddClient(client)?
-			// client.sendMessage(joinMessage)?
-			// channel.broadcast(joinMessage)?
+	if (!client.isRegistered())
+		return (sendError(client, IRC::ERR_NOTREGISTERED, ":You have not registered"));
 
-		// TOPIC EMPTY?
-			// sendReply(client, RPL_TOPIC, channelName + " :" + channel->getTopic());
-		//else
-			// sendReply(client, RPL_NOTOPIC, channelName + " :No topic is set");
-		
-		// send Channel List?
-			// channel or client exist?
-				//return
-			// loop throw channel -> user
-				// is channel->isModerator / find in channel._moderators
-				// get nickName();
-			// Send List
-				// sendReply(client, IRC::RPL_NAMREPLY, "= " + channel->getName() + " :" + list);
-				// sendReply(client, IRC::RPL_ENDOFNAMES, channel->getName() + " :End of NAMES list");
+	if (msg.params.empty())
+		return (sendError(client, IRC::ERR_NEEDMOREPARAMS, "JOIN :Not enough parameters"));
 
+	// Re-assemble the raw line so parseJoinMessage can split channels/keys
+	std::string raw = "JOIN " + msg.params[0];
+	if (msg.params.size() > 1)
+		raw += " " + msg.params[1];
 
+	JoinMessage jm = parseJoinMessage(raw);
 
-	// TODO 
-	// if (!client.isRegistered()) {
-	// 	sendError(client, IRC::ERR_NOTREGISTERED, "JOIN :You have not registered");
-	// 	return;
-	// }
-
-	// TODO prefix client?  return ":" + client.username
-	// TODO WE HAVE PREFIX client.getPrefix();
-	(void)server;
-	client.sendMessage(":" + client.getUsername() + " JOIN " + "#" + msg.params[0]); // TODO channel name // msg.params[1];
-	//std::string joinMessage =":" + client->getNickname() + " JOIN :" + channelName";
-
-	//TODO BRODCAST MESSAGE(client, channel, "brodcast message")?
-	// :client + " JOIN " + channelName
-
-	//TODO SPLIT
-	// std::vector<std::string> channels = splitArguments(message.getParams(0), ',');
-	// std::vector<std::string> keys = (message.getSize() > 1 ?
-	// 	splitArguments(message.getParams(1), ',') : std::vector<std::string>());
-
-	// for (size_t i = 0; i < channels.size(); i++)
-	// {
-	// 	joinChannel(client, channels[i],
-	// 				(i >= keys.size() ? "" : keys[i]));
-	//}
-	
+	for (size_t i = 0; i < jm.channels.size(); ++i)
+		handleOneJoin(server, client, jm.channels[i], jm.keys[i]);
 }
-
-// TODO ALL ERRORS
-// ERR_NEEDMOREPARAMS	ERR_BANNEDFROMCHAN
-// ERR_INVITEONLYCHAN	ERR_BADCHANNELKEY
-// ERR_CHANNELISFULL	ERR_BADCHANMASK
-// ERR_NOSUCHCHANNEL	ERR_TOOMANYCHANNELS
-// RPL_TOPIC
