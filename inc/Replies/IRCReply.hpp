@@ -2,7 +2,8 @@
 #define IRCREPLY_HPP
 
 #include "IRCCodes.hpp"
-#include "Client.hpp"
+
+class Client;
 
 void sendError(Client& client, const std::string& code, const std::string& msg);
 void sendReply(Client& client, const std::string& code, const std::string& msg);

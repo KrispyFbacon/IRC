@@ -79,6 +79,7 @@ namespace Config
 	const int BUFFER_SIZE      = 1024;
 	const int MAX_MESSAGE_SIZE = 4096;
 	const int MAX_EVENTS       = 64;
+	const int MAX_INVITED      = 50;
 }
 
 // --- Colors ---
@@ -125,12 +126,15 @@ std::string toString(T src)
 
 
 // --- Args Validation ---
-bool isValidPort(const std::string& port);
-bool isValidPassword(const std::string& password);
+bool	isValidPort(const std::string& port);
+bool	isValidPassword(const std::string& password);
 
 // --- String Helper ---
 std::string	getFirstString(const std::string);
 std::string	toUpper(const std::string &str);
+
+// --- Command Helpers ---
+bool	isValidNickname(const std::string& nick);
 
 
 

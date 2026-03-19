@@ -73,6 +73,8 @@ CLIENTS = Client.cpp
 COMMANDS = CommandFactory.cpp \
 			PingCommand.cpp \
 			PongCommand.cpp \
+			QuitCommand.cpp \
+			UserCommand.cpp \
 			JoinCommand.cpp  \
 			KickCommand.cpp \
 			InviteCommand.cpp \
@@ -85,8 +87,12 @@ COMMANDS = CommandFactory.cpp \
 			TopicCommand.cpp
 CORE = Server.cpp
 REPLIES = IRCReply.cpp
+<<<<<<< HEAD
 PARSING = Parsing.cpp \
 			ExtraParsing.cpp
+=======
+PARSING = Parsing.cpp
+>>>>>>> a627dcf217a2b950bc89152f93a3f331194913b7
 UTILS =  IRCCodes.cpp \
 			Utils.cpp
 

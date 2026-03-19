@@ -174,3 +174,33 @@ std::string	toUpper(const std::string &str)
 
 	return (result);
 }
+
+
+/* ============================= String Helper ============================= */
+
+bool isValidNickname(const std::string& nick)
+{
+	if (nick.empty() || nick.length() > 32)
+		return false;
+
+	// The forbidden routing characters (No spaces, no prefixes!)
+	const std::string forbidden = " !@#&:?*";
+
+	for (size_t i = 0; i < nick.length(); ++i)
+	{
+		unsigned char c = static_cast<unsigned char>(nick[i]);
+
+		if (c <= 127)
+		{
+			// If it's a space or a forbidden routing symbol
+			if (forbidden.find(c) != std::string::npos) 
+				return false;
+			
+			// Block invisible control characters (like Enter, Tab, Escape)
+			if (c < 32 || c == 127) 
+				return false;
+		}
+	}
+
+	return true;
+}

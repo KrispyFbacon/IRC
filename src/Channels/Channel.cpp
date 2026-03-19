@@ -1,6 +1,6 @@
 #include "Channel.hpp"
 
-Channel::Channel(std::string name): _name(name), _pass(""), _topic(""), _userLimit(std::numeric_limits<int>::max()){}
+Channel::Channel(std::string name): _name(name), _pass(""), _topic(""), _userLimit(std::numeric_limits<int>::max()), _oldestInvited(0), _numberOfInvited(0){}
 
 Channel::Channel(std::string name, const Channel &other) : _name(name)
 {
@@ -21,6 +21,8 @@ void	Channel::copyChannelInfo(Channel &dest, const Channel &src)
 	dest._userLimit = src._userLimit;
 	dest._inviteOnly = src._inviteOnly;
 	dest._topicLocked = src._topicLocked;
+	dest._numberOfInvited = dest._numberOfInvited;
+	dest._oldestInvited = src._oldestInvited;
 }
 
 std::string	Channel::getChannelName() const
@@ -119,8 +121,8 @@ bool	Channel::addClient(Client &client)
 	if (_clients.find(fd) != _clients.end())
 		return (false);
 
-	if (_invited.find(fd) != _invited.end())
-		removeInvited(fd);
+	const std::string clientNickname = client.getNickname();
+	removeInvited(clientNickname);
 	
 	_clients[fd] = &client;
 	return (true);
@@ -161,50 +163,44 @@ bool	Channel::removeClient(const int clientFd)
 	return (true);
 }
 
-bool	Channel::addInvited(Client &client)
+bool	Channel::addInvited(const std::string client)
 {
-	int	fd = client.getFd();
-
-	if (_clients.find(fd) != _invited.end())
-		return (false);
-
-	_invited[fd] = &client;
-	return (true);
-}
-
-Client	*Channel::getInvited(int clientFd)
-{
-	std::map<int, Client*>::iterator it = _invited.find(clientFd);
-
-	if (it == _invited.end())
-		return (NULL);
-
-	return (it->second);
-}
-
-Client	*Channel::getInvitedByNickname(const std::string nick)
-{
-	std::map<int, Client*>::iterator it = _invited.begin();
-
-	for (; it != _invited.end(); ++it)
+	if(_numberOfInvited < Config::MAX_INVITED)
 	{
-		Client	*client = it->second;
-
-		if (client->getNickname() == nick)
-			return (it->second);
+		_invited[_numberOfInvited] = client;
+		_numberOfInvited++;
+		return (true);
 	}
+	else
+	{
+		_invited[_oldestInvited] = client;
+		_oldestInvited = (_oldestInvited + 1) % Config::MAX_INVITED;
+		return (true);
+	}
+	
+}
+
+std::string	Channel::getInvited(const std::string client) const
+{
+	for (size_t i = 0; i < _invited.size(); ++i)
+	{
+		if (_invited[i] == client)
+				return (client);
+	}
+
 	return (NULL);
 }
 
-bool	Channel::removeInvited(const int clientFd)
+bool	Channel::removeInvited(const std::string client)
 {
-	std::map<int, Client*>::iterator	it = _invited.find(clientFd);
-	if (it == _invited.end())
-		return (false);
+	for (size_t i = 0; i < _invited.size(); ++i)
+	{
+		if (_invited[i] == client)
+			_invited.erase(_invited.begin() + i);
+			return (true);
+	}
 
-	_clients.erase(it);
-
-	return (true);
+	return (false);
 }
 
 void	Channel::broadcast(const std::string msg)
