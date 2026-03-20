@@ -56,14 +56,14 @@ void Print::Debug (const std::string& str)
 void Print::Ok (const std::string& str)
 {
 	std::cout << BOLD_G << "[ OK ] " << RST
-			  << str
+			  << str << RST
 	<< std::endl;
 }
 
 void Print::Error(const std::string &str)
 {
 	std::cerr << BOLD_R << "[ ERROR ] " << RST
-			  << str << ": " 
+			  << str << RST << ": " 
 			  << NUM_COLOR << strerror(errno) << RST
 	<< std::endl;
 }
@@ -71,14 +71,15 @@ void Print::Error(const std::string &str)
 void Print::Fail(const std::string &str)
 {
 	std::cerr << BOLD_R << "[ FAIL ] " << RST
-			  << str << ": " 
+			  << str << RST << ": " 
 			  << NUM_COLOR << strerror(errno) << RST
 	<< std::endl;
 }
 
 void Print::Warn(const std::string &str)
 {
-	std::cerr << BOLD_Y << "[ FAIL ] " << RST << str
+	std::cerr << BOLD_Y << "[ FAIL ] " << RST 
+			  << str << RST
 	<< std::endl;
 }
 
@@ -123,6 +124,7 @@ bool isValidPassword(const std::string& password)
 	return true;
 }
 
+//TODO delete
 // bool isValidPort(const char* port)
 // {
 // 	if (!port || !(*port))

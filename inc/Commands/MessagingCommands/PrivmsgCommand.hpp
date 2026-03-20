@@ -9,6 +9,8 @@ class Client;
 class PrivmsgCommand : public ACommand
 {
 	private:
+		void handleChannelMessage(Server& , Client&, const std::string&, const std::string& );
+		void handlePrivateMessage(Server& , Client&, const std::string&, const std::string& );
 
 	public:
 		static ACommand* make() { return new PrivmsgCommand(); }
