@@ -136,7 +136,8 @@ bool	Channel::addClient(Client &client)
 	
 	_clients[fd] = &client;
 
-	//TODO _clients[fd].addChannel(this);
+	Channel	&channelRef = (*this);
+	client.addChannel(channelRef);
 
 	return (true);
 }

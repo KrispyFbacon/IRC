@@ -18,7 +18,6 @@ class Client
 		std::string	_nickname;
 
 		std::string	_buffer;
-		std::string	_outBuffer;
 
 		bool	_isRegistered;
 		bool	_isAuthenticated;
@@ -41,7 +40,6 @@ class Client
 		std::string	getUsername() const;
 		std::string	getPassword() const;
 		std::string	getNickname() const;
-		std::string	getStrBuffer() const;
 		std::string	getPrefix() const;
 
 		std::string	&getBuffer();
@@ -51,16 +49,14 @@ class Client
 		void	setUsername(std::string);
 		void	setPassword(std::string);
 		void	setNickname(std::string);
-		void	setOutBuffer(std::string);
 
 		void	setRegistered(bool);
 		void	setAuthenticated(bool);
 		void	setDisconnected(bool status);
 
 	// Channel Handler
-		// TODO
-		void	addChannel(Channel& );
-		void	removeChannel(Channel& );
+		void	addChannel(Channel &);
+		void	removeChannel(Channel &);
 		void	removeChannel(const std::string &);
 
 	//buffer functions
