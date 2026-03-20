@@ -1,5 +1,6 @@
 #include "ExtraParsing.hpp"
 
+// TODO PArsing having splitArgument(const std::string &, 'char')?
 static std::vector<std::string>	splitByComma(const std::string &str)
 {
 	std::vector<std::string>	result;
@@ -32,6 +33,7 @@ static std::vector<std::string>	splitByComma(const std::string &str)
 //
 // Keys are matched positionally. Channels with no matching key get "PASS ".
 
+// TODO PArsing having splitArgument(const std::string &, 'char')?
 JoinMessage	parseJoinMessage(const std::string &raw)
 {
 	JoinMessage	result;
@@ -41,6 +43,8 @@ JoinMessage	parseJoinMessage(const std::string &raw)
 	if (msg.command != "JOIN" || msg.params.empty())
 		return (result);
 
+	//TODO I would use this for join, kick and privmsg (splitByComma);
+	// getline() like in server?
 	std::vector<std::string>	channels = splitByComma(msg.params[0]);
 	std::vector<std::string>	keys;
 

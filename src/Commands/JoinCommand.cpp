@@ -1,17 +1,22 @@
 #include "JoinCommand.hpp"
 
+// TODO '#' and '$'
+// TODO put in Acommand? the same as other fuctions in Utils.hpp?
 static bool isValidChannelName(const std::string& name)
 {
 	if (name.empty() || name[0] != '#' || name.size() < 2)
 		return (false);
 	for (size_t i = 1; i < name.size(); ++i)
 	{
+		// TODO all spaces, control chars, commas, colons?
+		// TODO <= 32?  and ':'?
 		if (name[i] == ' ' || name[i] == ',' || name[i] == '\a')
 			return (false);
 	}
 	return (true);
 }
 
+// TODO private for JOinCommand?
 static void sendNamesReply(Client& client, Channel* channel)
 {
 	const std::map<int, Client*>& clients    = channel->getClients();
@@ -35,6 +40,8 @@ static void sendNamesReply(Client& client, Channel* channel)
 static void handleOneJoin(Server& server, Client& client,
 						const std::string& rawJoin, const std::string& rawKey)
 {
+	//TODO no need to parse Message!
+
 	// rawJoin = "JOIN #chan", rawKey = "PASS thekey" or "PASS "
 	Message joinMsg = parseMessage(rawJoin);
 	Message keyMsg  = parseMessage(rawKey);
