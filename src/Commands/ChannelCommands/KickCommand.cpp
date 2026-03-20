@@ -16,13 +16,14 @@ static void	kickTarget(Client &client, Channel *channel, const std::string &targ
 						target + " " + channelName + " :They aren't on that channel"));
 
 	// Broadcast BEFORE removing so the kicked user receives it
-	std::string	kickMsg = ":" + client.getNickname()
+	std::string	kickMsg = ":" + client.getPrefix()
 						+ " KICK " + channelName
 						+ " " + target
 						+ " :" + reason;
 	channel->broadcast(kickMsg);
 
 	// Remove from moderators if they were one
+	// TODO No need for veryfication if it already checks that in removeModerator
 	if (channel->getModerator(targetClient->getFd()))
 		channel->removeModerator(targetClient->getFd());
 
@@ -55,11 +56,8 @@ void	KickCommand::execute(Server &server, Client &client, const Message &msg)
 		return (sendError(client, IRC::ERR_CHANOPRIVSNEEDED,
 						channelName + " :You're not channel operator"));
 
-	argumentSplit	split = splitParse(msg);
+	std::vector<std::string> targets = splitComma(msg.params[1]);
 
-	for (size_t i = 0; i < split.targets.size(); ++i)
-	{
-		std::string	pass = (i < split.keys.size()) ? split.keys[i] : "";
-		kickTarget(client, channel, split.targets[i], reason);
-	}
+	for (size_t i = 0; i < targets.size(); ++i)
+		kickTarget(client, channel, targets[i], reason);
 }

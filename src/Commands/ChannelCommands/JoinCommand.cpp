@@ -91,11 +91,17 @@ void	JoinCommand::execute(Server &server, Client &client, const Message &msg)
 		return sendError(client, IRC::ERR_NEEDMOREPARAMS,
 						 "JOIN :Not enough parameters");
 
-	argumentSplit	split = splitParse(msg);
 
-	for (size_t i = 0; i < split.targets.size(); ++i)
+	std::vector<std::string> targets = splitComma(msg.params[0]);
+	std::vector<std::string> keys;
+
+	if (msg.params.size() > 1 && !msg.params[1].empty())
+		keys = splitComma(msg.params[1]);
+
+
+	for (size_t i = 0; i < targets.size(); ++i)
 	{
-		std::string	pass = (i < split.keys.size()) ? split.keys[i] : "";
-		joinChannel(server, client, split.targets[i], pass);
+		std::string	pass = (i < keys.size()) ? keys[i] : "";
+		joinChannel(server, client, targets[i], pass);
 	}
 }

@@ -1,6 +1,9 @@
 #include "Parsing.hpp"
 
-static std::vector<std::string>	splitComma(const std::string &str)
+
+//TODO case of 
+// JOIN #room1,#room2,#room3 pass1,,pass3  <- Double comma
+std::vector<std::string>	splitComma(const std::string &str)
 {
 	std::vector<std::string>	tokens;
 	size_t						start = 0;
@@ -15,20 +18,6 @@ static std::vector<std::string>	splitComma(const std::string &str)
 	if (start < str.size())
 		tokens.push_back(str.substr(start));
 	return tokens;
-}
-
-
-argumentSplit	splitParse(const Message &msg)
-{
-	argumentSplit	jm;
-
-	jm.targets = splitComma(msg.params[0]);
-
-	// Only split keys if a second param exists and isn't empty
-	if (msg.params.size() >= 2 && !msg.params[1].empty())
-		jm.keys = splitComma(msg.params[1]);
-
-	return jm;
 }
 
 static size_t	skipDelimiters(const std::string *str, size_t i, const std::string &delimiter)

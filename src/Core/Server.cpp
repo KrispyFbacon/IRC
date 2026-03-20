@@ -399,6 +399,8 @@ void Server::removeClient(int fd)
 
 			chan->removeClient(fd);
 			chan->removeModerator(fd);
+
+			client->removeChannel(chan->getChannelName());
 			
 			// Did channel become empty?
 			if (chan->getClients().empty())
