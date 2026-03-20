@@ -89,7 +89,8 @@ COMMANDS = CommandFactory.cpp \
 			ModeTCommand.cpp
 CORE = Server.cpp
 REPLIES = IRCReply.cpp
-PARSING = Parsing.cpp
+PARSING = Parsing.cpp \
+			ExtraParsing.cpp
 UTILS =  IRCCodes.cpp \
 			Utils.cpp
 

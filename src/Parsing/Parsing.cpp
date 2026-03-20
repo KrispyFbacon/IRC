@@ -1,5 +1,35 @@
 #include "Parsing.hpp"
 
+std::vector<std::string>	splitComma(const std::string &str)
+{
+	std::vector<std::string>	tokens;
+	size_t						start = 0;
+	size_t						pos;
+
+	while ((pos = str.find(',', start)) != std::string::npos)
+	{
+		if (pos > start)
+			tokens.push_back(str.substr(start, pos - start));
+		start = pos + 1;
+	}
+	if (start < str.size())
+		tokens.push_back(str.substr(start));
+	return tokens;
+}
+
+commaSplit	splitParse(const Message &msg)
+{
+	commaSplit	jm;
+
+	jm.channels = splitComma(msg.params[0]);
+
+	// Only split keys if a second param exists and isn't empty
+	if (msg.params.size() >= 2 && !msg.params[1].empty())
+		jm.keys = splitComma(msg.params[1]);
+
+	return jm;
+}
+
 static size_t	skipDelimiters(const std::string *str, size_t i, const std::string &delimiter)
 {
 	size_t	len = str->length();

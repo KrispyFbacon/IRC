@@ -1,7 +1,7 @@
 #ifndef PARSING_HPP
-#define PARSING_HPP
+# define PARSING_HPP
 
-#include "Utils.hpp"
+# include "Utils.hpp"
 
 struct Message
 {

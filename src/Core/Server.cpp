@@ -163,6 +163,13 @@ Client* Server::getClientByNickname(const std::string& nickname)
 
 /* =========================== Channel Management =========================== */
 
+Channel* Server::createChannel(const std::string& name)
+{
+	Channel* channel = new Channel(name);
+	_channels[name] = channel;
+	return (channel);
+}
+
 Channel* Server::getChannel(std::string channelName)
 {
 	channelIt it = _channels.find(channelName);

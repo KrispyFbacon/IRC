@@ -73,6 +73,7 @@ class Server
 		void	checkRegistration(Client& client);
 		
 		// TODO Channel management
+		Channel* createChannel(const std::string& name);
 		Channel*	getChannel(std::string channelName);
 };
 
