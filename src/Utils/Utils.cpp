@@ -92,7 +92,7 @@ void Print::InputError(const std::string& str)
 	<< std::endl;
 }
 
-/* ============================ Args Validation ============================ */
+/* ============================ Args Validations ============================ */
 
 bool isValidPort(const std::string& port)
 {
@@ -157,7 +157,7 @@ bool isValidPassword(const std::string& password)
 // }
 
 
-/* ============================= String Helper ============================= */
+/* ============================= String Helpers ============================= */
 
 std::string	getFirstString(const std::string str)
 {
@@ -212,4 +212,18 @@ bool	isConnectionCommands(const std::string& cmd)
 	return (cmd == "PASS" || cmd == "NICK" || cmd == "USER"
 			|| cmd == "QUIT" || cmd == "CAP"
 			|| cmd == "PING" || cmd == "PONG");
+}
+
+bool	isValidChannelName(const std::string &name)
+{
+	if (name.empty() || name[0] != '#' || name[0] != '&' || name.size() < 2)
+		return (false);
+
+	for (size_t i = 1; i < name.size(); ++i)
+	{
+		if (name[i] <= 32 || name[i] == ',' || name[i] == ':')
+			return (false);
+	}
+
+	return (true);
 }
