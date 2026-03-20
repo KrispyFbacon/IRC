@@ -135,6 +135,7 @@ std::string	toUpper(const std::string &str);
 
 // --- Command Helpers ---
 bool	isValidNickname(const std::string& nick);
+bool	isValidChannelName(const std::string &name);
 
 
 
