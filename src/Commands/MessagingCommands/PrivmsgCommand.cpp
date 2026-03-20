@@ -17,7 +17,7 @@ void NickCommand::execute(Server& server, Client& client, const Message& msg)
 	std::string target = msg.params[0];
 	std::string text = msg.params[1];
 
-	Split	jm = splitParse(msg);
+	argumentSplit	jm = splitParse(msg);
 
 	// for (size_t i = 0; i < jm.channels.size(); ++i)
 	{

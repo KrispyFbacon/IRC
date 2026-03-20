@@ -1,99 +1,101 @@
 #include "JoinCommand.hpp"
+#include "Server.hpp"
 
+// command = "JOIN"
+// params[0] = "ch1,ch2,chN"
+// params[1] = "pass1,pass2,passN"  (optional)
 
-void JoinCommand::execute(Server& server, Client& client, const Message& msg)
+static void	sendNamesReply(Client &client, Channel *channel)
 {
-	Print::Debug ("JOIN COMMAND CALLED!");
+	const std::map<int, Client *>	&clients = channel->getClients();
+	const std::map<int, Client *>	&moderators = channel->getModerators();
 
-	//TODO Registered? ✅ Done before execute
-
-	if (msg.params.empty() || msg.params[0].empty())
-        return(sendError(client, IRC::ERR_NEEDMOREPARAMS, "JOIN :Not enough parameters"));
-
-	//TODO Split argument with ',' channel/key
-
-	for (size_t i = 0; i < channels.size(); i++)
+	std::string list;
+	for (std::map<int, Client *>::const_iterator it = clients.begin();
+		 it != clients.end(); ++it)
 	{
-		joinChannel(client, channels[i], (i >= keys.size() ? "" : keys[i]));
+		if (!list.empty())
+			list += " ";
+		if (moderators.find(it->first) != moderators.end())
+			list += "@";
+		list += it->second->getNickname();
 	}
 
-
-
-	// TODO prefix client?  return ":" + client.username
-	// TODO WE HAVE PREFIX client.getPrefix();
-
-	//(void)server;
-	//client.sendMessage(":" + client.getUsername() + " JOIN " + "#" + msg.params[0]); // TODO channel name // msg.params[1];
-	//std::string joinMessage =":" + client->getNickname() + " JOIN :" + channelName";
-
-	//TODO BRODCAST MESSAGE(client, channel, "brodcast message")?
-	// :client + " JOIN " + channelName
-
-	//TODO SPLIT
-	// std::vector<std::string> channels = splitArguments(message.getParams(0), ',');
-	// std::vector<std::string> keys = (message.getSize() > 1 ?
-	// 	splitArguments(message.getParams(1), ',') : std::vector<std::string>());
-
-	// for (size_t i = 0; i < channels.size(); i++)
-	// {
-	// 	joinChannel(client, channels[i],
-	// 				(i >= keys.size() ? "" : keys[i]));
-	//}
-	
+	sendReply(client, IRC::RPL_NAMREPLY,
+			  "= " + channel->getChannelName() + " :" + list);
+	sendReply(client, IRC::RPL_ENDOFNAMES,
+			  channel->getChannelName() + " :End of NAMES list");
 }
 
-
-void	JoinCommand::joinChannel(Server& server, Client& client, const std::string& channelName, const std::string& key)
+static void	joinChannel(Server &server, Client &client,
+						const std::string &channelName, const std::string &pass)
 {
-	//TODO isValidChannelName		-> ERR_NOSUCHCHANNEL
-		// TODO
-		// <2 - FALSE
-		// channelName[0] != '#' && channelName[0] != '&'?
-		// Check for invalid characters in channel name
-	if (isValidChannelName(const std::string& channelName) cons)) // in Acommand?
-		return(sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel"));
+	if (!isValidChannelName(channelName))
+		return (sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel"));
 
-	//TODO GetChannel
-	Channel* channel = server.getChannel(channelName);
+	Channel	*channel = server.getChannel(channelName);
+	if (!channel)
+	{
+		// Channel doesn't exist — create it and make the founder operator
+		channel = server.createChannel(channelName);
+		channel->addClient(client);
+		channel->addModerator(client);
+	}
+	else
+	{
+		// Already in channel?
+		if (channel->getClient(client.getFd()))
+			return sendError(client, IRC::ERR_USERONCHANNEL,
+							 client.getNickname() + " " + channelName
+							 + " :is already on channel");
 
-		// Channel exists?
-		if(!channel)
-		{
-			// -> Create new Channel
-            // -> Add Channel to Server's map
-            // -> channel.addClient(client)
-            // -> channel.addModerator(client) // Creator becomes moderator
-            // -> client.addChannel(channel)
-		}
-		//else
-		{
-			// already in channel?	-> ERR_USERONCHANNEL
-			// is invite only?		-> ERR_INVITEONLYCHAN
-			// has Password?		-> ERR_BADCHANNELKEY
-			// is it Full?			-> ERR_CHANNELISFULL
-			// channel.AddClient(client)?
-			// -> chan.removeInvite(client.getNickname()) <-- Consume ticket!
-			// client.sendMessage(joinMessage)?
-		}
+		// Invite-only?
+		if (channel->getInviteOnly() && channel->getInvited(client.getNickname()).empty())
+			return sendError(client, IRC::ERR_INVITEONLYCHAN,
+							 channelName + " :Cannot join channel (+i)");
 
-		//TODO broadcast channel
-		// chan.broadcast(":" + client.getNickName() + " JOIN :" + chanName); // client.getPrefix()?
+		// Wrong key?
+		if (!channel->getPass().empty() && channel->getPass() != pass)
+			return sendError(client, IRC::ERR_BADCHANNELKEY,
+							 channelName + " :Cannot join channel (+k)");
 
-		//TODO send topic
-			if (chan.getTopic().empty())
-				sendReply(client, IRC::RPL_NOTOPIC, channelName + " :No topic is set");
-			else
-				sendReply(client, RPL_TOPIC, channelName + " :" + channel->getTopic());
+		// Channel full?
+		if (static_cast<int>(channel->getClients().size()) >= channel->getUserLimit())
+			return sendError(client, IRC::ERR_CHANNELISFULL,
+							 channelName + " :Cannot join channel (+l)");
 		
-		// send Channel List?
-			// channel or client exist?
-				//return
-			// loop throw channel -> user
-				// is channel->isModerator // find in channel._moderators add '@'
-				// get nickName();
-			// Send List
-				// sendReply(client, IRC::RPL_NAMREPLY, "= " + channel->getName() + " :" + list);
-				// sendReply(client, IRC::RPL_ENDOFNAMES, channel->getName() + " :End of NAMES list");
-	
+		channel->addClient(client);
+	}
 
+	// Broadcast JOIN to everyone in the channel (including the joiner)
+	std::string	joinMsg = ":" + client.getPrefix() + " JOIN " + channelName;
+	channel->broadcast(joinMsg);
+
+	// Topic
+	std::string	topic = channel->getTopic();
+	if (!topic.empty())
+		sendReply(client, IRC::RPL_TOPIC, channelName + " :" + topic);
+	else
+		sendReply(client, IRC::RPL_NOTOPIC, channelName + " :No topic is set");
+
+	// NAMES list
+	sendNamesReply(client, channel);
+	Print::Ok(joinMsg);
+}
+
+void	JoinCommand::execute(Server &server, Client &client, const Message &msg)
+{
+	Print::Debug("JOIN COMMAND CALLED!");
+
+	if (msg.params.empty())
+		return sendError(client, IRC::ERR_NEEDMOREPARAMS,
+						 "JOIN :Not enough parameters");
+
+	argumentSplit	split = splitParse(msg);
+
+	for (size_t i = 0; i < split.channels.size(); ++i)
+	{
+		std::string	pass = (i < split.keys.size()) ? split.keys[i] : "";
+		joinChannel(server, client, split.channels[i], pass);
+	}
 }
