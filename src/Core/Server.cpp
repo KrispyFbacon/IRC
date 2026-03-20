@@ -387,21 +387,29 @@ void Server::removeClient(int fd)
 	close(fd);
 	
 	clientIt it = _clients.find(fd);
+
 	if (it != _clients.end())
 	{
-		// TODO remove this user from every channel
-			channelIt chanIt =
-				channelIt->second->removeClient();
-				// channelIt->second->removeModerator(fd);
+		Client* client = it->second;
+
+		channelIt chanIt = _channels.begin();
+		for(; chanIt != _channels.end(); ++chanIt)
+		{
+			Channel* chan = chanIt->second;
+
+			chan->removeClient(fd);
+			chan->removeModerator(fd);
 			
+			// Did channel become empty?
+			if (chan->getClients().empty())
+			{
+				Print::Debug("Channel " + chan->getChannelName() + " is empty. Deleting it.");
+				delete chan;
+
+				_channels.erase(chanIt++);
+			}
+		}
 		
-
-		// TODO Optional: If channel empty , delete it
-			// if (chan->getClients().empty())
-				//delete chan;
-				//_channels.erase(chanName);
-
-
 		delete it->second;
 		_clients.erase(it); // Removes the entry from the map
 	}

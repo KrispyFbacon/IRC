@@ -1,35 +1,28 @@
 #include "PrivmsgCommand.hpp"
 #include "Server.hpp"
 
-void NickCommand::execute(Server& server, Client& client, const Message& msg)
+void PrivmsgCommand::execute(Server& server, Client& client, const Message& msg)
 {
 	Print::Debug ("PRIVMSG Command Called!");
 
 	// Check for target and message paremeters
-	if (msg.params.empty() < 2)
+	if (msg.params.empty() || msg.params[0].empty())
+		return (sendError(client, IRC::ERR_NORECIPIENT, ":No recipient given (PRIVMSG)"));
+
+	if (msg.params.size() < 2 || msg.params[1].empty())
+		return (sendError(client, IRC::ERR_NOTEXTTOSEND, ":No text to send"));
+
+
+	std::vector<std::string> targets = splitComma(msg.params[0]);
+
+	for (size_t i = 0; i < targets.size(); ++i)
 	{
-		if (msg.params.size() < 1 || msg.params[0].empty())
-			return (sendError(client, IRC::ERR_NORECIPIENT, ":No recipient given (PRIVMSG)"));
+		if (targets[i][0] == '#' || targets[i][0] == '&')
+			handleChannelMessage(server, client, targets[i], msg.params[1]);
 		else
-			return (sendError(client, IRC::ERR_NOTEXTTOSEND, ":No text to send"));
+			handlePrivateMessage(server, client, targets[i], msg.params[1]);
 	}
-
-	std::string target = msg.params[0];
-	std::string text = msg.params[1];
-
-	argumentSplit	jm = splitParse(msg);
-
-	// for (size_t i = 0; i < jm.channels.size(); ++i)
-	{
-		if (jm.channels[i] == '#' || jm.channels[i] == '&')
-			handleChannelMessage(server, client, jm.channels[i], jm.keys[0]);
-		else
-			handlePrivateMessage(server, client, jm.channels[i], jm.keys[0]);
-	}
-		//handleOneJoin(server, client, jm.channels[i], jm.keys[0]); //TODO or leave jm.keys[i]?
 }
-
-
 
 /* ================================= PRIVATE =============================== */
 

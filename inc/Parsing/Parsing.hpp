@@ -11,7 +11,7 @@ struct Message
 
 struct argumentSplit
 {
-	std::vector<std::string>	channels;
+	std::vector<std::string>	targets;
 	std::vector<std::string>	keys;
 };
 
