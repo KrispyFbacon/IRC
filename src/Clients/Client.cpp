@@ -46,10 +46,6 @@ std::string	Client::getNickname() const
 	return (_nickname);
 }
 
-std::string	Client::getStrBuffer() const
-{
-	return (_outBuffer);
-}
 
 std::string	Client::getPrefix() const
 {
@@ -74,10 +70,6 @@ void	Client::setNickname(std::string nickname)
 	_nickname = nickname;
 }
 
-void	Client::setOutBuffer(std::string outBuffer)
-{
-	_outBuffer = outBuffer;
-}
 
 void	Client::setRegistered(bool isRegistered)
 {
@@ -118,8 +110,6 @@ bool	Client::getNextMessage(std::string &msg)
 	msg = _buffer.substr(0, pos);
 	_buffer.erase(0, pos + 2);
 
-	
-
 	return (true);
 };
 
@@ -127,6 +117,21 @@ void	Client::clearBuffer()
 {
 	std::string().swap(_buffer);
 };
+
+void	Client::addChannel(Channel &channel)
+{
+	_channels[channel.getChannelName()] = &channel;
+}
+
+void	Client::addChannel(Channel &channel)
+{
+	_channels[channel.getChannelName()] = &channel;
+}
+
+void	Client::removeChannel(const std::string &str)
+{
+	_channels.erase(str);
+}
 
 void	Client::sendMessage(const std::string& msg)
 {

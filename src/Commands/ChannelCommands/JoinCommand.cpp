@@ -93,9 +93,9 @@ void	JoinCommand::execute(Server &server, Client &client, const Message &msg)
 
 	argumentSplit	split = splitParse(msg);
 
-	for (size_t i = 0; i < split.channels.size(); ++i)
+	for (size_t i = 0; i < split.targets.size(); ++i)
 	{
 		std::string	pass = (i < split.keys.size()) ? split.keys[i] : "";
-		joinChannel(server, client, split.channels[i], pass);
+		joinChannel(server, client, split.targets[i], pass);
 	}
 }

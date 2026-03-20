@@ -1,6 +1,6 @@
 #include "Parsing.hpp"
 
-std::vector<std::string>	splitComma(const std::string &str)
+static std::vector<std::string>	splitComma(const std::string &str)
 {
 	std::vector<std::string>	tokens;
 	size_t						start = 0;
@@ -22,7 +22,7 @@ argumentSplit	splitParse(const Message &msg)
 {
 	argumentSplit	jm;
 
-	jm.channels = splitComma(msg.params[0]);
+	jm.targets = splitComma(msg.params[0]);
 
 	// Only split keys if a second param exists and isn't empty
 	if (msg.params.size() >= 2 && !msg.params[1].empty())

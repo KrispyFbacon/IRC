@@ -17,6 +17,5 @@ struct argumentSplit
 
 Message	parseMessage(const std::string);
 argumentSplit	splitParse(const Message &);
-std::vector<std::string>	splitComma(const std::string &);
 
 #endif
