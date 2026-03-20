@@ -31,6 +31,10 @@ namespace IRC
 	// PING/PONG
 	const std::string ERR_NOORIGIN			= "409";
 
+	// PrivmsgErrors errors
+	const std::string ERR_NORECIPIENT		= "411";
+	const std::string ERR_NOTEXTTOSEND		= "412";
+
 	// Nickname errors
 	const std::string ERR_NONICKNAMEGIVEN	= "431";
 	const std::string ERR_ERRONEUSNICKNAME	= "432";
@@ -54,8 +58,8 @@ namespace IRC
 	const std::string ERR_CHANOPRIVSNEEDED	= "482";
 
 	// MODE errors
-	const std::string ERR_UNKNOWNMODE		= "472";
 	const std::string ERR_KEYSET			= "467";
+	const std::string ERR_UNKNOWNMODE		= "472";
 	const std::string ERR_INVALIDLIMIT		= "696";
 }
 

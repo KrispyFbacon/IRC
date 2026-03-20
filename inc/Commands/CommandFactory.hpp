@@ -20,6 +20,8 @@
 #include "TopicCommand.hpp"
 #include "InviteCommand.hpp"
 
+#include "PrivmsgCommand.hpp"
+
 class Server;
 class Client;
 
