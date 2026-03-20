@@ -390,8 +390,8 @@ void Server::removeClient(int fd)
 	if (it != _clients.end())
 	{
 		// TODO remove this user from every channel
-			// channelIt
-				// channelIt->second->removeClient(fd);
+			channelIt chanIt =
+				channelIt->second->removeClient();
 				// channelIt->second->removeModerator(fd);
 			
 		

@@ -57,6 +57,12 @@ class Client
 		void	setAuthenticated(bool);
 		void	setDisconnected(bool status);
 
+	// Channel Handler
+		// TODO
+		void	addChannel(Channel& );
+		void	removeChannel(Channel& );
+		void	removeChannel(const std::string &);
+
 	//buffer functions
 		bool	getNextMessage(std::string &msg);
 		void	appendBuffer(const char *data, size_t len);

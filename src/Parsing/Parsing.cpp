@@ -17,9 +17,9 @@ std::vector<std::string>	splitComma(const std::string &str)
 	return tokens;
 }
 
-commaSplit	splitParse(const Message &msg)
+argumentSplit	splitParse(const Message &msg)
 {
-	commaSplit	jm;
+	argumentSplit	jm;
 
 	jm.channels = splitComma(msg.params[0]);
 

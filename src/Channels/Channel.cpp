@@ -135,6 +135,9 @@ bool	Channel::addClient(Client &client)
 	removeInvited(clientNickname);
 	
 	_clients[fd] = &client;
+
+	//TODO _clients[fd].addChannel(this);
+
 	return (true);
 }
 
@@ -201,6 +204,7 @@ std::string	Channel::getInvited(const std::string client) const
 	return (NULL);
 }
 
+// TODO
 bool	Channel::removeInvited(const std::string client)
 {
 	for (size_t i = 0; i < _invited.size(); ++i)

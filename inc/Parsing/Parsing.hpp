@@ -9,14 +9,14 @@ struct Message
 	std::vector<std::string>	params;
 };
 
-struct commaSplit
+struct argumentSplit
 {
 	std::vector<std::string>	channels;
 	std::vector<std::string>	keys;
 };
 
 Message	parseMessage(const std::string);
-commaSplit	splitParse(const Message &);
+argumentSplit	splitParse(const Message &);
 std::vector<std::string>	splitComma(const std::string &);
 
 #endif

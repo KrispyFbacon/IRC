@@ -63,7 +63,7 @@ static void	joinChannel(Server &server, Client &client,
 		if (static_cast<int>(channel->getClients().size()) >= channel->getUserLimit())
 			return sendError(client, IRC::ERR_CHANNELISFULL,
 							 channelName + " :Cannot join channel (+l)");
-
+		
 		channel->addClient(client);
 	}
 
@@ -91,11 +91,11 @@ void	JoinCommand::execute(Server &server, Client &client, const Message &msg)
 		return sendError(client, IRC::ERR_NEEDMOREPARAMS,
 						 "JOIN :Not enough parameters");
 
-	commaSplit	jm = splitParse(msg);
+	argumentSplit	split = splitParse(msg);
 
-	for (size_t i = 0; i < jm.channels.size(); ++i)
+	for (size_t i = 0; i < split.channels.size(); ++i)
 	{
-		std::string	pass = (i < jm.keys.size()) ? jm.keys[i] : "";
-		joinChannel(server, client, jm.channels[i], pass);
+		std::string	pass = (i < split.keys.size()) ? split.keys[i] : "";
+		joinChannel(server, client, split.channels[i], pass);
 	}
 }
