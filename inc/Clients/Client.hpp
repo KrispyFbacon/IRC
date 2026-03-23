@@ -55,6 +55,7 @@ class Client
 		void	setDisconnected(bool status);
 
 	// Channel Handler
+		Channel*	getChannel();
 		void	addChannel(Channel &);
 		void	removeChannel(Channel &);
 		void	removeChannel(const std::string &);

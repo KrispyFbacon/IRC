@@ -141,22 +141,35 @@ void	Client::sendMessage(const std::string& msg)
 
 void	Client::broadcast(const std::string& msg)
 {
-	//TODO
-
 	// Clients that already recieved message
 	std::vector<int> notifiedClients;
 	notifiedClients.push_back(this->getFd());
 
 	
-	// Search through client channel
-	// ITERATORES TYPEDEF
-	clientIt it = _channels.begin();
+	// OUTER LOOP: Iterate through the Client's map of channels
+	std::map<std::string, Channel*>::const_iterator chanIt = _channels.begin();
 
-	for (; it != _channels.end(); ++it)
+	for (; chanIt != _channels.end(); ++chanIt)
 	{
+		Channel* channel = chanIt->second;
 
+		// Get all Clients in this specific channel
+		const std::map<int, Client*>& chanClients = channel->getClients();
+
+		// INNER LOOP: Iterate through the Clients in channel
+		std::map<int, Client*>::const_iterator ClientIt = chanClients.begin();
+		for (; chanIt != _channels.end(); ++chanIt)
+		{
+			int clientFD = ClientIt->first;
+			Client* client = ClientIt->second;
+
+			// If they are NOT in the set, send the message and add them to the set!
+			if (std::find(notifiedClients.begin(), notifiedClients.end(), clientFD) == notifiedClients.end())
+			{
+				client->sendMessage(msg);
+				notifiedClients.push_back(clientFD);
+			}
+
+		}
 	}
-	// for (loop throught clients channels)
-		// check if same fd -> continue
-		// Check if already sent message to that fd
 }

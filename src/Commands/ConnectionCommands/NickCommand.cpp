@@ -34,11 +34,11 @@ void NickCommand::execute(Server& server, Client& client, const Message& msg)
 	{
 		std::string oldPrefix = client.getPrefix();
 
-		std::string brodcast = ":" + oldPrefix + " NICK :" + newNick;
+		std::string brodcastMsg = ":" + oldPrefix + " NICK :" + newNick;
 
-		client.sendMessage(brodcast);
+		client.sendMessage(brodcastMsg);
 
-		//TODO broadcast to all channels the user is in!
+		client.broadcast(brodcastMsg);
 	}
 
 	client.setNickname(newNick);
