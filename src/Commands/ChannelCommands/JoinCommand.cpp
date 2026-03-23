@@ -98,7 +98,6 @@ void	JoinCommand::execute(Server &server, Client &client, const Message &msg)
 	if (msg.params.size() > 1 && !msg.params[1].empty())
 		keys = splitComma(msg.params[1]);
 
-
 	for (size_t i = 0; i < targets.size(); ++i)
 	{
 		std::string	pass = (i < keys.size()) ? keys[i] : "";

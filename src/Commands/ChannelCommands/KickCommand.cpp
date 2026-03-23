@@ -22,10 +22,7 @@ static void	kickTarget(Client &client, Channel *channel, const std::string &targ
 						+ " :" + reason;
 	channel->broadcast(kickMsg);
 
-	// Remove from moderators if they were one
-	// TODO No need for veryfication if it already checks that in removeModerator
-	if (channel->getModerator(targetClient->getFd()))
-		channel->removeModerator(targetClient->getFd());
+	channel->removeModerator(targetClient->getFd());
 
 	channel->removeClient(targetClient->getFd());
 	targetClient->removeChannel(channelName);

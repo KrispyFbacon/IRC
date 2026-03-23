@@ -52,7 +52,7 @@ void PrivmsgCommand::handlePrivateMessage(Server& server, Client& sender, const 
 		return (sendError(sender, IRC::ERR_NOSUCHNICK, targetNick + " :No such nick/channel"));
 	
 	// Send the message!
-	std::string dmMsg = ":" + sender.getPrefix() + " PRIVMSG " + targetNick + " :" + msg;
+	std::string dmMsg = ":" + sender.getPrefix() + " PRIVMSG " + sender.getNickname() + " :" + msg;
 	target->sendMessage(dmMsg);
 	
 

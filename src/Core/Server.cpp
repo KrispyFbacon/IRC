@@ -107,7 +107,9 @@ void Server::cleanup()
 	_clients.clear();
 	
 	// Channel cleanup
-		//channelIt
+	for (channelIt it = _channels.begin(); it != _channels.end(); ++it)
+		delete it->second;
+	_channels.clear();
 
 	// Epoll fd
 	if (_epfd != -1)
@@ -167,6 +169,7 @@ Channel* Server::createChannel(const std::string& name)
 {
 	Channel* channel = new Channel(name);
 	_channels[name] = channel;
+
 	return (channel);
 }
 
@@ -397,7 +400,6 @@ void Server::removeClient(int fd)
 
 			chan->removeClient(fd);
 			chan->removeModerator(fd);
-
 			client->removeChannel(chan->getChannelName());
 			
 			// Did channel become empty?
@@ -408,6 +410,8 @@ void Server::removeClient(int fd)
 
 				_channels.erase(chanIt++);
 			}
+			else
+				++chanIt;
 		}
 		
 		delete it->second;

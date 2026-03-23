@@ -61,16 +61,20 @@ class Server
 		void	cleanup();
 
 		// Getters
-		std::string	getPassword() const; // TODO inline?
+		std::string	getPassword() const;
 
-		// TODO CLient management
+		// CLient management
 		Client*	getClient(int clientFd);
 		Client*	getClientByNickname(const std::string& nickname);
 		void	checkRegistration(Client& client);
 		
-		// TODO Channel management
+		// Channel management
 		Channel* createChannel(const std::string& name);
 		Channel*	getChannel(std::string channelName);
 };
+
+//TODO
+	//CHECK IN CHANNEL
+	// IF MODERATOR FIRST THEN USERS OR ORDER OF JOIN
 
 #endif

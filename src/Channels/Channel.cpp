@@ -1,6 +1,6 @@
 #include "Channel.hpp"
 
-Channel::Channel(std::string name): _name(name), _pass(""), _topic(""), _userLimit(std::numeric_limits<int>::max()), _oldestInvited(0), _numberOfInvited(0){}
+Channel::Channel(std::string name): _name(name), _pass(""), _topic(""), _userLimit(std::numeric_limits<int>::max()), _oldestInvited(0), _numberOfInvited(0), _inviteOnly(false), _topicLocked(false){}
 
 Channel::Channel(std::string name, const Channel &other) : _name(name)
 {

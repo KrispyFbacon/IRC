@@ -19,6 +19,12 @@
 #include "KickCommand.hpp"
 #include "TopicCommand.hpp"
 #include "InviteCommand.hpp"
+#include "ModeCommand.hpp"
+#include "ModeICommand.hpp"
+#include "ModeKCommand.hpp"
+#include "ModeLCommand.hpp"
+#include "ModeOCommand.hpp"
+#include "ModeTCommand.hpp"
 
 #include "PrivmsgCommand.hpp"
 

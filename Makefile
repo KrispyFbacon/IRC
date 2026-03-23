@@ -25,6 +25,7 @@ INC_DIRS = -Iinc \
 			-Iinc/Commands/ConnectionCommands \
 			-Iinc/Commands/ChannelCommands \
 			-Iinc/Commands/ChannelCommands/ModeCommand \
+			-Iinc/Commands/MessagingCommands \
 			-Iinc/Core \
 			-Iinc/Replies \
 			-Iinc/Parsing \
@@ -60,6 +61,7 @@ VPATH += src/Commands
 VPATH += src/Commands/ConnectionCommands
 VPATH += src/Commands/ChannelCommands
 VPATH += src/Commands/ChannelCommands/ModeCommand
+VPATH += src/Commands/MessagingCommands
 VPATH += src/Core
 VPATH += src/Parsing
 VPATH += src/Replies
@@ -86,11 +88,11 @@ COMMANDS = CommandFactory.cpp \
 			ModeKCommand.cpp \
 			ModeLCommand.cpp \
 			ModeOCommand.cpp \
-			ModeTCommand.cpp
+			ModeTCommand.cpp \
+			PrivmsgCommand.cpp
 CORE = Server.cpp
 REPLIES = IRCReply.cpp
-PARSING = Parsing.cpp \
-			ExtraParsing.cpp
+PARSING = Parsing.cpp
 UTILS =  IRCCodes.cpp \
 			Utils.cpp
 

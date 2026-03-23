@@ -1,8 +1,8 @@
 #include "Client.hpp"
 
 Client::Client(int fd) 
-		: _fd(fd), _isRegistered(false), _isAuthenticated(false), 
-			_isDisconnected(false) {}
+		: _fd(fd), _username(""), _password(""), _nickname(""),
+			_isRegistered(false), _isAuthenticated(false), _isDisconnected(false) {}
 
 Client::~Client()
 {
@@ -123,11 +123,6 @@ void	Client::addChannel(Channel &channel)
 	_channels[channel.getChannelName()] = &channel;
 }
 
-void	Client::addChannel(Channel &channel)
-{
-	_channels[channel.getChannelName()] = &channel;
-}
-
 void	Client::removeChannel(const std::string &str)
 {
 	_channels.erase(str);
@@ -149,6 +144,7 @@ void	Client::broadcast(const std::string& msg)
 	// OUTER LOOP: Iterate through the Client's map of channels
 	std::map<std::string, Channel*>::const_iterator chanIt = _channels.begin();
 
+	
 	for (; chanIt != _channels.end(); ++chanIt)
 	{
 		Channel* channel = chanIt->second;
@@ -158,8 +154,9 @@ void	Client::broadcast(const std::string& msg)
 
 		// INNER LOOP: Iterate through the Clients in channel
 		std::map<int, Client*>::const_iterator ClientIt = chanClients.begin();
-		for (; chanIt != _channels.end(); ++chanIt)
+		for (; ClientIt != chanClients.end(); ++ClientIt)
 		{
+			Print::Debug ("BROOOOOOOOOOOOOOOOOOOOOO");
 			int clientFD = ClientIt->first;
 			Client* client = ClientIt->second;
 
