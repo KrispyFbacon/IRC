@@ -138,3 +138,25 @@ void	Client::sendMessage(const std::string& msg)
 	std::string line = msg + "\r\n";
 	send(_fd, line.c_str(), line.size(), 0);
 }
+
+void	Client::broadcast(const std::string& msg)
+{
+	//TODO
+
+	// Clients that already recieved message
+	std::vector<int> notifiedClients;
+	notifiedClients.push_back(this->getFd());
+
+	
+	// Search through client channel
+	// ITERATORES TYPEDEF
+	clientIt it = _channels.begin();
+
+	for (; it != _channels.end(); ++it)
+	{
+
+	}
+	// for (loop throught clients channels)
+		// check if same fd -> continue
+		// Check if already sent message to that fd
+}

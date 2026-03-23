@@ -51,10 +51,6 @@ class Server
 		void	handleNewConnection();
 		void	handleClientMessage(int clientFd);
 		void	removeClient(int clientFd);
-
-
-		// TODO IRC logic (Parsing)
-			// void processMessage(int fd, const std::string& msg);
 		
 	public:
 		Server(const std::string& port, const std::string& password);

@@ -182,8 +182,6 @@ Channel* Server::getChannel(std::string channelName)
 
 
 
-
-
 /* ================================= PRIVATE =============================== */
 
 

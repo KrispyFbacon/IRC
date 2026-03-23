@@ -220,15 +220,15 @@ bool	Channel::removeInvited(const std::string client)
 	return (false);
 }
 
-void	Channel::broadcast(const std::string msg)
+void	Channel::broadcast(const std::string &msg, int excludeFd)
 {
 	std::map<int, Client*>::iterator it = _clients.begin();
 
 	for (; it != _clients.end(); ++it)
 	{
-		Client	*client = it->second;
-		std::string	clientName = client->getNickname();
+		if (it->first == excludeFd)
+			continue;
 
-		client->sendMessage(msg);
+		it->second->sendMessage(msg);
 	}
 }

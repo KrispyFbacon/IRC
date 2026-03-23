@@ -65,7 +65,7 @@ class Channel
 		bool	addInvited(const std::string);
 		bool	removeInvited(const std::string);
 
-		void	broadcast(const std::string);
+		void	broadcast(const std::string &msg, int excludeFd = -1);
 };
 
 #endif

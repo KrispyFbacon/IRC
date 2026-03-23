@@ -65,6 +65,7 @@ class Client
 		void	clearBuffer();
 
 		void	sendMessage(const std::string& msg);
+		void	broadcast(const std::string& msg);
 
 };
 

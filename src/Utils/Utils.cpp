@@ -124,38 +124,6 @@ bool isValidPassword(const std::string& password)
 	return true;
 }
 
-//TODO delete
-// bool isValidPort(const char* port)
-// {
-// 	if (!port || !(*port))
-// 		return false;
-	
-// 	for (int i = 0; port[i] != '\0'; ++i)
-// 	{
-// 		if (!std::isdigit(static_cast<unsigned char>(port[i])))
-// 			return false;
-// 	}
-
-// 	long n = std::strtol(port, NULL, 10);
-// 	return (n >= 1 && n <= 65535);
-// }
-
-//
-// bool isValidPassword(const char* password)
-// {
-// 	if (!password || !(*password))
-// 		return false;
-
-// 	for (int i = 0; password[i] != '\0'; ++i)
-// 	{
-// 		if (std::isspace(static_cast<unsigned char>(password[i])))
-// 			return false;
-// 		if (!std::isprint(static_cast<unsigned char>(password[i])))
-// 			return false;
-// 	}
-// 	return true;
-// }
-
 
 /* ============================= String Helpers ============================= */
 

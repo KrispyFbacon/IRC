@@ -31,16 +31,15 @@ void PrivmsgCommand::handleChannelMessage(Server& server, Client& client, const 
 	// Check if channel exists
 	Channel* channel = server.getChannel(channelName);
 	if (!channel)
-		return (sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + ":No such channel"));
+		return (sendError(client, IRC::ERR_NOSUCHCHANNEL, channelName + " :No such channel"));
 
 	// Check if sender is in the channel
 	if (!channel->getClient(client.getFd()))
 		return(sendError(client, IRC::ERR_CANNOTSENDTOCHAN, channelName + " :Cannot send to channel"));
 
-	// TODO Broadcast to everyone in the channel EXCEPT the sender
+	// Broadcast to everyone in the Channel EXCEPT the sender
 	std::string broadcastMsg = ":" + client.getPrefix() + " PRIVMSG " + channelName + " :" + msg;
-	// TODO Having 2 types of broadcast? JUST PRIVMSG has ignores itself on broadcast
-		//channel->broadcast(broadcastMsg, client.getFd());
+	channel->broadcast(broadcastMsg, client.getFd());
 	
 	Print::Ok("Broadcasted message from " NUM_COLOR + client.getNickname() + RST + " to " + NUM_COLOR + channelName);
 }
@@ -50,7 +49,7 @@ void PrivmsgCommand::handlePrivateMessage(Server& server, Client& sender, const 
 	// Check if target exists
 	Client* target = server.getClientByNickname(targetNick);
 	if (!target)
-		return (sendError(sender, IRC::ERR_NOSUCHNICK, targetNick + " :No such channel"));
+		return (sendError(sender, IRC::ERR_NOSUCHNICK, targetNick + " :No such nick/channel"));
 	
 	// Send the message!
 	std::string dmMsg = ":" + sender.getPrefix() + " PRIVMSG " + targetNick + " :" + msg;
