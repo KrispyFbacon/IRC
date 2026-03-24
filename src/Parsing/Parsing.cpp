@@ -11,7 +11,7 @@ std::vector<std::string>	splitComma(const std::string &str)
 
 	while ((pos = str.find(',', start)) != std::string::npos)
 	{
-		if (pos > start)
+		if (pos >= start)
 			tokens.push_back(str.substr(start, pos - start));
 		start = pos + 1;
 	}

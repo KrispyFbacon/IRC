@@ -394,7 +394,7 @@ void Server::removeClient(int fd)
 		Client* client = it->second;
 
 		channelIt chanIt = _channels.begin();
-		for(; chanIt != _channels.end(); ++chanIt)
+		while(chanIt != _channels.end())
 		{
 			Channel* chan = chanIt->second;
 

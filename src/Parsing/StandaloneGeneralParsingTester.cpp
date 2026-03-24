@@ -37,6 +37,23 @@ std::string	toUpper(const std::string &str)
 	return (result);
 }
 
+std::vector<std::string>	splitComma(const std::string &str)
+{
+	std::vector<std::string>	tokens;
+	size_t						start = 0;
+	size_t						pos;
+
+	while ((pos = str.find(',', start)) != std::string::npos)
+	{
+		if (pos >= start)
+			tokens.push_back(str.substr(start, pos - start));
+		start = pos + 1;
+	}
+	if (start < str.size())
+		tokens.push_back(str.substr(start));
+	return tokens;
+}
+
 static size_t	skipDelimiters(const std::string *str, size_t i, const std::string &delimiter)
 {
 	size_t	len = str->length();
@@ -90,10 +107,16 @@ Message	parseMessage(const std::string str)
 
 	parsedMessage.command = toUpper(words[0]);
 	for (std::string::size_type i = 1; i < words.size(); i++)
-		parsedMessage.params.push_back(words[i]);
+	{
+		std::vector<std::string> split = splitComma(words[i]);
+		for (std::string::size_type i = 0; i < split.size(); i++)
+			parsedMessage.params.push_back(split[i]);
+	}
+		
 
 	return (parsedMessage);
 }
+
 
 
 // // ----------------- Tester -----------------
@@ -136,7 +159,7 @@ int	main()
 {
 	std::vector<std::string>	testCases;
 
-	testCases.push_back("pass 123 :");
+	testCases.push_back("pass 123,,456");
 	testCases.push_back("pass ::: ::123");
 	testCases.push_back("pass 123:::::");
 	testCases.push_back(": pass 123: pass 123");
