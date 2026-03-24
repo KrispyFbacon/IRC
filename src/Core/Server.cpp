@@ -398,8 +398,8 @@ void Server::removeClient(int fd)
 		{
 			Channel* chan = chanIt->second;
 
-			chan->removeClient(fd);
 			chan->removeModerator(fd);
+			chan->removeClient(fd);
 			client->removeChannel(chan->getChannelName());
 			
 			// Did channel become empty?

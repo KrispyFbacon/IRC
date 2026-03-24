@@ -24,6 +24,9 @@ class Channel
 		std::map<int, Client*>	_clients;
 		std::map<int, Client*>	_moderators;
 		std::vector<std::string>	_invited;
+		std::vector<int>	_joinOrder;
+
+		bool	promoteToModerator(int);
 
 	public:
 		Channel(std::string);
