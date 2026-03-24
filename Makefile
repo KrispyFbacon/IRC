@@ -23,7 +23,9 @@ INC_DIRS = -Iinc \
 			-Iinc/Clients \
 			-Iinc/Commands \
 			-Iinc/Commands/ConnectionCommands \
-			-Iinc/Commands/ChannelCommands\
+			-Iinc/Commands/ChannelCommands \
+			-Iinc/Commands/ChannelCommands/ModeCommand \
+			-Iinc/Commands/MessagingCommands \
 			-Iinc/Core \
 			-Iinc/Replies \
 			-Iinc/Parsing \
@@ -58,6 +60,8 @@ VPATH += src/Clients
 VPATH += src/Commands
 VPATH += src/Commands/ConnectionCommands
 VPATH += src/Commands/ChannelCommands
+VPATH += src/Commands/ChannelCommands/ModeCommand
+VPATH += src/Commands/MessagingCommands
 VPATH += src/Core
 VPATH += src/Parsing
 VPATH += src/Replies
@@ -69,15 +73,26 @@ SRC = main.cpp
 CHANNELS = Channel.cpp
 CLIENTS = Client.cpp
 COMMANDS = CommandFactory.cpp \
+			InviteCommand.cpp \
+			JoinCommand.cpp \
+			KickCommand.cpp \
+			TopicCommand.cpp \
+			NickCommand.cpp \
+			PassCommand.cpp \
 			PingCommand.cpp \
 			PongCommand.cpp \
-			JoinCommand.cpp  \
-			KickCommand.cpp \
-			InviteCommand.cpp \
-			TopicCommand.cpp
+			QuitCommand.cpp \
+			UserCommand.cpp \
+			ModeCommand.cpp \
+			ModeICommand.cpp \
+			ModeKCommand.cpp \
+			ModeLCommand.cpp \
+			ModeOCommand.cpp \
+			ModeTCommand.cpp \
+			PrivmsgCommand.cpp
 CORE = Server.cpp
 REPLIES = IRCReply.cpp
-PARSING = GeneralParsing.cpp
+PARSING = Parsing.cpp
 UTILS =  IRCCodes.cpp \
 			Utils.cpp
 

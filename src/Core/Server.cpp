@@ -106,6 +106,11 @@ void Server::cleanup()
 		delete it->second;
 	_clients.clear();
 	
+	// Channel cleanup
+	for (channelIt it = _channels.begin(); it != _channels.end(); ++it)
+		delete it->second;
+	_channels.clear();
+
 	// Epoll fd
 	if (_epfd != -1)
 	{
@@ -145,8 +150,28 @@ Client* Server::getClient(int clientFd)
 	return it->second;
 }
 
+Client* Server::getClientByNickname(const std::string& nickname)
+{
+	clientIt it = _clients.begin();
+
+	for(; it != _clients.end(); ++it)
+	{
+		if (it->second->getNickname() == nickname)
+			return it->second;
+	}
+
+	return NULL;
+}
 
 /* =========================== Channel Management =========================== */
+
+Channel* Server::createChannel(const std::string& name)
+{
+	Channel* channel = new Channel(name);
+	_channels[name] = channel;
+
+	return (channel);
+}
 
 Channel* Server::getChannel(std::string channelName)
 {
@@ -157,8 +182,6 @@ Channel* Server::getChannel(std::string channelName)
 
 	return it->second;
 }
-
-
 
 
 
@@ -314,33 +337,43 @@ void Server::handleClientMessage(int clientFd)
 		throw ClientException("recv() failed FD: " + toString(clientFd));
 	}
 
+	// External Disconnect (Ctrl + C)
 	if (bytesRead == 0)
 	{
 		Print::Debug("Client gracefully disconnected FD: " + toString(clientFd));
 		removeClient(clientFd);
 		return;
-		
 	}
 	
 	Print::Debug("Recieved " + toString(bytesRead)
 						+ " bytes from client FD: " + toString(clientFd));
 	
-	//TODO maybe change to MessageParse class?
+	//TODO maybe change to MessageParse class? and have getNextMessage in MessageParse
 	client->appendBuffer(buffer, bytesRead);
 
 	std::string line;
-	while (client->getNextMessage(line))
+	while (client->getNextMessage(line)) // TODO weird? delete? save it in client and then use it for message?
 	{
 		// TODO Message and Command classes
 		Message msg = parseMessage(line);
 
 		Print::Debug("FD: " + toString(clientFd) + " -> [" + line + "]");
 
-		
-
 		_cmdFactory.execute(*this, *client, msg);
+
+		if (client->isDisconnected())
+			break ;
 	}
 
+	// Internal Disconnect (QUIT Command)
+	if (client->isDisconnected())
+	{
+		Print::Debug("Client requested disconnect FD: " + toString(clientFd));
+		removeClient(clientFd);
+		return;
+	}
+
+	// Safe Buffer Check
 	if (client->getBufferSize() > Config::MAX_MESSAGE_SIZE)
 	{
 		client->clearBuffer();
@@ -355,11 +388,65 @@ void Server::removeClient(int fd)
 	close(fd);
 	
 	clientIt it = _clients.find(fd);
+
 	if (it != _clients.end())
 	{
+		Client* client = it->second;
+
+		channelIt chanIt = _channels.begin();
+		for(; chanIt != _channels.end(); ++chanIt)
+		{
+			Channel* chan = chanIt->second;
+
+			chan->removeClient(fd);
+			chan->removeModerator(fd);
+			client->removeChannel(chan->getChannelName());
+			
+			// Did channel become empty?
+			if (chan->getClients().empty())
+			{
+				Print::Debug("Channel " + chan->getChannelName() + " is empty. Deleting it.");
+				delete chan;
+
+				_channels.erase(chanIt++);
+			}
+			else
+				++chanIt;
+		}
+		
 		delete it->second;
 		_clients.erase(it); // Removes the entry from the map
 	}
 	
 	Print::Debug("Client removed FD: " + toString(fd));
+}
+
+// TODO CHECK REGISTRATION
+void Server::checkRegistration(Client& client)
+{
+	// If they are already registered, do nothing
+	if (client.isRegistered())
+		return;
+
+	// Check if they have finished all the required steps
+	bool hasPassword = client.isAuthenticated();
+	bool hasNickname = !client.getNickname().empty();
+	bool hasUsername = !client.getUsername().empty();
+
+	// Nick and User filled?
+	if (hasPassword && hasNickname && hasUsername)
+	{
+		// Success!
+		client.setRegistered(true);
+
+		// Send the 4 welcome replies
+		sendReply(client, IRC::RPL_WELCOME, ":Welcome to the Internet Relay Network " + client.getPrefix());
+		sendReply(client, IRC::RPL_YOURHOST, ":Your host is " + Config::SERVER_NAME + ", running version 1.0");
+		sendReply(client, IRC::RPL_CREATED, ":This server was created today");
+		sendReply(client, IRC::RPL_MYINFO, ":" + Config::SERVER_NAME + " 1.0 o o");
+		
+		Print::Ok("Client FD:" + toString(client.getFd()) + " '" + client.getNickname() + "' " + "has fully registered!");
+
+		// TODO (Optional: Send MOTD here if you implement it)
+	}
 }

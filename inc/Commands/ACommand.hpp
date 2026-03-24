@@ -3,6 +3,7 @@
 
 #include "Utils.hpp"
 #include "Client.hpp"
+#include "Channel.hpp"
 
 #include "Parsing.hpp"
 #include "IRCReply.hpp"
@@ -21,7 +22,5 @@ class ACommand
 
 		virtual void execute(Server& server, Client& client, const Message& msg) = 0;
 };
-
-#include "Server.hpp"
 
 #endif

@@ -1,9 +1,9 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 
-# include <string>
-# include <map>
+# include "Utils.hpp"
 # include "Client.hpp"
+# include "IRCReply.hpp"
 
 class Client;
 
@@ -11,32 +11,61 @@ class Channel
 {
 	private:
 		std::string	_name;
+		std::string	_pass;
 		std::string	_topic;
+		int	_userLimit;
 
-		//TODO std::map<Client*, bool isMod>
-		
-		// TODO pair? <name/fd, isMod>
+		int	_oldestInvited;
+		int	_numberOfInvited;
+
+		bool	_inviteOnly;
+		bool	_topicLocked;
+
 		std::map<int, Client*>	_clients;
 		std::map<int, Client*>	_moderators;
+		std::vector<std::string>	_invited;
 
 	public:
 		Channel(std::string);
 		Channel(std::string, const Channel &);
 		~Channel();
 
+		const std::map<int, Client*>	&getClients() const;
+		const std::map<int, Client*>	&getModerators() const;
+
 		std::string	getChannelName() const;
+
+		void	copyChannelInfo(Channel &, const Channel &);
 
 		std::string	getTopic() const;
 		void	setTopic(const std::string);
 
-		void	copyChannelInfo(Channel &, const Channel &);
+		std::string	getPass() const;
+		void	setPass(const std::string);
 
-		Client	*getModerator(int clientFd);
-		bool	addModerator(Client *client);
-		bool	removeModerator(Client *client);
+		bool	getInviteOnly() const;
+		void	setInviteOnly(bool);
+
+		bool	getTopicLocked() const;
+		void	setTopicLocked(bool);
+
+		int		getUserLimit() const;
+		void	setUserLimit(const int);
+
+		Client	*getModerator(int);
+		bool	addModerator(Client &client);
+		bool	removeModerator(const int);
 		
-		bool	addClient(Client *client);
-		bool	removeClient(Client *client);
+		Client	*getClient(const int);
+		Client	*getClientByNickname(const std::string);
+		bool	addClient(Client &client);
+		bool	removeClient(const int);
+
+		std::string	getInvited(const std::string) const;
+		bool	addInvited(const std::string);
+		bool	removeInvited(const std::string);
+
+		void	broadcast(const std::string &msg, int excludeFd = -1);
 };
 
 #endif

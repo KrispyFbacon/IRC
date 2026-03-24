@@ -6,19 +6,27 @@
 
 #include "Parsing.hpp"
 #include "IRCReply.hpp"
-//#include "Message.hpp"
 
 #include "ACommand.hpp"
 #include "NickCommand.hpp"
 #include "PassCommand.hpp"
 #include "PingCommand.hpp"
 #include "PongCommand.hpp"
+#include "QuitCommand.hpp"
 #include "UserCommand.hpp"
 
 #include "JoinCommand.hpp"
 #include "KickCommand.hpp"
 #include "TopicCommand.hpp"
 #include "InviteCommand.hpp"
+#include "ModeCommand.hpp"
+#include "ModeICommand.hpp"
+#include "ModeKCommand.hpp"
+#include "ModeLCommand.hpp"
+#include "ModeOCommand.hpp"
+#include "ModeTCommand.hpp"
+
+#include "PrivmsgCommand.hpp"
 
 class Server;
 class Client;

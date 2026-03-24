@@ -56,14 +56,14 @@ void Print::Debug (const std::string& str)
 void Print::Ok (const std::string& str)
 {
 	std::cout << BOLD_G << "[ OK ] " << RST
-			  << str
+			  << str << RST
 	<< std::endl;
 }
 
 void Print::Error(const std::string &str)
 {
 	std::cerr << BOLD_R << "[ ERROR ] " << RST
-			  << str << ": " 
+			  << str << RST << ": " 
 			  << NUM_COLOR << strerror(errno) << RST
 	<< std::endl;
 }
@@ -71,14 +71,15 @@ void Print::Error(const std::string &str)
 void Print::Fail(const std::string &str)
 {
 	std::cerr << BOLD_R << "[ FAIL ] " << RST
-			  << str << ": " 
+			  << str << RST << ": " 
 			  << NUM_COLOR << strerror(errno) << RST
 	<< std::endl;
 }
 
 void Print::Warn(const std::string &str)
 {
-	std::cerr << BOLD_Y << "[ FAIL ] " << RST << str
+	std::cerr << BOLD_Y << "[ FAIL ] " << RST 
+			  << str << RST
 	<< std::endl;
 }
 
@@ -91,7 +92,7 @@ void Print::InputError(const std::string& str)
 	<< std::endl;
 }
 
-/* ============================ Args Validation ============================ */
+/* ============================ Args Validations ============================ */
 
 bool isValidPort(const std::string& port)
 {
@@ -123,39 +124,8 @@ bool isValidPassword(const std::string& password)
 	return true;
 }
 
-// bool isValidPort(const char* port)
-// {
-// 	if (!port || !(*port))
-// 		return false;
-	
-// 	for (int i = 0; port[i] != '\0'; ++i)
-// 	{
-// 		if (!std::isdigit(static_cast<unsigned char>(port[i])))
-// 			return false;
-// 	}
 
-// 	long n = std::strtol(port, NULL, 10);
-// 	return (n >= 1 && n <= 65535);
-// }
-
-//
-// bool isValidPassword(const char* password)
-// {
-// 	if (!password || !(*password))
-// 		return false;
-
-// 	for (int i = 0; password[i] != '\0'; ++i)
-// 	{
-// 		if (std::isspace(static_cast<unsigned char>(password[i])))
-// 			return false;
-// 		if (!std::isprint(static_cast<unsigned char>(password[i])))
-// 			return false;
-// 	}
-// 	return true;
-// }
-
-
-/* ============================= String Helper ============================= */
+/* ============================= String Helpers ============================= */
 
 std::string	getFirstString(const std::string str)
 {
@@ -173,4 +143,55 @@ std::string	toUpper(const std::string &str)
 		result[i] = std::toupper(static_cast<unsigned char>(result[i]));
 
 	return (result);
+}
+
+
+/* ============================ Command Helper ============================= */
+
+bool	isValidNickname(const std::string& nick)
+{
+	if (nick.empty() || nick.length() > 32)
+		return false;
+
+	// The forbidden routing characters (No spaces, no prefixes!)
+	const std::string forbidden = " !@#&:?*";
+
+	for (size_t i = 0; i < nick.length(); ++i)
+	{
+		unsigned char c = static_cast<unsigned char>(nick[i]);
+
+		if (c <= 127)
+		{
+			// If it's a space or a forbidden routing symbol
+			if (forbidden.find(c) != std::string::npos) 
+				return false;
+			
+			// Block invisible control characters (like Enter, Tab, Escape)
+			if (c < 32 || c == 127) 
+				return false;
+		}
+	}
+
+	return true;
+}
+
+bool	isConnectionCommands(const std::string& cmd)
+{
+	return (cmd == "PASS" || cmd == "NICK" || cmd == "USER"
+			|| cmd == "QUIT" || cmd == "CAP"
+			|| cmd == "PING" || cmd == "PONG");
+}
+
+bool	isValidChannelName(const std::string &name)
+{
+	if (name.empty() || (name[0] != '#' && name[0] != '&') || name.size() < 2)
+    return (false);
+
+	for (size_t i = 1; i < name.size(); ++i)
+	{
+		if (name[i] <= 32 || name[i] == ',' || name[i] == ':')
+			return (false);
+	}
+
+	return (true);
 }

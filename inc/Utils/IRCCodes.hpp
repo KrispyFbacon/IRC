@@ -31,6 +31,13 @@ namespace IRC
 	extern const std::string ERR_UNKNOWNCOMMAND;
 	extern const std::string ERR_NOMOTD;
 
+	// PING/PONG
+	extern const std::string ERR_NOORIGIN;
+
+	// // PrivmsgErrors errors
+	extern const std::string ERR_NORECIPIENT;
+	extern const std::string ERR_NOTEXTTOSEND;
+
 	// Nickname errors
 	extern const std::string ERR_NONICKNAMEGIVEN;
 	extern const std::string ERR_ERRONEUSNICKNAME;

@@ -1,7 +1,7 @@
 #ifndef PARSING_HPP
-#define PARSING_HPP
+# define PARSING_HPP
 
-#include "Utils.hpp"
+# include "Utils.hpp"
 
 struct Message
 {
@@ -10,5 +10,6 @@ struct Message
 };
 
 Message	parseMessage(const std::string);
+std::vector<std::string>	splitComma(const std::string &);
 
 #endif

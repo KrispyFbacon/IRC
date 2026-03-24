@@ -25,6 +25,7 @@
 #include <sstream>
 #include <fstream>
 #include <cctype>
+#include <limits>
 
 // --- Network / Socket Core ---
 #include <sys/socket.h>	// socket, setsockopt, getsockname, bind, connect, listen, accept, send, recv
@@ -78,11 +79,13 @@ namespace Config
 	const int BUFFER_SIZE      = 1024;
 	const int MAX_MESSAGE_SIZE = 4096;
 	const int MAX_EVENTS       = 64;
+	const int MAX_INVITED      = 50;
 }
 
 // --- Colors ---
 #define NUM_COLOR	RGB_BOLD(255, 165, 0)
 #define TIMESTAMP	BOLD_Y
+
 
 
 
@@ -124,31 +127,16 @@ std::string toString(T src)
 
 
 // --- Args Validation ---
-bool isValidPort(const std::string& port);
-bool isValidPassword(const std::string& password);
+bool	isValidPort(const std::string& port);
+bool	isValidPassword(const std::string& password);
 
 // --- String Helper ---
 std::string	getFirstString(const std::string);
 std::string	toUpper(const std::string &str);
 
-
-
-// ERR_NOSUCHNICK = 401,
-// ERR_NOSUCHCHANNEL = 403,
-// ERR_UNKNOWNCOMMAND = 421,
-// ERR_NONICKNAMEGIVEN = 431,
-// ERR_USERNOTINCHANNEL = 441,
-// ERR_NOTONCHANNEL = 442,
-// ERR_USERONCHANNEL = 443,
-// ERR_NOTREGISTERED = 451,
-// ERR_NEEDMOREPARAMS = 461,
-// ERR_ALREADYREGISTERED = 462,
-// ERR_PASSWDMISMATCH = 464,
-// ERR_CHANNELISFULL = 471,
-// ERR_UNKNOWNMODE = 472,
-// ERR_INVITEONLYCHAN = 473,
-// ERR_BADCHANNELKEY = 475,
-// ERR_CHANOPRIVSNEEDED = 482,
-// ERR_INVALIDMODEPARAM = 696
+// --- Command Helpers ---
+bool	isValidNickname(const std::string& nick);
+bool	isValidChannelName(const std::string &name);
+bool	isConnectionCommands(const std::string& cmd);
 
 #endif

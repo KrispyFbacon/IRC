@@ -1,6 +1,8 @@
 #include "Client.hpp"
 
-Client::Client(int fd) : _fd(fd), _isRegistered(false), _isAuthenticated(false){}
+Client::Client(int fd) 
+		: _fd(fd), _username(""), _password(""), _nickname(""),
+			_isRegistered(false), _isAuthenticated(false), _isDisconnected(false) {}
 
 Client::~Client()
 {
@@ -9,79 +11,87 @@ Client::~Client()
 
 // Getters
 
-inline int	Client::getFd() const
+int	Client::getFd() const
 {
 	return (_fd);
 }
 
-inline bool	Client::isRegistered() const
+bool	Client::isRegistered() const
 {
 	return (_isRegistered);
 }
 
-inline bool	Client::isAuthenticated() const
+bool	Client::isAuthenticated() const
 {
 	return (_isAuthenticated);
 }
 
-inline std::string	Client::getUsername() const
+bool Client::isDisconnected() const
+{ 
+	return (_isDisconnected);
+}
+
+std::string	Client::getUsername() const
 {
 	return (_username);
 }
 
-inline std::string	Client::getPassword() const
+std::string	Client::getPassword() const
 {
 	return (_password);
 }
 
-inline std::string	Client::getNickname() const
+std::string	Client::getNickname() const
 {
 	return (_nickname);
 }
 
-inline std::string	Client::getStrBuffer() const
+
+std::string	Client::getPrefix() const
 {
-	return (_outBuffer);
+	return (_nickname + "!" + _username + "@localhost");
 }
+
 
 // Setters
 
-inline void	Client::setUsername(std::string username)
+void	Client::setUsername(std::string username)
 {
 	_username = username;
 }
 
-inline void	Client::setPassword(std::string password)
+void	Client::setPassword(std::string password)
 {
 	_password = password;
 }
 
-inline void	Client::setNickname(std::string nickname)
+void	Client::setNickname(std::string nickname)
 {
 	_nickname = nickname;
 }
 
-inline void	Client::setOutBuffer(std::string outBuffer)
-{
-	_outBuffer = outBuffer;
-}
 
-inline void	Client::setRegistered(bool isRegistered)
+void	Client::setRegistered(bool isRegistered)
 {
 	_isRegistered = isRegistered;
 }
 
-inline void	Client::setAuthenticated(bool isAuthenticated)
+void	Client::setAuthenticated(bool isAuthenticated)
 {
 	_isAuthenticated = isAuthenticated;
 }
 
-inline std::string	&Client::getBuffer()
+void	Client::setDisconnected(bool status)
+{
+	_isDisconnected = status;
+}
+
+std::string	&Client::getBuffer()
 {
 	return (_buffer);
 }
 
-inline size_t	Client::getBufferSize() const
+size_t	Client::getBufferSize() const
 {
 	return (_buffer.size());
 };
@@ -100,8 +110,6 @@ bool	Client::getNextMessage(std::string &msg)
 	msg = _buffer.substr(0, pos);
 	_buffer.erase(0, pos + 2);
 
-	
-
 	return (true);
 };
 
@@ -110,8 +118,55 @@ void	Client::clearBuffer()
 	std::string().swap(_buffer);
 };
 
+void	Client::addChannel(Channel &channel)
+{
+	_channels[channel.getChannelName()] = &channel;
+}
+
+void	Client::removeChannel(const std::string &str)
+{
+	_channels.erase(str);
+}
+
 void	Client::sendMessage(const std::string& msg)
 {
 	std::string line = msg + "\r\n";
 	send(_fd, line.c_str(), line.size(), 0);
+}
+
+void	Client::broadcast(const std::string& msg)
+{
+	// Clients that already recieved message
+	std::vector<int> notifiedClients;
+	notifiedClients.push_back(this->getFd());
+
+	
+	// OUTER LOOP: Iterate through the Client's map of channels
+	std::map<std::string, Channel*>::const_iterator chanIt = _channels.begin();
+
+	
+	for (; chanIt != _channels.end(); ++chanIt)
+	{
+		Channel* channel = chanIt->second;
+
+		// Get all Clients in this specific channel
+		const std::map<int, Client*>& chanClients = channel->getClients();
+
+		// INNER LOOP: Iterate through the Clients in channel
+		std::map<int, Client*>::const_iterator ClientIt = chanClients.begin();
+		for (; ClientIt != chanClients.end(); ++ClientIt)
+		{
+			Print::Debug ("BROOOOOOOOOOOOOOOOOOOOOO");
+			int clientFD = ClientIt->first;
+			Client* client = ClientIt->second;
+
+			// If they are NOT in the set, send the message and add them to the set!
+			if (std::find(notifiedClients.begin(), notifiedClients.end(), clientFD) == notifiedClients.end())
+			{
+				client->sendMessage(msg);
+				notifiedClients.push_back(clientFD);
+			}
+
+		}
+	}
 }
