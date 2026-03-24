@@ -1,4 +1,5 @@
 #include "Channel.hpp"
+#include <climits>
 
 Channel::Channel(std::string name): _name(name), _pass(""), _topic(""), _userLimit(std::numeric_limits<int>::max()), _oldestInvited(0), _numberOfInvited(0), _inviteOnly(false), _topicLocked(false){}
 
@@ -10,6 +11,8 @@ Channel::Channel(std::string name, const Channel &other) : _name(name)
 Channel::~Channel()
 {
 	_clients.clear();
+	_moderators.clear();
+	_invited.clear();
 }
 
 void	Channel::copyChannelInfo(Channel &dest, const Channel &src)
@@ -95,7 +98,7 @@ void	Channel::setTopicLocked(bool option)
 bool	Channel::addModerator(Client &client)
 {
 	int	fd = client.getFd();
-
+ODO Part and next moderator when client leave
 	if (_moderators.find(fd) != _moderators.end())
 		return (false);
 
@@ -115,11 +118,22 @@ Client	*Channel::getModerator(int clientFd)
 
 bool	Channel::removeModerator(const int clientFd)
 {
-	std::map<int, Client*>::iterator	it = _moderators.find(clientFd);
-	if (it == _moderators.end())
+	std::map<int, Client*>::iterator	modIt = _moderators.find(clientFd);
+	std::map<int, Client*>::iterator	cliIt = _clients.find(clientFd);
+
+	if (modIt == _moderators.end() || cliIt == _clients.end())
 		return (false);
 
-	_moderators.erase(it);
+	cliIt = _clients.begin();
+	if (modIt == _moderators.end() && cliIt != _clients.end())
+	{
+		Client *client = cliIt->second;
+		Client &clientRef = *client;
+		addModerator(clientRef);
+		return (false);
+	}
+
+	_moderators.erase(modIt);
 
 	return (true);
 }
@@ -179,19 +193,17 @@ bool	Channel::removeClient(const int clientFd)
 
 bool	Channel::addInvited(const std::string client)
 {
-	if(_numberOfInvited < Config::MAX_INVITED)
+	if (_numberOfInvited < Config::MAX_INVITED)
 	{
-		_invited[_numberOfInvited] = client;
+		_invited.push_back(client);
 		_numberOfInvited++;
-		return (true);
 	}
 	else
 	{
 		_invited[_oldestInvited] = client;
 		_oldestInvited = (_oldestInvited + 1) % Config::MAX_INVITED;
-		return (true);
 	}
-	
+	return (true);
 }
 
 std::string	Channel::getInvited(const std::string client) const
@@ -202,7 +214,7 @@ std::string	Channel::getInvited(const std::string client) const
 				return (client);
 	}
 
-	return (NULL);
+	return ("");
 }
 
 // TODO

@@ -138,6 +138,9 @@ rr: re
 rv: all
 	@$(VAL) ./$(NAME) 6667 123
 
+rrv: re
+	@$(VAL) ./$(NAME) 6667 123
+
 clean:
 	@$(RM) $(OBJS)
 	@echo "$(RED)[CLEAN] Object files removed.$(RESET)"
