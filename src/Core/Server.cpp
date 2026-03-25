@@ -384,9 +384,6 @@ void Server::handleClientMessage(int clientFd)
 
 void Server::removeClient(int fd)
 {
-	epollDel(fd);
-	close(fd);
-	
 	clientIt it = _clients.find(fd);
 
 	if (it != _clients.end())
@@ -398,10 +395,9 @@ void Server::removeClient(int fd)
 		{
 			Channel* chan = chanIt->second;
 
-			chan->removeModerator(fd);
 			chan->removeClient(fd);
 			client->removeChannel(chan->getChannelName());
-			
+
 			// Did channel become empty?
 			if (chan->getClients().empty())
 			{
@@ -418,6 +414,8 @@ void Server::removeClient(int fd)
 		_clients.erase(it); // Removes the entry from the map
 	}
 	
+	epollDel(fd);
+	close(fd);
 	Print::Debug("Client removed FD: " + toString(fd));
 }
 

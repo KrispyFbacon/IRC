@@ -125,6 +125,9 @@ bool	Channel::removeModerator(const int clientFd)
 
 	_moderators.erase(modIt);
 
+	for (size_t i = 0; i < _joinOrder.size(); ++i)
+
+
 	if (_moderators.empty() && !_joinOrder.empty())
 		return(promoteToModerator(clientFd));
 
@@ -143,8 +146,8 @@ bool	Channel::addClient(Client &client)
 	
 	_clients[fd] = &client;
 
-	Channel	&channelRef = (*this);
-	client.addChannel(channelRef);
+	client.addChannel(*(this));
+	_joinOrder.push_back(fd);
 
 	return (true);
 }
@@ -175,11 +178,14 @@ Client	*Channel::getClientByNickname(const std::string nick)
 
 bool	Channel::removeClient(const int clientFd)
 {
-	std::map<int, Client*>::iterator	it = _clients.find(clientFd);
-	if (it == _clients.end())
+	Print::Ok("entered remove client function");
+	std::map<int, Client*>::iterator	cliIt = _clients.find(clientFd);
+
+	if (cliIt == _clients.end())
 		return (false);
 
-	_clients.erase(it);
+	removeModerator(cliIt->first);
+	_clients.erase(cliIt);
 
 	// Remove from the chronological succession list
 	std::vector<int>::iterator joinIt = std::find(_joinOrder.begin(), _joinOrder.end(), clientFd);
@@ -250,19 +256,26 @@ bool	Channel::promoteToModerator(int ignoreFd)
 {
 	for (size_t i = 0; i < _joinOrder.size(); ++i)
 	{
-		int oldestFd = _joinOrder[i];
-		
-		if (oldestFd != ignoreFd)
-		{
-			Client* newMod = _clients[oldestFd];
-			addModerator(*newMod);
-			
-			std::string modeMsg = ":" + Config::SERVER_NAME + " MODE " + _name + " +o " + newMod->getNickname();
-			broadcast(modeMsg);
+		int	oldestFd = _joinOrder[i];
 
-			Print::Ok("Server promoted " + newMod->getNickname() + " to operator status in " + _name);
-			return (true);
-		}
+		if (oldestFd == ignoreFd)
+			continue ;
+
+		std::map<int, Client*>::iterator it = _clients.find(oldestFd);
+		if (it == _clients.end())
+			continue ; // user no longer in channel
+
+		Client* newMod = it->second;
+		if (!newMod)
+			continue ;
+
+		addModerator(*newMod);
+
+		std::string modeMsg = ":" + Config::SERVER_NAME + " MODE " + _name + " +o " + newMod->getNickname();
+		broadcast(modeMsg);
+
+		Print::Ok("Server promoted " + newMod->getNickname() + " to operator status in " + _name);
+		return (true);
 	}
 
 	return (false);
