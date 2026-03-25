@@ -302,31 +302,32 @@ void Server::epollDel (int fd)
 
 void Server::handleNewConnection()
 {
-	while (true)
+	struct sockaddr_storage clientAdress;
+	socklen_t clientLen = sizeof(clientAdress);
+
+	int clientFd = accept(_fd, (struct sockaddr*)&clientAdress, &clientLen);
+	if (clientFd == -1)
 	{
-		struct sockaddr_storage clientAdress;
-		socklen_t clientLen = sizeof(clientAdress);
-	
-		int clientFd = accept(_fd, (struct sockaddr*)&clientAdress, &clientLen);
-		if (clientFd == -1)
-			return; // Can't use errno to loop!
-		// if (clientFd == -1)
-		// {
-		// 	if (errno == EAGAIN || errno == EWOULDBLOCK)
-		// 		break ;
-		// 	throw(SocketException("accept() failed"));
-		// }
-
-
-		setNonBlocking(clientFd);
-		epollAdd(clientFd, EPOLLIN);
-
-
-		Client* newClient = new Client(clientFd);
-		_clients[clientFd] = newClient;
-		
-		Print::Ok("Client connected FD: " + toString(clientFd));
+		Print::Warn("accept() failed");
+		return;
 	}
+	// Can't use errno to loop!
+	// if (clientFd == -1)
+	// {
+	// 	if (errno == EAGAIN || errno == EWOULDBLOCK)
+	// 		break ;
+	// 	throw(SocketException("accept() failed"));
+	// }
+
+
+	setNonBlocking(clientFd);
+	epollAdd(clientFd, EPOLLIN);
+
+
+	Client* newClient = new Client(clientFd);
+	_clients[clientFd] = newClient;
+	
+	Print::Ok("Client connected FD: " + toString(clientFd));
 }
 
 void Server::handleClientMessage(int clientFd)
@@ -340,11 +341,11 @@ void Server::handleClientMessage(int clientFd)
 	ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 	if (bytesRead < 0)
 	{
-		if (errno == EAGAIN || errno == EWOULDBLOCK)
-		{
-			Print::Debug("No data available, but connection is still open");
-			return;
-		}
+		// if (errno == EAGAIN || errno == EWOULDBLOCK)
+		// {
+		// 	Print::Debug("No data available, but connection is still open");
+		// 	return;
+		// }
 		throw ClientException("recv() failed FD: " + toString(clientFd));
 	}
 
