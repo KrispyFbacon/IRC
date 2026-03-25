@@ -1,8 +1,5 @@
 #include "Parsing.hpp"
 
-
-//TODO case of 
-// JOIN #room1,#room2,#room3 pass1,,pass3  <- Double comma
 std::vector<std::string>	splitComma(const std::string &str)
 {
 	std::vector<std::string>	tokens;

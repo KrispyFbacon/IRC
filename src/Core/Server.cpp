@@ -30,7 +30,6 @@ void Server::initServer()
 	// Set the listening socket to non-blocking
 	setNonBlocking(_fd);
 
-	// TODO maybe Socket::listen(backlog)
 	// Start listening for incoming connections
 	if (listen(_fd, Config::BACKLOG) < 0)
 		throw (SocketException("Listen() failed"));
@@ -49,7 +48,6 @@ void Server::run()
 
 	while (g_running)
 	{
-		// TODO save somewhere?
 		epoll_event events[Config::MAX_EVENTS];
 
 		int nfds = epoll_wait(_epfd, events, Config::MAX_EVENTS, -1);
@@ -353,6 +351,12 @@ void Server::handleClientMessage(int clientFd)
 	if (bytesRead == 0)
 	{
 		Print::Debug("Client gracefully disconnected FD: " + toString(clientFd));
+		if (client->isRegistered())
+		{
+			std::string quitMsg = ":" + client->getPrefix() + " QUIT :Client disconnected";
+			client->broadcast(quitMsg);
+		}
+		
 		removeClient(clientFd);
 		return;
 	}
@@ -360,17 +364,17 @@ void Server::handleClientMessage(int clientFd)
 	Print::Debug("Recieved " + toString(bytesRead)
 						+ " bytes from client FD: " + toString(clientFd));
 	
-	//TODO maybe change to MessageParse class? and have getNextMessage in MessageParse
 	client->appendBuffer(buffer, bytesRead);
 
 	std::string line;
-	while (client->getNextMessage(line)) // TODO weird? delete? save it in client and then use it for message?
+	while (client->getNextMessage(line))
 	{
-		// TODO Message and Command classes
+		// Message parse
 		Message msg = parseMessage(line);
 
 		Print::Debug("FD: " + toString(clientFd) + " -> [" + line + "]");
 
+		// Execute command
 		_cmdFactory.execute(*this, *client, msg);
 
 		if (client->isDisconnected())
@@ -431,7 +435,7 @@ void Server::removeClient(int fd)
 	Print::Debug("Client removed FD: " + toString(fd));
 }
 
-// TODO CHECK REGISTRATION
+// Check Registration
 void Server::checkRegistration(Client& client)
 {
 	// If they are already registered, do nothing
@@ -456,7 +460,5 @@ void Server::checkRegistration(Client& client)
 		sendReply(client, IRC::RPL_MYINFO, ":" + Config::SERVER_NAME + " 1.0 o o");
 		
 		Print::Ok("Client FD:" + toString(client.getFd()) + " '" + client.getNickname() + "' " + "has fully registered!");
-
-		// TODO (Optional: Send MOTD here if you implement it)
 	}
 }

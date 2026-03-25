@@ -130,9 +130,6 @@ bool	Channel::removeModerator(const int clientFd)
 
 	_moderators.erase(modIt);
 
-	for (size_t i = 0; i < _joinOrder.size(); ++i)
-
-
 	if (_moderators.empty() && !_joinOrder.empty())
 		return(promoteToModerator(clientFd));
 

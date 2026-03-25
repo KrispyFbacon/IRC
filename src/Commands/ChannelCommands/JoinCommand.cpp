@@ -5,8 +5,6 @@
 // params[0] = "ch1,ch2,chN"
 // params[1] = "pass1,pass2,passN"  (optional)
 
-// TODO ORDER
-// TODO Part and next moderator when client leaves
 static void	sendNamesReply(Client &client, Channel *channel)
 {
 	const std::map<int, Client *>	&clients = channel->getClients();
