@@ -55,4 +55,7 @@ void	KickCommand::execute(Server &server, Client &client, const Message &msg)
 
 	for (size_t i = 0; i < targets.size(); ++i)
 		kickTarget(client, channel, targets[i], reason);
+
+	if (channel->getClients().empty())
+			server.removeChannel(channel);
 }

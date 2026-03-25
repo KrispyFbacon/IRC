@@ -71,6 +71,7 @@ class Server
 		// Channel management
 		Channel* createChannel(const std::string& name);
 		Channel*	getChannel(std::string channelName);
+		void	removeChannel(Channel* channel);
 };
 
 //TODO

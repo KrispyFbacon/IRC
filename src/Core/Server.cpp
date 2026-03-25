@@ -183,6 +183,17 @@ Channel* Server::getChannel(std::string channelName)
 	return it->second;
 }
 
+void Server::removeChannel(Channel* channel)
+{
+	if (channel->getClients().empty())
+	{
+		std::string name = channel->getChannelName(); // save before delete
+		Print::Debug("Channel " + name + " is empty. Deleting it.");
+
+		delete channel;
+		_channels.erase(name);
+	}
+}
 
 
 /* ================================= PRIVATE =============================== */
