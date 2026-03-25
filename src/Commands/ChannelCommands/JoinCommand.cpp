@@ -109,7 +109,8 @@ void	JoinCommand::execute(Server &server, Client &client, const Message &msg)
 	Print::Debug("JOIN COMMAND CALLED!");
 
 	if (msg.params.empty())
-		return (sendError(client, IRC::ERR_NEEDMOREPARAMS, "JOIN :Not enough parameters"));
+		return sendError(client, IRC::ERR_NEEDMOREPARAMS,
+						 "JOIN :Not enough parameters");
 
 
 	std::vector<std::string> targets = splitComma(msg.params[0]);
