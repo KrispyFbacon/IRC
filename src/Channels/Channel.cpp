@@ -273,7 +273,7 @@ bool	Channel::promoteToModerator(int ignoreFd)
 		addModerator(*newMod);
 
 		std::string modeMsg = ":" + Config::SERVER_NAME + " MODE " + _name + " +o " + newMod->getNickname();
-		broadcast(modeMsg);
+		broadcast(modeMsg, ignoreFd);
 
 		Print::Ok("Server promoted " + newMod->getNickname() + " to operator status in " + _name);
 		return (true);
