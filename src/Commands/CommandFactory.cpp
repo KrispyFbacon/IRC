@@ -9,7 +9,7 @@ CommandFactory::CommandFactory()
 	_commands["PONG"] = &PongCommand::make;
 	_commands["QUIT"] = &QuitCommand::make;
 	_commands["USER"] = &UserCommand::make;
-	_commands["PART"] = &PartCommand::make;
+
 
 	// Channels Commands
 	_commands["JOIN"] = &JoinCommand::make;
@@ -17,7 +17,11 @@ CommandFactory::CommandFactory()
 	_commands["INVITE"] = &InviteCommand::make;
 	_commands["KICK"] = &KickCommand::make;
 	_commands["TOPIC"] = &TopicCommand::make;
+	_commands["PART"] = &PartCommand::make;
+
+	// Messaging commands
 	_commands["PRIVMSG"] = &PrivmsgCommand::make;
+	_commands["MOTD"] = &MotdCommand::make;
 }
 
 CommandFactory::~CommandFactory() {}
