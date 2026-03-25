@@ -361,9 +361,6 @@ void Server::handleClientMessage(int clientFd)
 		return;
 	}
 	
-	Print::Debug("Recieved " + toString(bytesRead)
-						+ " bytes from client FD: " + toString(clientFd));
-	
 	client->appendBuffer(buffer, bytesRead);
 
 	std::string line;
