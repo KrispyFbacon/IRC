@@ -14,6 +14,7 @@
 #include "PongCommand.hpp"
 #include "QuitCommand.hpp"
 #include "UserCommand.hpp"
+#include "PartCommand.hpp"
 
 #include "JoinCommand.hpp"
 #include "KickCommand.hpp"
@@ -25,6 +26,7 @@
 #include "ModeLCommand.hpp"
 #include "ModeOCommand.hpp"
 #include "ModeTCommand.hpp"
+#include "MotdCommand.hpp"
 
 #include "PrivmsgCommand.hpp"
 

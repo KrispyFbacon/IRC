@@ -21,7 +21,6 @@
 
 class Client;
 class Channel;
-//class CommandFactory;
 
 class Server
 {
@@ -29,11 +28,10 @@ class Server
 		typedef	std::map<int, Client*>::iterator clientIt;
 		typedef	std::map<std::string, Channel*>::iterator channelIt;
 
-		// Socket _serverSocked(); TODO maybe since server and clients will have their own socket
 		int	_fd; // serverFd
 		int	_epfd; // epoll Fd
-		std::string	_port; //TODO turn into const
-		std::string	_password;
+		const std::string	_port;
+		const std::string	_password;
 		
 		std::map<int, Client*>	_clients;
 		std::map<std::string, Channel*>	_channels;
@@ -71,10 +69,7 @@ class Server
 		// Channel management
 		Channel* createChannel(const std::string& name);
 		Channel*	getChannel(std::string channelName);
+		void	removeChannel(Channel* channel);
 };
-
-//TODO
-	//CHECK IN CHANNEL
-	// IF MODERATOR FIRST THEN USERS OR ORDER OF JOIN
 
 #endif

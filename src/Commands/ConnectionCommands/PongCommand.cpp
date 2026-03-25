@@ -7,5 +7,5 @@ void PongCommand::execute(Server& server, Client& client, const Message& msg)
 	
 	std::string nickName = client.getNickname().empty() ? "*" : client.getNickname();
 
-	Print::Debug("Received PONG from " + nickName);
+	Print::Ok("Received PONG from " + nickName);
 }

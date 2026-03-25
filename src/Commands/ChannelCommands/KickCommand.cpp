@@ -22,8 +22,6 @@ static void	kickTarget(Client &client, Channel *channel, const std::string &targ
 						+ " :" + reason;
 	channel->broadcast(kickMsg);
 
-	channel->removeModerator(targetClient->getFd());
-
 	channel->removeClient(targetClient->getFd());
 	targetClient->removeChannel(channelName);
 }
@@ -57,4 +55,7 @@ void	KickCommand::execute(Server &server, Client &client, const Message &msg)
 
 	for (size_t i = 0; i < targets.size(); ++i)
 		kickTarget(client, channel, targets[i], reason);
+
+	if (channel->getClients().empty())
+			server.removeChannel(channel);
 }

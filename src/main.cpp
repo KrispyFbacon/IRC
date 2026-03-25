@@ -73,17 +73,3 @@ int main(int argc, char* argv[])
 	
 	return 0;
 }
-
-//SERVER CLASS
-// TODO Socket class?
-// TODO Epoll class/struct? with inBuffer and outBuffer?
-
-// CHANNEL CLASS
-// TODO Invite only flag
-// TODO Password
-// TODO Operator priveledge (if topic / password can be changed by non-moderators)
-// TODO Channel Client limit
-// TODO List of moderators
-
-// CLIENT CLASS
-// TODO ClientStatus class?

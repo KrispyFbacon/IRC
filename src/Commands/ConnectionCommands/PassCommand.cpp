@@ -19,5 +19,4 @@ void PassCommand::execute(Server& server, Client& client, const Message& msg)
 	client.setAuthenticated(true);
 
 	Print::Ok("Client FD: " + toString(client.getFd()) + " is Authenticated");
-	server.checkRegistration(client);
 }

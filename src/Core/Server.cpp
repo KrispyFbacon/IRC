@@ -30,7 +30,6 @@ void Server::initServer()
 	// Set the listening socket to non-blocking
 	setNonBlocking(_fd);
 
-	// TODO maybe Socket::listen(backlog)
 	// Start listening for incoming connections
 	if (listen(_fd, Config::BACKLOG) < 0)
 		throw (SocketException("Listen() failed"));
@@ -49,7 +48,6 @@ void Server::run()
 
 	while (g_running)
 	{
-		// TODO save somewhere?
 		epoll_event events[Config::MAX_EVENTS];
 
 		int nfds = epoll_wait(_epfd, events, Config::MAX_EVENTS, -1);
@@ -183,6 +181,17 @@ Channel* Server::getChannel(std::string channelName)
 	return it->second;
 }
 
+void Server::removeChannel(Channel* channel)
+{
+	if (channel->getClients().empty())
+	{
+		std::string name = channel->getChannelName(); // save before delete
+		Print::Debug("Channel " + name + " is empty. Deleting it.");
+
+		delete channel;
+		_channels.erase(name);
+	}
+}
 
 
 /* ================================= PRIVATE =============================== */
@@ -291,31 +300,32 @@ void Server::epollDel (int fd)
 
 void Server::handleNewConnection()
 {
-	while (true)
+	struct sockaddr_storage clientAdress;
+	socklen_t clientLen = sizeof(clientAdress);
+
+	int clientFd = accept(_fd, (struct sockaddr*)&clientAdress, &clientLen);
+	if (clientFd == -1)
 	{
-		struct sockaddr_storage clientAdress;
-		socklen_t clientLen = sizeof(clientAdress);
-	
-		int clientFd = accept(_fd, (struct sockaddr*)&clientAdress, &clientLen);
-		if (clientFd == -1)
-			return; // Can't use errno to loop!
-		// if (clientFd == -1)
-		// {
-		// 	if (errno == EAGAIN || errno == EWOULDBLOCK)
-		// 		break ;
-		// 	throw(SocketException("accept() failed"));
-		// }
-
-
-		setNonBlocking(clientFd);
-		epollAdd(clientFd, EPOLLIN);
-
-
-		Client* newClient = new Client(clientFd);
-		_clients[clientFd] = newClient;
-		
-		Print::Ok("Client connected FD: " + toString(clientFd));
+		Print::Warn("accept() failed");
+		return;
 	}
+	// Can't use errno to loop!
+	// if (clientFd == -1)
+	// {
+	// 	if (errno == EAGAIN || errno == EWOULDBLOCK)
+	// 		break ;
+	// 	throw(SocketException("accept() failed"));
+	// }
+
+
+	setNonBlocking(clientFd);
+	epollAdd(clientFd, EPOLLIN);
+
+
+	Client* newClient = new Client(clientFd);
+	_clients[clientFd] = newClient;
+	
+	Print::Ok("Client connected FD: " + toString(clientFd));
 }
 
 void Server::handleClientMessage(int clientFd)
@@ -329,11 +339,11 @@ void Server::handleClientMessage(int clientFd)
 	ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 	if (bytesRead < 0)
 	{
-		if (errno == EAGAIN || errno == EWOULDBLOCK)
-		{
-			Print::Debug("No data available, but connection is still open");
-			return;
-		}
+		// if (errno == EAGAIN || errno == EWOULDBLOCK)
+		// {
+		// 	Print::Debug("No data available, but connection is still open");
+		// 	return;
+		// }
 		throw ClientException("recv() failed FD: " + toString(clientFd));
 	}
 
@@ -341,24 +351,27 @@ void Server::handleClientMessage(int clientFd)
 	if (bytesRead == 0)
 	{
 		Print::Debug("Client gracefully disconnected FD: " + toString(clientFd));
+		if (client->isRegistered())
+		{
+			std::string quitMsg = ":" + client->getPrefix() + " QUIT :Client disconnected";
+			client->broadcast(quitMsg);
+		}
+		
 		removeClient(clientFd);
 		return;
 	}
 	
-	Print::Debug("Recieved " + toString(bytesRead)
-						+ " bytes from client FD: " + toString(clientFd));
-	
-	//TODO maybe change to MessageParse class? and have getNextMessage in MessageParse
 	client->appendBuffer(buffer, bytesRead);
 
 	std::string line;
-	while (client->getNextMessage(line)) // TODO weird? delete? save it in client and then use it for message?
+	while (client->getNextMessage(line))
 	{
-		// TODO Message and Command classes
+		// Message parse
 		Message msg = parseMessage(line);
 
 		Print::Debug("FD: " + toString(clientFd) + " -> [" + line + "]");
 
+		// Execute command
 		_cmdFactory.execute(*this, *client, msg);
 
 		if (client->isDisconnected())
@@ -384,9 +397,6 @@ void Server::handleClientMessage(int clientFd)
 
 void Server::removeClient(int fd)
 {
-	epollDel(fd);
-	close(fd);
-	
 	clientIt it = _clients.find(fd);
 
 	if (it != _clients.end())
@@ -394,14 +404,13 @@ void Server::removeClient(int fd)
 		Client* client = it->second;
 
 		channelIt chanIt = _channels.begin();
-		for(; chanIt != _channels.end(); ++chanIt)
+		while(chanIt != _channels.end())
 		{
 			Channel* chan = chanIt->second;
 
 			chan->removeClient(fd);
-			chan->removeModerator(fd);
 			client->removeChannel(chan->getChannelName());
-			
+
 			// Did channel become empty?
 			if (chan->getClients().empty())
 			{
@@ -418,10 +427,12 @@ void Server::removeClient(int fd)
 		_clients.erase(it); // Removes the entry from the map
 	}
 	
+	epollDel(fd);
+	close(fd);
 	Print::Debug("Client removed FD: " + toString(fd));
 }
 
-// TODO CHECK REGISTRATION
+// Check Registration
 void Server::checkRegistration(Client& client)
 {
 	// If they are already registered, do nothing
@@ -444,9 +455,10 @@ void Server::checkRegistration(Client& client)
 		sendReply(client, IRC::RPL_YOURHOST, ":Your host is " + Config::SERVER_NAME + ", running version 1.0");
 		sendReply(client, IRC::RPL_CREATED, ":This server was created today");
 		sendReply(client, IRC::RPL_MYINFO, ":" + Config::SERVER_NAME + " 1.0 o o");
-		
-		Print::Ok("Client FD:" + toString(client.getFd()) + " '" + client.getNickname() + "' " + "has fully registered!");
+		Message motd;
+		motd.command = "MOTD";
+		_cmdFactory.execute(*this, client, motd);
 
-		// TODO (Optional: Send MOTD here if you implement it)
+		Print::Ok("Client FD:" + toString(client.getFd()) + " '" + client.getNickname() + "' " + "has fully registered!");
 	}
 }

@@ -10,6 +10,9 @@ Channel::Channel(std::string name, const Channel &other) : _name(name)
 Channel::~Channel()
 {
 	_clients.clear();
+	_moderators.clear();
+	_invited.clear();
+	_joinOrder.clear();
 }
 
 void	Channel::copyChannelInfo(Channel &dest, const Channel &src)
@@ -33,6 +36,11 @@ const std::map<int, Client*>	&Channel::getClients() const
 const std::map<int, Client*>	&Channel::getModerators() const
 {
 	return (_moderators);
+}
+
+const std::vector<int>	&Channel::getJoinOrder() const
+{
+	return (_joinOrder);
 }
 
 std::string	Channel::getChannelName() const
@@ -115,11 +123,15 @@ Client	*Channel::getModerator(int clientFd)
 
 bool	Channel::removeModerator(const int clientFd)
 {
-	std::map<int, Client*>::iterator	it = _moderators.find(clientFd);
-	if (it == _moderators.end())
-		return (false);
+	std::map<int, Client*>::iterator modIt = _moderators.find(clientFd);
 
-	_moderators.erase(it);
+	if (modIt == _moderators.end())
+		return false; 
+
+	_moderators.erase(modIt);
+
+	if (_moderators.empty() && !_joinOrder.empty())
+		return(promoteToModerator(clientFd));
 
 	return (true);
 }
@@ -136,8 +148,8 @@ bool	Channel::addClient(Client &client)
 	
 	_clients[fd] = &client;
 
-	Channel	&channelRef = (*this);
-	client.addChannel(channelRef);
+	client.addChannel(*(this));
+	_joinOrder.push_back(fd);
 
 	return (true);
 }
@@ -168,30 +180,35 @@ Client	*Channel::getClientByNickname(const std::string nick)
 
 bool	Channel::removeClient(const int clientFd)
 {
-	std::map<int, Client*>::iterator	it = _clients.find(clientFd);
-	if (it == _clients.end())
+	std::map<int, Client*>::iterator	cliIt = _clients.find(clientFd);
+
+	if (cliIt == _clients.end())
 		return (false);
 
-	_clients.erase(it);
+	removeModerator(cliIt->first);
+	_clients.erase(cliIt);
+
+	// Remove from the chronological succession list
+	std::vector<int>::iterator joinIt = std::find(_joinOrder.begin(), _joinOrder.end(), clientFd);
+	if (joinIt != _joinOrder.end())
+		_joinOrder.erase(joinIt);
 
 	return (true);
 }
 
 bool	Channel::addInvited(const std::string client)
 {
-	if(_numberOfInvited < Config::MAX_INVITED)
+	if (_numberOfInvited < Config::MAX_INVITED)
 	{
-		_invited[_numberOfInvited] = client;
+		_invited.push_back(client);
 		_numberOfInvited++;
-		return (true);
 	}
 	else
 	{
 		_invited[_oldestInvited] = client;
 		_oldestInvited = (_oldestInvited + 1) % Config::MAX_INVITED;
-		return (true);
 	}
-	
+	return (true);
 }
 
 std::string	Channel::getInvited(const std::string client) const
@@ -202,10 +219,10 @@ std::string	Channel::getInvited(const std::string client) const
 				return (client);
 	}
 
-	return (NULL);
+	return ("");
 }
 
-// TODO
+
 bool	Channel::removeInvited(const std::string client)
 {
 	for (size_t i = 0; i < _invited.size(); ++i)
@@ -231,4 +248,36 @@ void	Channel::broadcast(const std::string &msg, int excludeFd)
 
 		it->second->sendMessage(msg);
 	}
+}
+
+
+/* ================================= PRIVATE =============================== */
+
+bool	Channel::promoteToModerator(int ignoreFd)
+{
+	for (size_t i = 0; i < _joinOrder.size(); ++i)
+	{
+		int	oldestFd = _joinOrder[i];
+
+		if (oldestFd == ignoreFd)
+			continue ;
+
+		std::map<int, Client*>::iterator it = _clients.find(oldestFd);
+		if (it == _clients.end())
+			continue ; // user no longer in channel
+
+		Client* newMod = it->second;
+		if (!newMod)
+			continue ;
+
+		addModerator(*newMod);
+
+		std::string modeMsg = ":" + Config::SERVER_NAME + " MODE " + _name + " +o " + newMod->getNickname();
+		broadcast(modeMsg, ignoreFd);
+
+		Print::Ok("Server promoted " + newMod->getNickname() + " to operator status in " + _name);
+		return (true);
+	}
+
+	return (false);
 }

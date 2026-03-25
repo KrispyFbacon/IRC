@@ -138,9 +138,7 @@ void	Client::broadcast(const std::string& msg)
 {
 	// Clients that already recieved message
 	std::vector<int> notifiedClients;
-	notifiedClients.push_back(this->getFd());
 
-	
 	// OUTER LOOP: Iterate through the Client's map of channels
 	std::map<std::string, Channel*>::const_iterator chanIt = _channels.begin();
 
@@ -156,9 +154,11 @@ void	Client::broadcast(const std::string& msg)
 		std::map<int, Client*>::const_iterator ClientIt = chanClients.begin();
 		for (; ClientIt != chanClients.end(); ++ClientIt)
 		{
-			Print::Debug ("BROOOOOOOOOOOOOOOOOOOOOO");
 			int clientFD = ClientIt->first;
 			Client* client = ClientIt->second;
+
+			if (client == this)
+				continue;
 
 			// If they are NOT in the set, send the message and add them to the set!
 			if (std::find(notifiedClients.begin(), notifiedClients.end(), clientFD) == notifiedClients.end())
@@ -166,7 +166,6 @@ void	Client::broadcast(const std::string& msg)
 				client->sendMessage(msg);
 				notifiedClients.push_back(clientFD);
 			}
-
 		}
 	}
 }

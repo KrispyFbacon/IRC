@@ -82,6 +82,7 @@ COMMANDS = CommandFactory.cpp \
 			PingCommand.cpp \
 			PongCommand.cpp \
 			QuitCommand.cpp \
+			PartCommand.cpp \
 			UserCommand.cpp \
 			ModeCommand.cpp \
 			ModeICommand.cpp \
@@ -89,6 +90,7 @@ COMMANDS = CommandFactory.cpp \
 			ModeLCommand.cpp \
 			ModeOCommand.cpp \
 			ModeTCommand.cpp \
+			MotdCommand.cpp \
 			PrivmsgCommand.cpp
 CORE = Server.cpp
 REPLIES = IRCReply.cpp
@@ -136,6 +138,9 @@ rr: re
 	@./$(NAME) 6667 123
 
 rv: all
+	@$(VAL) ./$(NAME) 6667 123
+
+rrv: re
 	@$(VAL) ./$(NAME) 6667 123
 
 clean:

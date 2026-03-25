@@ -19,32 +19,8 @@ void QuitCommand::execute(Server& server, Client& client, const Message& msg)
 	{
 		std::string broadcast = ":" + client.getPrefix() + " QUIT :Quit: " + reason;
 
-		//TODO Broadcast quit message
+		client.broadcast(broadcast);
 	}
 
 	client.setDisconnected(true);
 }
-
-// TODO broadcast type to all channels?
-	// std::set<int> notifiedUsers;?
-	// for (loop throught clients channels)
-		// check if same fd -> continue
-		// Check if already sent message to that fd
-
-// TODO CAREFULL FOR LEAKS
-	//TODO CHANNEL::removeClient (int fd) and Channel::removeClient(Client* client)?
-		//_clients.erase(fd);
-		//_moderators.erase(fd);
-		// TODO CLIENT:: client->removeChannel(this->getName());?
-				// _channels.erase(channelName);
-
-	//TODO CHANNEL::addCLient(Client* client)
-		// _clients[client->getFd()] = client;
-		// client->addChannel(this, this->getName());
-
-		
-	//TODO Client -> addChannel, removeChannel?
-	//TODO Channel -> addClient, removeClient?
-
-	// TODO Server::removeClient, QuitCommand, PartCommand, and KickCommand 
-	//		will all just call Channel::removeClient(client)?
