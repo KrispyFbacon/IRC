@@ -82,6 +82,7 @@ COMMANDS = CommandFactory.cpp \
 			PingCommand.cpp \
 			PongCommand.cpp \
 			QuitCommand.cpp \
+			PartCommand.cpp \
 			UserCommand.cpp \
 			ModeCommand.cpp \
 			ModeICommand.cpp \

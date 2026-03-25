@@ -11,6 +11,7 @@ CommandFactory::CommandFactory()
 	_commands["PONG"] = &PongCommand::make;
 	_commands["QUIT"] = &QuitCommand::make;
 	_commands["USER"] = &UserCommand::make;
+	_commands["PART"] = &PartCommand::make;
 
 	// Channels Commands
 	_commands["JOIN"] = &JoinCommand::make;
