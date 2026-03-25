@@ -178,7 +178,6 @@ Client	*Channel::getClientByNickname(const std::string nick)
 
 bool	Channel::removeClient(const int clientFd)
 {
-	Print::Ok("entered remove client function");
 	std::map<int, Client*>::iterator	cliIt = _clients.find(clientFd);
 
 	if (cliIt == _clients.end())
