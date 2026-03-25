@@ -38,6 +38,11 @@ const std::map<int, Client*>	&Channel::getModerators() const
 	return (_moderators);
 }
 
+const std::vector<int>	&Channel::getJoinOrder() const
+{
+	return (_joinOrder);
+}
+
 std::string	Channel::getChannelName() const
 {
 	return(_name);

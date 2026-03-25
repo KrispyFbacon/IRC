@@ -11,20 +11,39 @@ static void	sendNamesReply(Client &client, Channel *channel)
 {
 	const std::map<int, Client *>	&clients = channel->getClients();
 	const std::map<int, Client *>	&moderators = channel->getModerators();
+	const std::vector<int>			&joinOrder = channel->getJoinOrder();
+	
+	std::string modList;
+	std::string regList;
 
-	std::string list;
-	for (std::map<int, Client *>::const_iterator it = clients.begin();
-		 it != clients.end(); ++it)
+	for (size_t i = 0; i < joinOrder.size(); ++i)
 	{
-		if (!list.empty())
-			list += " ";
-		if (moderators.find(it->first) != moderators.end())
-			list += "@";
-		list += it->second->getNickname();
+		int fd = joinOrder[i];
+
+		std::map<int, Client *>::const_iterator it = clients.find(fd);
+		if (it != clients.end())
+		{
+			if (moderators.find(fd) != moderators.end())
+			{
+				if (!modList.empty())
+					modList += " ";
+				modList += "@" + it->second->getNickname();
+			}
+			else
+			{
+				if (!regList.empty())
+					regList += " ";
+				regList += it->second->getNickname();
+			}
+		}
 	}
 
+	if (!modList.empty() && !regList.empty())
+		modList += " ";
+	modList += regList;
+
 	sendReply(client, IRC::RPL_NAMREPLY,
-			  "= " + channel->getChannelName() + " :" + list);
+			  "= " + channel->getChannelName() + " :" + modList);
 	sendReply(client, IRC::RPL_ENDOFNAMES,
 			  channel->getChannelName() + " :End of NAMES list");
 }
