@@ -26,6 +26,7 @@
 #include "ModeLCommand.hpp"
 #include "ModeOCommand.hpp"
 #include "ModeTCommand.hpp"
+#include "MotdCommand.hpp"
 
 #include "PrivmsgCommand.hpp"
 

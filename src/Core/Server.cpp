@@ -453,9 +453,10 @@ void Server::checkRegistration(Client& client)
 		sendReply(client, IRC::RPL_YOURHOST, ":Your host is " + Config::SERVER_NAME + ", running version 1.0");
 		sendReply(client, IRC::RPL_CREATED, ":This server was created today");
 		sendReply(client, IRC::RPL_MYINFO, ":" + Config::SERVER_NAME + " 1.0 o o");
-		
-		Print::Ok("Client FD:" + toString(client.getFd()) + " '" + client.getNickname() + "' " + "has fully registered!");
+		Message motd;
+		motd.command = "MOTD";
+		_cmdFactory.execute(*this, client, motd);
 
-		// TODO (Optional: Send MOTD here if you implement it)
+		Print::Ok("Client FD:" + toString(client.getFd()) + " '" + client.getNickname() + "' " + "has fully registered!");
 	}
 }

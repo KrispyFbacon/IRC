@@ -90,6 +90,7 @@ COMMANDS = CommandFactory.cpp \
 			ModeLCommand.cpp \
 			ModeOCommand.cpp \
 			ModeTCommand.cpp \
+			MotdCommand.cpp \
 			PrivmsgCommand.cpp
 CORE = Server.cpp
 REPLIES = IRCReply.cpp
