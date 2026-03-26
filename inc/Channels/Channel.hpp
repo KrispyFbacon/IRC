@@ -45,7 +45,7 @@ class Channel
 		void	setTopic(const std::string);
 
 		std::string	getPass() const;
-		void	setPass(const std::string);
+		bool	setPass(const std::string);
 
 		bool	getInviteOnly() const;
 		void	setInviteOnly(bool);

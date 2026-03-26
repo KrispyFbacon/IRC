@@ -48,7 +48,8 @@ void PrivmsgCommand::handlePrivateMessage(Server& server, Client& sender, const 
 {
 	// Check if target exists
 	Client* target = server.getClientByNickname(targetNick);
-	if (!target)
+
+	if (!target || !target->isRegistered())
 		return (sendError(sender, IRC::ERR_NOSUCHNICK, targetNick + " :No such nick/channel"));
 	
 	// Send the message!
@@ -59,3 +60,4 @@ void PrivmsgCommand::handlePrivateMessage(Server& server, Client& sender, const 
 	Print::Ok("DM from " NUM_COLOR + sender.getNickname() + RST + " to " + NUM_COLOR + targetNick);
 }
 
+	

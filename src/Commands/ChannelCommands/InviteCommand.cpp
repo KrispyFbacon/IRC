@@ -30,7 +30,7 @@ void	InviteCommand::execute(Server &server, Client &client, const Message &msg)
 
 	// Target user exists?
 	Client	*target = server.getClientByNickname(targetName);
-	if (!target)
+	if (!target || !target->isRegistered())
 		return (sendError(client, IRC::ERR_NOSUCHNICK, targetName + " :No such nick"));
 
 	// If target already in channel

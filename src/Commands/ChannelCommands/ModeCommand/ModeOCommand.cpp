@@ -11,7 +11,7 @@ void	ModeOCommand::execute(Server &server, Client &client, Channel &channel, cha
 		return (sendError(client, IRC::ERR_NEEDMOREPARAMS, "MODE :Not enough parameters"));
 
 	Client	*target = server.getClientByNickname(targetNick);
-	if (!target)
+	if (!target || !target->isRegistered())
 		return (sendError(client, IRC::ERR_NOSUCHNICK, targetNick + " :No such nick"));
 	if (!channel.getClient(target->getFd()))
 		return (sendError(client, IRC::ERR_USERNOTINCHANNEL, targetNick + " " + channelName + " :They aren't on that channel"));

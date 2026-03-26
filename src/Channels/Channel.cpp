@@ -63,10 +63,14 @@ std::string	Channel::getPass() const
 	return (_pass);
 }
 
-void	Channel::setPass(const std::string pass)
+bool	Channel::setPass(const std::string pass)
 {
-	if (isValidPassword(pass))
-		_pass = pass;
+	if (isValidPassword(pass) || pass.size() == 0)
+		{
+			_pass = pass;
+			return (true);
+		}
+	return (false);
 }
 
 int	Channel::getUserLimit() const

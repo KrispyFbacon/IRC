@@ -13,7 +13,9 @@ void	ModeKCommand::execute(Client &client, Channel &channel, char sign, const st
 			return (sendError(client, IRC::ERR_NEEDMOREPARAMS, "MODE :Not enough parameters"));
 		if (!channel.getPass().empty())
 			return (sendError(client, IRC::ERR_KEYSET, channelName + " :Channel key already set"));
-		channel.setPass(key);
+		if (!channel.setPass(key))
+			sendError(client, IRC::ERR_BADCHANNELKEY,
+				channelName + " :Cannot join channel (+k)");
 		channel.broadcast(":" + clientPrefix + " MODE " + channelName + " +k " + key);
 	}
 	else

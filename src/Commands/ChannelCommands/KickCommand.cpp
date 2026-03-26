@@ -11,7 +11,7 @@ static void	kickTarget(Client &client, Channel *channel, const std::string &targ
 	const std::string	channelName = channel->getChannelName();
 
 	Client	*targetClient = channel->getClientByNickname(target);
-	if (!targetClient)
+	if (!targetClient || !targetClient->isRegistered())
 		return (sendError(client, IRC::ERR_USERNOTINCHANNEL,
 						target + " " + channelName + " :They aren't on that channel"));
 
