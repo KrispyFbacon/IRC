@@ -27,7 +27,7 @@ void	ModeLCommand::execute(Client &client, Channel &channel, char sign, const st
 	}
 	else
 	{
-		channel.setUserLimit(std::numeric_limits<int>::max());
+		channel.setUserLimit(static_cast<int>(std::numeric_limits<int>::max()));
 		channel.broadcast(":" + clientPrefix + " MODE " + channelName + " -l");
 	}
 }

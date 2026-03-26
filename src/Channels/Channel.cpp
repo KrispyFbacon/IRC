@@ -80,7 +80,7 @@ int	Channel::getUserLimit() const
 
 void	Channel::setUserLimit(const int userLimit)
 {
-	if (userLimit > 0 && userLimit < std::numeric_limits<int>::max())
+	if (userLimit > 0 && userLimit <= std::numeric_limits<int>::max())
 		_userLimit = userLimit;
 }
 
