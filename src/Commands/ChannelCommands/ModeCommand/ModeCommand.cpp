@@ -75,7 +75,7 @@ void	ModeCommand::execute(Server &server, Client &client, const Message &msg)
 		if (channel->getUserLimit() != std::numeric_limits<int>::max())
 		modeStr += "l";
 
-		return (client.sendMessage(":42IRC " + IRC::RPL_CHANNELMODEIS + " " + client.getNickname() + " " + channelName + " " + modeStr));
+		return (sendReply(client, IRC::RPL_CHANNELMODEIS, client.getNickname() + " " + channelName + " " + modeStr));
 	}
 
 	// Only channel operators may change modes

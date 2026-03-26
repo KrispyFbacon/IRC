@@ -368,6 +368,9 @@ void Server::handleClientMessage(int clientFd)
 	{
 		// Message parse
 		Message msg = parseMessage(line);
+		
+		if (msg.command.empty())
+			continue;
 
 		Print::Debug("FD: " + toString(clientFd) + " -> [" + line + "]");
 

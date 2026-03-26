@@ -20,7 +20,7 @@
 #include <algorithm>	// std::find
 
 // --- C++ Standard Tools (Allowed) ---
-#include <ctime> 		// time_t
+#include <ctime>		// time_t
 #include <iomanip>
 #include <sstream>
 #include <fstream>
@@ -29,16 +29,16 @@
 
 // --- Network / Socket Core ---
 #include <sys/socket.h>	// socket, setsockopt, getsockname, bind, connect, listen, accept, send, recv
-#include <sys/types.h> // socklen_t, ssize_t, pid_t
+#include <sys/types.h>	// socklen_t, ssize_t, pid_t
 #include <netinet/in.h>	// htons, htonl, ntohs, ntohl, INADDR_ANY (IPv4)
-#include <arpa/inet.h> 	// inet_addr, inet_ntoa, inet_ntop
-#include <netdb.h> 		// getprotobyname, gethostbyname, getaddrinfo, freeaddrinfo
+#include <arpa/inet.h>	// inet_addr, inet_ntoa, inet_ntop
+#include <netdb.h>		// getprotobyname, gethostbyname, getaddrinfo, freeaddrinfo
 
 // --- I/O & File Control ---
-#include <unistd.h> 	// close, lseek, (read, write - implied)
-#include <fcntl.h> 		// fcntl(), O_NONBLOCK (used for non-blocking I/O)
-#include <sys/stat.h> 	// fstat
-#include <sys/epoll.h> 	// epoll
+#include <unistd.h>		// close, lseek, (read, write - implied)
+#include <fcntl.h>		// fcntl(), O_NONBLOCK (used for non-blocking I/O)
+#include <sys/stat.h>	// fstat
+#include <sys/epoll.h>	// epoll
 
 // --- Signal Handling ---
 #include <signal.h>		// signal, sigaction, sigemptyset, sigfillset, sigaddset, sigdelset, sigismember
@@ -51,7 +51,27 @@
 #include "Color.hpp"
 #include "IRCCodes.hpp"
 
-//https://www.tutorialspoint.com/cplusplus/cpp_socket_programming.html
+// Manuals
+// https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.8
+// https://beej.us/guide/bgnet/html/split-wide/
+// https://www.tutorialspoint.com/cplusplus/cpp_socket_programming.htm
+
+// Api and ipv4/ipv6 explainers
+//https://www.geeksforgeeks.org/software-testing/what-is-an-api/
+//https://www.uptrends.com/what-is/ipv4
+
+
+// Fuctions Helpers
+//https://www.geeksforgeeks.org/c/non-blocking-io-with-pipes-in-c/
+//https://www.geeksforgeeks.org/cpp/socket-programming-in-cpp/
+//https://cplusplus.com/forum/unices/10016/
+//https://man7.org/linux/man-pages/man2/epoll_create.2.html
+//https://man7.org/linux/man-pages/man7/epoll.7.html
+//https://www.w3schools.com/cpp/cpp_vectors.asp
+//https://pubs.opengroup.org/onlinepubs/009695099/functions/setsockopt.html
+
+// Class Diagram
+//https://plantuml.com/class-diagram
 
 
 
@@ -62,24 +82,21 @@
 	#define DEBUG 1
 #endif
 
-// // 
-// #define SERVER_NAME "42IRC"
-// #define BACKLOG 10
-// #define BUFFER_SIZE 1024
-// #define MAX_MESSAGE_SIZE 4096
-// #define MAX_EVENTS 64 // 128 (64: clean & efficent, 128: very safe but more resource intensive)
-
 namespace Config
 {
 	// Server options
-	extern const std::string SERVER_NAME;
+	extern const std::string	SERVER_NAME;
 
 	//--- Network / Socket Core ---
-	const int BACKLOG          = 10;
-	const int BUFFER_SIZE      = 1024;
-	const int MAX_MESSAGE_SIZE = 4096;
-	const int MAX_EVENTS       = 64;
-	const int MAX_INVITED      = 50;
+	const int BACKLOG			= 10;
+	const int BUFFER_SIZE		= 1024;
+	const int MAX_MESSAGE_SIZE	= 4096;
+	const int MAX_EVENTS		= 64;
+	const int MAX_INVITED		= 50;
+
+	//--- IRC Limits ---
+	const size_t MAX_NICKNAME_LENGTH = 32;
+	const size_t MAX_CHANNEL_LENGTH  = 50;
 }
 
 // --- Colors ---
@@ -135,8 +152,8 @@ std::string	getFirstString(const std::string);
 std::string	toUpper(const std::string &str);
 
 // --- Command Helpers ---
+bool	isConnectionCommands(const std::string& cmd);
 bool	isValidNickname(const std::string& nick);
 bool	isValidChannelName(const std::string &name);
-bool	isConnectionCommands(const std::string& cmd);
 
 #endif

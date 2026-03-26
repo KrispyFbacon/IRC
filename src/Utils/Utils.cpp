@@ -14,7 +14,7 @@
 
 namespace Config
 {
-	const std::string SERVER_NAME = "42IRC";
+	const std::string	SERVER_NAME = "42IRC";
 }
 
 void Print::StdOut(const std::string &str)
@@ -55,9 +55,12 @@ void Print::Debug (const std::string& str)
 
 void Print::Ok (const std::string& str)
 {
-	std::cout << BOLD_G << "[ OK ] " << RST
-			  << str << RST
-	<< std::endl;
+	if (DEBUG)
+	{
+		std::cout << BOLD_G << "[ OK ] " << RST
+				<< str << RST
+		<< std::endl;
+	}
 }
 
 void Print::Error(const std::string &str)
@@ -70,17 +73,22 @@ void Print::Error(const std::string &str)
 
 void Print::Fail(const std::string &str)
 {
-	std::cerr << BOLD_R << "[ FAIL ] " << RST
-			  << str << RST << ": " 
-			  << NUM_COLOR << strerror(errno) << RST
-	<< std::endl;
+	if (DEBUG)
+	{
+		std::cerr << BOLD_R << "[ FAIL ] " << RST
+				<< str << RST
+		<< std::endl;
+	}
 }
 
 void Print::Warn(const std::string &str)
 {
-	std::cerr << BOLD_Y << "[ FAIL ] " << RST 
-			  << str << RST
-	<< std::endl;
+	if (DEBUG)
+	{
+		std::cerr << BOLD_Y << "[ WARN ] " << RST 
+				<< str << RST
+		<< std::endl;
+	}
 }
 
 
@@ -91,6 +99,7 @@ void Print::InputError(const std::string& str)
 			  << RST << " ./ircserv <port 1-65535> <password>"
 	<< std::endl;
 }
+
 
 /* ============================ Args Validations ============================ */
 
@@ -148,13 +157,24 @@ std::string	toUpper(const std::string &str)
 
 /* ============================ Command Helper ============================= */
 
+bool	isConnectionCommands(const std::string& cmd)
+{
+	return (cmd == "PASS" || cmd == "NICK" || cmd == "USER"
+			|| cmd == "QUIT" || cmd == "CAP"
+			|| cmd == "PING" || cmd == "PONG");
+}
+
 bool	isValidNickname(const std::string& nick)
 {
-	if (nick.empty() || nick.length() > 32)
+	if (nick.empty() || nick.length() > Config::MAX_NICKNAME_LENGTH)
 		return false;
 
+	// IRC RFC: Nicknames cannot start with a digit or a hyphen
+	if (std::isdigit(static_cast<unsigned char>(nick[0])) || nick[0] == '-')
+		return false;
+		
 	// The forbidden routing characters (No spaces, no prefixes!)
-	const std::string forbidden = " !@#&:?*";
+	const std::string forbidden = " !@#&:?*,.";
 
 	for (size_t i = 0; i < nick.length(); ++i)
 	{
@@ -175,16 +195,10 @@ bool	isValidNickname(const std::string& nick)
 	return true;
 }
 
-bool	isConnectionCommands(const std::string& cmd)
-{
-	return (cmd == "PASS" || cmd == "NICK" || cmd == "USER"
-			|| cmd == "QUIT" || cmd == "CAP"
-			|| cmd == "PING" || cmd == "PONG");
-}
-
 bool	isValidChannelName(const std::string &name)
 {
-	if (name.empty() || (name[0] != '#' && name[0] != '&') || name.size() < 2)
+	if (name.empty() || (name[0] != '#' && name[0] != '&')
+		|| name.size() < 2 || name.size() > Config::MAX_CHANNEL_LENGTH)
 		return (false);
 
 	for (size_t i = 1; i < name.size(); ++i)

@@ -5,7 +5,7 @@
 void	ModeOCommand::execute(Server &server, Client &client, Channel &channel, char sign, const std::string &targetNick)
 {
 	const std::string	channelName = channel.getChannelName();
-	const std::string	clientNick = client.getNickname();
+	const std::string	clientPrefix = client.getPrefix();
 
 	if (targetNick.empty())
 		return (sendError(client, IRC::ERR_NEEDMOREPARAMS, "MODE :Not enough parameters"));
@@ -21,7 +21,7 @@ void	ModeOCommand::execute(Server &server, Client &client, Channel &channel, cha
 	else if (channel.getModerator(target->getFd()))
 		channel.removeModerator(target->getFd());
 
-	channel.broadcast(":" + clientNick + " MODE " + channelName + " " + sign + "o " + targetNick);
+	channel.broadcast(":" + clientPrefix + " MODE " + channelName + " " + sign + "o " + targetNick);
 }
 
 // Standalone call: MODE #channel +o nick  or  MODE #channel -o nick

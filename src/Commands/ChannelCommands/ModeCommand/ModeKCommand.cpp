@@ -5,7 +5,7 @@
 void	ModeKCommand::execute(Client &client, Channel &channel, char sign, const std::string &key)
 {
 	const std::string	channelName = channel.getChannelName();
-	const std::string	clientNick = client.getNickname();
+	const std::string	clientPrefix = client.getPrefix();
 
 	if (sign == '+')
 	{
@@ -14,12 +14,12 @@ void	ModeKCommand::execute(Client &client, Channel &channel, char sign, const st
 		if (!channel.getPass().empty())
 			return (sendError(client, IRC::ERR_KEYSET, channelName + " :Channel key already set"));
 		channel.setPass(key);
-		channel.broadcast(":" + clientNick + " MODE " + channelName + " +k " + key);
+		channel.broadcast(":" + clientPrefix + " MODE " + channelName + " +k " + key);
 	}
 	else
 	{
 		channel.setPass("");
-		channel.broadcast(":" + clientNick + " MODE " + channelName + " -k");
+		channel.broadcast(":" + clientPrefix + " MODE " + channelName + " -k");
 	}
 }
 

@@ -6,7 +6,7 @@ void	ModeTCommand::execute(Client &client, Channel &channel, char sign)
 {
 	channel.setTopicLocked(sign == '+');
 
-	std::string	modeMsg = ":" + client.getNickname() + " MODE " + channel.getChannelName() + " " + sign + "t";
+	std::string	modeMsg = ":" + client.getPrefix() + " MODE " + channel.getChannelName() + " " + sign + "t";
 	channel.broadcast(modeMsg);
 }
 

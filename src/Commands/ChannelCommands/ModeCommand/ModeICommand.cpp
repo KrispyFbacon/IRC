@@ -6,15 +6,13 @@ void	ModeICommand::execute(Client &client, Channel &channel, char sign)
 {
 	channel.setInviteOnly(sign == '+');
 
-	std::string	modeMsg = ":" + client.getNickname() + " MODE " + channel.getChannelName() + " " + sign + "i";
+	std::string	modeMsg = ":" + client.getPrefix() + " MODE " + channel.getChannelName() + " " + sign + "i";
 	channel.broadcast(modeMsg);
 }
 
 // Standalone call: MODE #channel +i  or  MODE #channel -i
 void	ModeICommand::execute(Server &server, Client &client, const Message &msg)
 {
-	(void)server;
-
 	if (msg.params.size() < 2)
 		return (sendError(client, IRC::ERR_NEEDMOREPARAMS, "MODE :Not enough parameters"));
 

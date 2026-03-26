@@ -17,7 +17,7 @@ void QuitCommand::execute(Server& server, Client& client, const Message& msg)
 	// Broadcast the QUIT
 	if (client.isRegistered())
 	{
-		std::string broadcast = ":" + client.getPrefix() + " QUIT :Quit: " + reason;
+		std::string broadcast = ":" + client.getPrefix() + " QUIT :" + reason;
 
 		client.broadcast(broadcast);
 	}

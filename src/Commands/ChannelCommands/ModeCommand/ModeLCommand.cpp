@@ -5,7 +5,7 @@
 void	ModeLCommand::execute(Client &client, Channel &channel, char sign, const std::string &limitStr)
 {
 	const std::string	channelName = channel.getChannelName();
-	const std::string	clientNick = client.getNickname();
+	const std::string	clientPrefix = client.getPrefix();
 
 	if (sign == '+')
 	{
@@ -23,12 +23,12 @@ void	ModeLCommand::execute(Client &client, Channel &channel, char sign, const st
 			return (sendError(client, IRC::ERR_INVALIDLIMIT, channelName + " l * :Invalid limit mode parameter"));
 
 		channel.setUserLimit(static_cast<int>(limit));
-		channel.broadcast(":" + clientNick + " MODE " + channelName + " +l " + limitStr);
+		channel.broadcast(":" + clientPrefix + " MODE " + channelName + " +l " + limitStr);
 	}
 	else
 	{
 		channel.setUserLimit(std::numeric_limits<int>::max());
-		channel.broadcast(":" + clientNick + " MODE " + channelName + " -l");
+		channel.broadcast(":" + clientPrefix + " MODE " + channelName + " -l");
 	}
 }
 
