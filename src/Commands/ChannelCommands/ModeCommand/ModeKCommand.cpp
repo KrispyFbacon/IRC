@@ -14,8 +14,8 @@ void	ModeKCommand::execute(Client &client, Channel &channel, char sign, const st
 		if (!channel.getPass().empty())
 			return (sendError(client, IRC::ERR_KEYSET, channelName + " :Channel key already set"));
 		if (!channel.setPass(key))
-			sendError(client, IRC::ERR_BADCHANNELKEY,
-				channelName + " :Cannot join channel (+k)");
+			return (sendError(client, IRC::ERR_INVALIDKEY,
+					channelName + " :Key is not well-formed"));
 		channel.broadcast(":" + clientPrefix + " MODE " + channelName + " +k " + key);
 	}
 	else

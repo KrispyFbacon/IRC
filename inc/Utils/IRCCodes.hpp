@@ -63,6 +63,7 @@ namespace IRC
 	// MODE errors
 	extern const std::string ERR_UNKNOWNMODE;
 	extern const std::string ERR_KEYSET;
+	extern const std::string ERR_INVALIDKEY;
 	extern const std::string ERR_INVALIDLIMIT;
 }
 
