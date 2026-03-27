@@ -1,0 +1,90 @@
+%%{init: {
+  "theme": "dark",
+  "themeVariables": {
+    "background": "#1e1e1e",
+    "primaryColor": "#2d2d30",
+    "primaryTextColor": "#d4d4d4",
+    "primaryBorderColor": "#569cd6",
+    "lineColor": "#6a9955",
+    "secondaryColor": "#252526",
+    "tertiaryColor": "#1e1e1e",
+    "clusterBkg": "#252526",
+    "clusterBorder": "#3c3c3c",
+    "fontSize": "14px"
+  }
+}}%%
+sequenceDiagram
+    autonumber
+    actor User as Client (e.g., irssi, nc)
+    participant S as Server
+    participant C as Client (Object)
+    participant CF as CommandFactory
+    participant Cmd as ACommand (Nick/Privmsg)
+    participant Chan as Channel
+
+    %% Phase 1: Connection
+    rect rgba(86, 156, 214, 0.1)
+    Note over User,Chan: Phase 1: New Connection
+    User->>S: connect(IP, Port)
+    S->>S: epoll_wait() detects EPOLLIN on _fd
+    S->>S: handleNewConnection()
+    S->>C: new Client(clientFd)
+    activate C
+    C-->>S: Client initialized
+    deactivate C
+    S->>S: epollAdd(clientFd, EPOLLIN)
+    end
+
+    %% Phase 2: Registration (NICK)
+    rect rgba(106, 153, 85, 0.1)
+    Note over User,Chan: Phase 2: Parsing & Command Execution (e.g., NICK)
+    User->>S: "NICK myNick\r\n"
+    S->>S: epoll_wait() detects EPOLLIN on clientFd
+    S->>S: handleClientMessage(clientFd)
+    S->>C: appendBuffer(buffer, bytesRead)
+    
+    loop While messages in buffer
+        S->>C: getNextMessage(line)
+        C-->>S: true (message extracted)
+        S->>S: parseMessage(line)
+        S->>CF: execute(Server, Client, msg)
+        activate CF
+        CF->>Cmd: make() & execute() (NickCommand)
+        activate Cmd
+        Cmd->>C: setNickname("myNick")
+        Cmd->>S: checkRegistration(client)
+        Cmd-->>CF: delete cmd
+        deactivate Cmd
+        CF-->>S: return
+        deactivate CF
+    end
+    end
+
+    %% Phase 3: Messaging
+    rect rgba(215, 186, 125, 0.1)
+    Note over User,Chan: Phase 3: Broadcasting to a Channel
+    User->>S: "PRIVMSG #42porto :Hello everyone!\r\n"
+    S->>S: handleClientMessage(clientFd)
+    S->>CF: execute(Server, Client, msg)
+    activate CF
+    CF->>Cmd: make() & execute() (PrivmsgCommand)
+    activate Cmd
+    Cmd->>S: getChannel("#42porto")
+    S-->>Cmd: Channel*
+    Cmd->>Chan: broadcast(broadcastMsg, senderFd)
+    activate Chan
+    
+    loop For each Client in _clients map
+        Chan->>C: sendMessage(msg)
+        activate C
+        C->>User: send(fd, msg, size, 0)
+        deactivate C
+    end
+    
+    Chan-->>Cmd: return
+    deactivate Chan
+    Cmd-->>CF: delete cmd
+    deactivate Cmd
+    CF-->>S: return
+    deactivate CF
+    end

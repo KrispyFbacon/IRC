@@ -1,0 +1,101 @@
+classDiagram
+    %% Core System
+    class Server {
+        -int _fd
+        -int _epfd
+        -string _port
+        -string _password
+        -map~int, Client*~ _clients
+        -map~string, Channel*~ _channels
+        -CommandFactory _cmdFactory
+        +initServer()
+        +run()
+        +cleanup()
+        +getClient(int) Client*
+        +getChannel(string) Channel*
+        -handleNewConnection()
+        -handleClientMessage(int)
+    }
+
+    class Client {
+        -int _fd
+        -string _username
+        -string _nickname
+        -string _buffer
+        -bool _isRegistered
+        -map~string, Channel*~ _channels
+        +sendMessage(string msg)
+        +broadcast(string msg)
+        +getNextMessage(string& msg) bool
+        +addChannel(Channel&)
+    }
+
+    class Channel {
+        -string _name
+        -string _topic
+        -string _pass
+        -int _userLimit
+        -map~int, Client*~ _clients
+        -map~int, Client*~ _moderators
+        -vector~string~ _invited
+        +broadcast(string msg, int excludeFd)
+        +addClient(Client&) bool
+        +removeClient(int) bool
+        +addModerator(Client&) bool
+        +promoteToModerator(int) bool
+    }
+
+    %% Command Pattern
+    class CommandFactory {
+        -map~string, Creator~ _commands
+        +execute(Server&, Client&, Message&)
+    }
+
+    class ACommand {
+        <<abstract>>
+        +execute(Server&, Client&, Message&)*
+    }
+
+    class Message {
+        <<struct>>
+        +string command
+        +vector~string~ params
+    }
+
+    %% Command Inheritances (Grouped for readability)
+    class ConnectionCommands {
+        <<Nick, Pass, User, Ping, Pong, Quit>>
+    }
+    class ChannelCommands {
+        <<Join, Part, Topic, Kick, Invite, Mode>>
+    }
+    class MessagingCommands {
+        <<Privmsg, Motd>>
+    }
+
+    %% Exceptions
+    class ServerException {
+        -string _message
+        +what() const
+    }
+    class SocketException
+    class EpollException
+    class ClientException
+
+    %% Relationships
+    Server "1" *-- "*" Client : manages
+    Server "1" *-- "*" Channel : manages
+    Server "1" *-- "1" CommandFactory : uses
+
+    Client "*" <--> "*" Channel : interacts
+
+    CommandFactory ..> ACommand : instantiates / calls
+    CommandFactory ..> Message : parses
+
+    ACommand <|-- ConnectionCommands
+    ACommand <|-- ChannelCommands
+    ACommand <|-- MessagingCommands
+
+    ServerException <|-- SocketException
+    ServerException <|-- EpollException
+	ServerException <|-- ClientException

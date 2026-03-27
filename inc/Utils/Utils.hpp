@@ -51,30 +51,6 @@
 #include "Color.hpp"
 #include "IRCCodes.hpp"
 
-// Manuals
-// https://datatracker.ietf.org/doc/html/rfc1459#section-4.2.8
-// https://beej.us/guide/bgnet/html/split-wide/
-// https://www.tutorialspoint.com/cplusplus/cpp_socket_programming.htm
-
-// Api and ipv4/ipv6 explainers
-//https://www.geeksforgeeks.org/software-testing/what-is-an-api/
-//https://www.uptrends.com/what-is/ipv4
-
-
-// Fuctions Helpers
-//https://www.geeksforgeeks.org/c/non-blocking-io-with-pipes-in-c/
-//https://www.geeksforgeeks.org/cpp/socket-programming-in-cpp/
-//https://cplusplus.com/forum/unices/10016/
-//https://man7.org/linux/man-pages/man2/epoll_create.2.html
-//https://man7.org/linux/man-pages/man7/epoll.7.html
-//https://www.w3schools.com/cpp/cpp_vectors.asp
-//https://pubs.opengroup.org/onlinepubs/009695099/functions/setsockopt.html
-
-// Class Diagram
-//https://plantuml.com/class-diagram
-
-
-
 /* ================================ Defines ================================ */
 
 // --- Debug ---

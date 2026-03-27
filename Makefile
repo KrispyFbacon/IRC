@@ -153,5 +153,20 @@ fclean: clean
 
 re: fclean all
 
+
+#==============================================================================#
+#                                    EXTRACT                                   #
+#==============================================================================#
+
+extract:
+	@rm -f out.txt
+	@find inc src -type f \( -name "*.hpp" -o -name "*.cpp" \) | sort | while read f; do \
+		echo "===== $$f =====" >> out.txt; \
+		cat "$$f" >> out.txt; \
+		echo "" >> out.txt; \
+	done
+	@echo "$(GREEN)[SUCCESS]$(RESET) All code extracted to out.txt"
+
+
 # Phony Targets
-.PHONY: all clean fclean re r rv
+.PHONY: all clean fclean re r rv extract
